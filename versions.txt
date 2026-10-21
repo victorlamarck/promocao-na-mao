@@ -1,3 +1,9 @@
+v 0.2.4
+
+- Mostra na tela inicial quando as ofertas foram atualizadas pela última vez
+- Mais ofertas do Big Mais, agora também as da loja online
+_______________________________________________________________________________________________________________________
+
 v 0.2.3
 
 - Corrige erro ao abrir o app que impedia salvar a cor, a lista e as ofertas no celular
