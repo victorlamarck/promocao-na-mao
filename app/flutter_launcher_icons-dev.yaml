@@ -1,0 +1,8 @@
+# Ícones do flavor dev. Regenerar: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/icone/icone_dev.png"
+  android: true
+  adaptive_icon_background: "#1E7A66"
+  adaptive_icon_foreground: "assets/icone/frente_dev.png"
+  ios: true
+  remove_alpha_ios: true

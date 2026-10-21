@@ -1,0 +1,151 @@
+---
+// Política de privacidade (LGPD + exigência do AdSense). Mudou o que o site coleta? Mude aqui e a data.
+import Base from '../layouts/Base.astro';
+const email = 'oi.promocaonamao@gmail.com';
+---
+<Base titulo="Política de privacidade" descricao="Que dados o Promoção na Mão usa, para quê, e como pedir para apagar.">
+  <article class="texto">
+    <h1>Política de privacidade</h1>
+    <p class="suave">Atualizada em 21 de outubro de 2026</p>
+
+    <p>
+      O Promoção na Mão reúne as ofertas dos encartes dos supermercados de Governador Valadares.
+      Vale para o site e para o app (Android e iPhone). Você não precisa criar conta nem informar e-mail
+      ou telefone para usar. Esta página
+      explica, em linguagem simples, o pouco que usamos sobre você e por quê.
+    </p>
+    <p>
+      O responsável pelo Promoção na Mão e pelos dados tratados aqui (o "controlador", na LGPD) é a
+      <strong>VL Desenvolvimento e Tecnologia LTDA</strong>, CNPJ <strong>44.884.573/0001-09</strong>.
+      Contato: <a href={`mailto:${email}`}>{email}</a>.
+    </p>
+
+    <h2>O que guardamos</h2>
+    <h3>Sua lista de compras</h3>
+    <p>
+      Quando você toca em <strong>Adicionar</strong>, criamos uma lista de compras no nosso banco de dados,
+      com os itens, as quantidades, o mercado de cada oferta e o que já foi marcado como pego.
+      No navegador (ou no app) fica guardado só um <strong>código secreto</strong> que identifica a sua lista
+      (no armazenamento local do aparelho). Não é um cookie, e não é usado para rastrear você. O app também
+      guarda no celular uma cópia da sua lista, da última lista recebida e das ofertas, para funcionar sem internet.
+    </p>
+    <p>
+      Se você preencher <strong>Seu nome</strong> ao compartilhar, ele aparece para quem abrir o link
+      ("A Ana compartilhou esta lista com você"). É opcional.
+    </p>
+    <p>
+      <strong>Quem tem o link da lista consegue vê-la</strong> e, conforme o link, marcar o que já pegou.
+      Compartilhe só com quem você quiser. Não colocamos as listas no Google.
+    </p>
+
+    <h3>Sua localização</h3>
+    <p>
+      Só quando você toca em <strong>Perto de mim</strong> (no app, ao abrir a lista de mercados), o navegador
+      ou o celular pede permissão para usar a sua localização aproximada. A distância até os mercados é calculada no próprio aparelho: a localização
+      <strong>não é enviada nem guardada</strong> por nós. Se você negar, os mercados aparecem em ordem alfabética.
+    </p>
+
+    <h3>O que você busca</h3>
+    <p>
+      As palavras que você digita na busca são enviadas ao nosso banco de dados para encontrar as ofertas.
+      Não ligamos as buscas a você.
+    </p>
+
+    <h3>Dados técnicos</h3>
+    <p>
+      Como em qualquer site, os serviços que hospedam o Promoção na Mão registram dados técnicos de cada
+      acesso, como o endereço IP, o navegador e a data e hora, para o site funcionar e se proteger de abusos.
+    </p>
+
+    <h3>No app: travamentos, uso e avisos</h3>
+    <p>
+      O app usa serviços do <strong>Firebase (Google)</strong> para três coisas:
+    </p>
+    <ul>
+      <li><strong>Relatório de travamentos</strong> (Crashlytics): quando o app trava, vai um relatório técnico
+        (modelo do celular, versão do sistema e o ponto do código que falhou) para corrigirmos o erro.</li>
+      <li><strong>Estatística de uso</strong> (Analytics): quais telas são abertas, para sabermos o que é útil.
+        Registramos o tipo de tela ("uma lista recebida"), nunca o código da sua lista, e
+        <strong>não usamos o ID de publicidade</strong> do celular.</li>
+      <li><strong>Avisos de ofertas novas</strong>: só se você ligar o sino na página de um mercado. O Google
+        gera um identificador de notificação para o seu celular; ele não fica no nosso banco de dados. Para
+        parar, desligue o sino ou as notificações do app nas configurações do celular.</li>
+    </ul>
+
+    <h2>Com quem os dados ficam</h2>
+    <ul>
+      <li><strong>Supabase</strong>: o banco de dados das ofertas e das listas, em servidores em São Paulo.</li>
+      <li><strong>Firebase (Google)</strong>: hospeda as páginas do site e, no app, cuida dos relatórios de travamento, da estatística de uso e dos avisos.</li>
+      <li><strong>Google AdSense e AdMob</strong>: anúncios do Google nos espaços sem anúncio vendido (site e app Android).</li>
+      <li><strong>GitHub</strong>: guarda as cópias de segurança diárias do banco de dados (ver abaixo).</li>
+      <li><strong>Google Fonts</strong>: entrega as fontes do site; o seu navegador as baixa diretamente do Google.</li>
+      <li><strong>Google AdSense</strong>: quando houver anúncios do Google no site (ver abaixo).</li>
+    </ul>
+    <p>Não vendemos seus dados e não os passamos a anunciantes.</p>
+
+    <h2>Anúncios e cookies</h2>
+    <p>
+      O site é gratuito e se mantém com anúncios, sempre marcados com o selo <strong>Anúncio</strong>
+      ou <strong>Patrocinado</strong>. Os anúncios que vendemos diretamente para o comércio local não usam
+      nenhum dado seu: são os mesmos para todo mundo.
+    </p>
+    <p>
+      Nos espaços sem anúncio vendido podem aparecer anúncios do <strong>Google AdSense</strong>. O Google e
+      seus parceiros usam cookies para mostrar anúncios com base nas suas visitas a este e a outros sites.
+      Você pode desativar os anúncios personalizados nas
+      <a href="https://myadcenter.google.com/" rel="noopener" target="_blank">configurações de anúncios do Google</a>
+      e saber mais em <a href="https://policies.google.com/technologies/ads?hl=pt-BR" rel="noopener" target="_blank">como o Google usa cookies em anúncios</a>.
+      O próprio Promoção na Mão não cria cookies.
+    </p>
+    <p>
+      No <strong>app Android</strong>, os espaços sem anúncio vendido podem mostrar anúncios do
+      <strong>Google AdMob</strong>. Para isso o Google usa o <strong>ID de publicidade</strong> do celular (um
+      código do Android que não é o seu nome nem o seu telefone) e dados técnicos do aparelho, para escolher o
+      anúncio, contar visualizações e evitar fraude. Você pode apagar ou trocar esse ID, ou desligar os anúncios
+      personalizados, em <strong>Configurações → Privacidade → Anúncios</strong> do Android. Mais em
+      <a href="https://policies.google.com/technologies/partner-sites?hl=pt-BR" rel="noopener" target="_blank">como o Google usa dados de apps parceiros</a>.
+    </p>
+
+    <h2>Links para outros sites</h2>
+    <p>
+      Os botões <strong>Enviar pelo WhatsApp</strong>, <strong>Como chegar</strong> (Google Maps) e os anúncios
+      levam para outros serviços, que têm as suas próprias políticas de privacidade.
+    </p>
+
+    <h2>Por quanto tempo</h2>
+    <p>
+      A lista fica guardada até você apagá-la, ou até ficar <strong>6 meses sem nenhuma mudança</strong>,
+      quando a apagamos automaticamente. Você pode tirar itens a qualquer momento ou apagar a lista
+      inteira no botão <strong>Apagar minha lista</strong>. Ela some na hora do nosso banco
+      de dados, e quem recebeu o link deixa de vê-la. Para não perder listas por falha, fazemos uma
+      cópia de segurança do banco por dia, guardada por <strong>30 dias</strong>; depois disso a lista apagada
+      some também das cópias. Se você limpou os dados do navegador e ficou sem
+      acesso a uma lista antiga, escreva para o e-mail abaixo com o link dela que nós apagamos. Passo a passo em
+      <a href="/apagar-dados/">Como apagar seus dados</a>.
+    </p>
+
+    <h2>Seus direitos (LGPD)</h2>
+    <p>
+      Pela Lei Geral de Proteção de Dados (Lei 13.709/2018), você pode pedir para saber quais dados seus
+      temos, corrigi-los ou apagá-los, entre outros direitos. Basta escrever para
+      <a href={`mailto:${email}?subject=${encodeURIComponent('Privacidade - Promoção na Mão')}`}>{email}</a>.
+      Respondemos em até 15 dias.
+    </p>
+
+    <h2>Crianças</h2>
+    <p>O site é feito para adultos que fazem as compras da casa e não busca coletar dados de crianças.</p>
+
+    <h2>Mudanças</h2>
+    <p>
+      Se mudarmos o que fazemos com dados, esta página será atualizada, com a nova data no topo.
+    </p>
+  </article>
+</Base>
+
+<style>
+  .texto { line-height: 1.6; }
+  .texto h1 { font-size: 30px; line-height: 36px; }
+  .texto h2 { font-size: 20px; margin-top: 28px; }
+  .texto h3 { font-family: 'Nunito', system-ui, sans-serif; font-weight: 800; font-size: 16px; margin-top: 16px; }
+  .texto p, .texto ul { margin: 8px 0; }
+</style>

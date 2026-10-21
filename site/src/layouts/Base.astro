@@ -1,0 +1,203 @@
+---
+// Layout de todas as páginas (protótipo: Web-Inicio.dc.html). Com `comLista`, a lista
+// fica ao lado das ofertas (no celular, embaixo).
+import MinhaLista from '../components/MinhaLista.tsx';
+import ContagemLista from '../components/ContagemLista.tsx';
+import { ehProd, contatoAnuncie, adsenseCliente, lojaAndroid, lojaIos, pacoteAndroid } from '../lib/config';
+
+interface Props { titulo: string; descricao?: string; comLista?: boolean; termo?: string; indexar?: boolean; botaoLista?: boolean; imagem?: string }
+const { titulo, descricao = 'As ofertas dos encartes dos supermercados de Governador Valadares numa lista só.', comLista = false, termo = '', indexar = true, botaoLista = true, imagem = '/previa/site.png' } = Astro.props;
+const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · Promoção na Mão`;
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{tituloCompleto}</title>
+  <meta name="description" content={descricao}>
+  {(!indexar || !ehProd) && <meta name="robots" content="noindex">}  <!-- o dev (.web.app) nunca vai para o Google -->
+  <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)}>  <!-- endereço oficial (com www), mesmo se abrirem sem www -->
+
+  <meta property="og:title" content={tituloCompleto}>
+  <meta property="og:description" content={descricao}>
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Promoção na Mão">
+  <!-- prévia do link no WhatsApp: src/pages/previa/[id].png.ts -->
+  <meta property="og:image" content={new URL(imagem, Astro.site)}>
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#1E7A66">
+  {adsenseCliente && <meta name="google-adsense-account" content={adsenseCliente}>}
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Nunito:wght@400;600;700;800&display=swap">
+</head>
+<body>
+  {!ehProd && <div class="faixa-dev">DEV</div>}
+  <header class="topo">
+    <div class="topo-dentro">
+      <a href="/" class="marca">
+        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="#1E7A66"></path><circle cx="31" cy="15" r="2.8" fill="#FFFFFF"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"></path></svg>
+        <span class="f">Promoção <span class="verde">na Mão</span></span>
+      </a>
+      <form class="busca" action="/buscar" method="get" role="search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <label for="q" class="so-leitor">Buscar produto</label>
+        <input id="q" name="q" type="search" value={termo} placeholder="Buscar nos encartes de GV: arroz, café, cerveja…" autocomplete="off" required>
+      </form>
+      {botaoLista && <a href="/#lista" class="botao botao-cheio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"></path></svg>
+        <ContagemLista client:idle />
+      </a>}
+    </div>
+  </header>
+
+  {comLista ? (
+    <div class="colunas">
+      <main><slot /></main>
+      <MinhaLista client:load />
+    </div>
+  ) : (
+    <main class="estreito"><slot /></main>
+  )}
+
+  <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
+
+  {(lojaAndroid || lojaIos) && (
+    <div id="abrir-app" class="folha" role="dialog" aria-labelledby="abrir-app-titulo" aria-describedby="abrir-app-texto" hidden
+      data-android={lojaAndroid} data-ios={lojaIos} data-pacote={pacoteAndroid}>
+      <h2 id="abrir-app-titulo">Prefere usar o app?</h2>
+      <p id="abrir-app-texto">Abra esta mesma página no app Promoção na Mão ou continue aqui no navegador.</p>
+      <a class="botao botao-cheio botao-grande" id="abrir-app-sim" href="#">Abrir no app</a>
+      <button type="button" class="botao botao-grande" id="abrir-app-nao">Continuar no navegador</button>
+    </div>
+  )}
+
+  <footer class="rodape">
+    <div class="rodape-dentro">
+      <span>Promoção na Mão · ofertas dos encartes de Governador Valadares</span>
+      <span class="links"><a href={contatoAnuncie}>Para mercados</a><a href={contatoAnuncie}>Anuncie</a><a href="/privacidade/">Privacidade</a></span>
+    </div>
+  </footer>
+
+  <script>
+    import '../scripts/adicionar';
+    import '../scripts/abrirApp';
+  </script>
+</body>
+</html>
+
+<style is:global>
+  :root {
+    --fundo: #F4F8F7; --texto: #1B1D1C; --suave: #4A4F4C; --linha: #D9DDD9; --linha-clara: #E4E7E3;
+    --contorno: #707971; --verde: #1E7A66; --verde-escuro: #0E372E; --verde-claro: #D6E7E3; --cinza: #EEF0EC;
+    --branco: #FFFFFF; --anuncio: #BEEAF6; --anuncio-texto: #001F26;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font-family: 'Nunito', system-ui, sans-serif; font-size: 16px; line-height: 1.4; }
+  h1, h2, h3, .f { font-family: 'Fredoka', 'Nunito', system-ui, sans-serif; font-weight: 600; margin: 0; }
+  a { color: var(--verde); } a:hover { color: var(--verde-escuro); }
+  button { font: inherit; cursor: pointer; }
+  button:disabled { cursor: progress; opacity: .7; }
+  :focus-visible { outline: 3px solid var(--verde); outline-offset: 2px; }
+  .so-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .verde { color: var(--verde); }
+  .suave { color: var(--suave); font-size: 13px; }
+  [hidden] { display: none !important; }
+
+  .faixa-dev { position: fixed; top: 10px; right: -30px; z-index: 10; transform: rotate(45deg); background: #B3261E; color: #fff; font-weight: 800; font-size: 12px; padding: 2px 36px; pointer-events: none; }
+
+  .topo { background: var(--branco); border-bottom: 1px solid var(--linha); }
+  .topo-dentro { max-width: 1240px; margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--texto); font-size: 24px; }
+  .busca { flex: 1 1 320px; min-width: 0; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; border-radius: 999px; background: var(--cinza); }
+  .busca input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--texto); outline: none; }
+  .busca input::placeholder { color: var(--suave); }
+  .busca:focus-within { outline: 3px solid var(--verde); outline-offset: 2px; }
+
+  .botao { min-height: 40px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 700; text-decoration: none; border: 1px solid var(--contorno); background: transparent; color: var(--verde); }
+  .botao-cheio { border: 0; background: var(--verde); color: var(--branco); }
+  .botao-cheio:hover { color: var(--branco); background: var(--verde-escuro); }
+  .botao-claro { border: 0; background: var(--verde-claro); color: var(--verde-escuro); }
+  .botao-grande { min-height: 48px; font-size: 15px; font-weight: 800; padding: 0 24px; }
+
+  .colunas { max-width: 1240px; margin: 0 auto; padding: 24px 16px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .colunas > main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+  .estreito { max-width: 600px; margin: 0 auto; padding: 20px 16px 32px; display: flex; flex-direction: column; gap: 16px; }
+
+  .destaque { border-radius: 24px; background: var(--verde); color: var(--branco); padding: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; }
+  .destaque h1 { font-size: clamp(28px, 4vw, 36px); line-height: 1.17; text-wrap: balance; }
+  .destaque p { margin: 8px 0 0; color: var(--verde-claro); max-width: 520px; line-height: 1.5; }
+
+  .secao { display: flex; flex-direction: column; gap: 12px; }
+  .secao-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .secao h2 { font-size: 22px; line-height: 28px; }
+
+  .atalhos { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .grade-mercados { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .mercado-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); color: var(--texto); text-decoration: none; }
+  .mercado-card:hover { border-color: var(--verde); color: var(--texto); }
+  .avatar { width: 44px; height: 44px; flex: none; border-radius: 22px; color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+  .mercado-card strong { display: block; font-size: 15px; }
+
+  .grade-ofertas { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; } /* 2 colunas no celular */
+  .card { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); }
+  .card.na-lista { border: 2px solid var(--verde); padding: 11px; }
+  .card-link { color: inherit; text-decoration: none; } .card-link:hover { text-decoration: underline; color: inherit; }
+  .card-mercado { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--suave); }
+  .ponto { width: 8px; height: 8px; flex: none; border-radius: 4px; }
+  .card h3 { font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; font-size: 15px; line-height: 20px; min-height: 40px; }
+  .card .card-titulo { font-size: 20px; line-height: 26px; }
+  .card-preco { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+  .preco { font-family: 'Fredoka', 'Nunito', sans-serif; font-weight: 600; font-size: 22px; line-height: 28px; color: var(--verde-escuro); }
+  .etiqueta { align-self: flex-start; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: var(--verde-claro); color: var(--verde-escuro); }
+  .etiqueta-condicao { background: #FFE0B2; color: #4A2800; }
+  .etiqueta-vence { background: #FFF3C4; color: #5C4300; }
+  .etiqueta-vence.venceu { background: #FDE7E7; color: #8C1D18; }
+  .grupo-item .etiqueta { display: inline-block; vertical-align: middle; margin-left: 4px; }
+  .card-acao { margin-top: auto; padding-top: 4px; }
+  .add { width: 100%; height: 44px; border: 0; border-radius: 999px; background: var(--verde); color: var(--branco); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .contador { height: 44px; border-radius: 999px; background: var(--verde); color: var(--branco); display: flex; align-items: center; justify-content: space-between; }
+  .contador button { width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: var(--branco); display: flex; align-items: center; justify-content: center; }
+  .contador .qtd { font-weight: 800; }
+
+  .anuncio { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); color: var(--texto); text-decoration: none; }
+  .anuncio-faixa { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; }
+  .anuncio img { width: 100%; border-radius: 8px; object-fit: cover; }
+  .selo { align-self: flex-start; font-size: 12px; font-weight: 700; color: var(--anuncio-texto); background: var(--anuncio); padding: 2px 8px; border-radius: 8px; }
+
+  .lista { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 24px; background: var(--branco); border: 1px solid var(--linha); position: sticky; top: 16px; }
+  .lista-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .lista h2 { font-size: 22px; line-height: 28px; }
+  .grupo { display: flex; flex-direction: column; border: 1px solid var(--linha); border-radius: 16px; overflow: hidden; background: var(--branco); }
+  .grupo-topo { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--fundo); }
+  .grupo-topo strong { flex: 1; font-size: 14px; }
+  .grupo-item { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 4px 12px; border-top: 1px solid var(--linha-clara); font-size: 14px; }
+  .grupo-item span:first-child { flex: 1; min-width: 0; }
+  .pego { text-decoration: line-through; color: var(--suave); }
+  .compartilhar { display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 16px; background: var(--verde-claro); color: var(--verde-escuro); }
+  .campo { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 4px 0 12px; border-radius: 12px; background: var(--branco); }
+  .campo input { flex: 1; min-width: 0; border: 0; font: inherit; font-size: 14px; background: transparent; color: var(--texto); }
+  .tracejado { padding: 14px; border-radius: 16px; border: 1px dashed var(--contorno); font-size: 14px; }
+
+  .folha { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; flex-direction: column; gap: 10px; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); background: var(--branco); border-radius: 24px 24px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,.18); }
+  .folha h2 { font-size: 20px; } .folha p { margin: 0 0 4px; color: var(--suave); }
+  .aviso { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); margin: 0; max-width: calc(100% - 32px); padding: 12px 16px; border-radius: 12px; background: var(--texto); color: var(--branco); font-weight: 700; font-size: 14px; }
+  .aviso:empty { display: none; }
+
+  .rodape { border-top: 1px solid var(--linha); background: var(--branco); }
+  .rodape-dentro { max-width: 1240px; margin: 0 auto; padding: 20px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--suave); }
+  .rodape .links { display: flex; gap: 16px; }
+
+  @media (max-width: 640px) {
+    .lista { position: static; } .topo-dentro { gap: 10px; } .marca { font-size: 20px; }
+    .colunas, .estreito { padding-top: 16px; }
+    .grade-ofertas { gap: 8px; } .card { padding: 10px; } .card.na-lista { padding: 9px; }
+    .card h3 { font-size: 14px; line-height: 19px; } .preco { font-size: 20px; }
+    .destaque { padding: 20px; }
+  }
+</style>

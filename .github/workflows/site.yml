@@ -1,0 +1,103 @@
+# Site (Astro, site/). As páginas de ofertas são geradas no build, então o site é refeito:
+#   PR em site/                       → build (confere que compila)
+#   push no branch dev em site/       → publica o DEV  (promocaonamao-f08a7.web.app)
+#   push na main em site/             → publica o PROD (promocaonamao-1 / www.promocaonamao.com.br)
+#   depois do "Dados" (aviso do repositório privado promocao-na-mao-dados: repository_dispatch "dados"),
+#   todo dia às 03:05 e pelo botão
+#                                     → refaz os dois: dev do branch dev, prod da main
+# Cada um com o seu banco: dev → APP_CONFIG_DEV, prod → APP_CONFIG_PROD (Supabase e contatos).
+# Deploy: FIREBASE_SA_DEV, FIREBASE_SA_PROD.
+name: Site
+
+on:
+  pull_request:
+    paths: ['site/**', '.github/workflows/site.yml']
+  push:
+    branches: [main, dev]
+    paths: ['site/**', '.github/workflows/site.yml']
+  repository_dispatch:
+    types: [dados]
+  schedule:
+    - cron: '5 6 * * *' # 03:05 em Brasília: ofertas vencidas saem do site
+  workflow_dispatch:
+
+# Token da esteira só lê o repositório (nada aqui escreve no GitHub).
+permissions:
+  contents: read
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        alvo: [dev, prod]
+    concurrency: site-${{ matrix.alvo }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # para poder trocar para o branch dev/main
+      - name: O que fazer neste evento
+        id: plano
+        env:
+          EVENTO: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          ALVO: ${{ matrix.alvo }}
+        run: |
+          branch=$([ "$ALVO" = prod ] && echo main || echo dev)
+          build=0; publicar=0; versao=""
+          case "$EVENTO" in
+            pull_request) [ "$ALVO" = dev ] && build=1 ;; # o PR é conferido uma vez só
+            push) [ "$REF" = "refs/heads/$branch" ] && build=1 && publicar=1 ;;
+            *) git rev-parse -q --verify "origin/$branch" > /dev/null && build=1 && publicar=1 && versao="origin/$branch" ;;
+          esac
+          [ -n "$versao" ] && git checkout -q "$versao"
+          echo "build=$build" >> "$GITHUB_OUTPUT"; echo "publicar=$publicar" >> "$GITHUB_OUTPUT"
+          echo "$ALVO: build=$build publicar=$publicar versao=${versao:-$REF}"
+
+      - uses: actions/setup-node@v5
+        if: steps.plano.outputs.build == '1'
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Config do build
+        if: steps.plano.outputs.build == '1'
+        env:
+          CONFIG: ${{ matrix.alvo == 'prod' && secrets.APP_CONFIG_PROD || secrets.APP_CONFIG_DEV }}
+          ALVO: ${{ matrix.alvo }}
+        run: |
+          [ -n "$CONFIG" ] || { echo "::error::falta o secret APP_CONFIG_$(echo "$ALVO" | tr a-z A-Z)"; exit 1; }
+          c() { printf '%s' "$CONFIG" | jq -r ".$1 // empty"; }
+          {
+            echo "PUBLIC_SUPABASE_URL=$(c SUPABASE_URL)"
+            echo "PUBLIC_SUPABASE_PUBLISHABLE_KEY=$(c SUPABASE_PUBLISHABLE_KEY)"
+            echo "PUBLIC_CONTATO_ANUNCIE=$(c CONTATO_ANUNCIE)"
+            echo "PUBLIC_ADSENSE_CLIENT=$(c ADSENSE_CLIENT)"
+            echo "PUBLIC_PLAY_STORE_URL=$(c PLAY_STORE_URL)"
+            echo "PUBLIC_APP_STORE_URL=$(c APP_STORE_URL)"
+            echo "ANDROID_SHA256=$(c ANDROID_SHA256)"
+            if [ "$ALVO" = prod ]; then
+              echo "PUBLIC_FLAVOR=prod"; echo "SITE_URL=https://www.promocaonamao.com.br"; echo "PROJETO=promocaonamao-1"
+            else
+              echo "PUBLIC_FLAVOR=dev"; echo "SITE_URL=https://promocaonamao-f08a7.web.app"; echo "PROJETO=promocaonamao-f08a7"
+            fi
+          } >> "$GITHUB_ENV"
+      - name: Testes, tipos e build
+        if: steps.plano.outputs.build == '1'
+        working-directory: site
+        run: |
+          npm ci
+          npm test
+          npx astro check
+          npm run build # inclui a cópia para .well-known/ (App Links)
+
+      - name: Publicar no Firebase Hosting
+        if: steps.plano.outputs.publicar == '1'
+        working-directory: site
+        env:
+          SA: ${{ matrix.alvo == 'prod' && secrets.FIREBASE_SA_PROD || secrets.FIREBASE_SA_DEV }}
+        run: |
+          [ -n "$SA" ] || { echo "::error::falta o secret FIREBASE_SA_${{ matrix.alvo == 'prod' && 'PROD' || 'DEV' }}"; exit 1; }
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx -y firebase-tools@14.27.0 deploy --only hosting --project "$PROJETO" --non-interactive

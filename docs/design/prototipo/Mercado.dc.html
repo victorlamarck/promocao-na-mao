@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Big Mais — Promoção na Mão</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+h1,h2,.f{font-family:'Fredoka','Nunito',system-ui,sans-serif!important;font-weight:600!important}
+a{color:#1E7A66}a:hover{color:#0E372E}
+input[type=radio]{accent-color:#1E7A66}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; background: #F4F8F7; font-family: 'Nunito', system-ui, sans-serif; color: #1B1D1C; overflow: hidden">
+
+  <header style="padding: 8px 16px 8px 4px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 8px; height: 64px">
+      <a href="Mercados.dc.html" aria-label="Voltar para Mercados" style="width: 48px; height: 48px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 24px; color: #1B1D1C">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+      </a>
+      <span style="width: 40px; height: 40px; flex: none; border-radius: 20px; background: #1D4ED8; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px">BM</span>
+      <div style="display: flex; flex-direction: column; min-width: 0">
+        <h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600">Big Mais</h1>
+        <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">Folheto de outubro · vale até 03/11</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: 8px; overflow-x: auto; margin-right: -16px; padding: 0 16px 4px 12px">
+      <sc-for list="{{chips}}" as="c" hint-placeholder-count="5">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="{{c.style}}">
+          <sc-if value="{{c.on}}" hint-placeholder-val="{{false}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
+          </sc-if>
+          {{c.label}}
+        </button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 16px 24px">
+    <div style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 16px; background: #D6E7E3; color: #0E372E; font-size: 14px; line-height: 20px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+      <span>O selo verde mostra o preço para quem tem cadastro no <strong>bigmais+</strong>.</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{itens}}" as="o" hint-placeholder-count="4">
+        <div style="{{o.cardStyle}}">
+          <a href="Oferta.dc.html" style="display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: #1B1D1C">
+            <div style="height: 96px; border-radius: 8px; background: #EEF0EC; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #4A4F4C">imagem do encarte</div>
+            <span style="font-size: 13px; line-height: 18px; font-weight: 600; min-height: 36px; padding: 0 2px">{{o.nome}}</span>
+            <span style="display: flex; align-items: baseline; gap: 4px; padding: 0 2px">
+              <span style="font-size: 12px; color: #4A4F4C">{{o.prefixo}}</span>
+              <span style="font-size: 20px; line-height: 26px; font-family: 'Fredoka', 'Nunito', sans-serif; font-weight: 600; color: #0E372E">R$ {{o.preco}}</span>
+            </span>
+            <span style="align-self: flex-start; font-size: 12px; line-height: 16px; font-weight: 600; color: #0E372E; background: #D6E7E3; padding: 2px 8px; border-radius: 8px">R$ {{o.clube}} no bigmais+</span>
+          </a>
+          <sc-if value="{{o.fora}}" hint-placeholder-val="{{true}}">
+            <button type="button" onClick="{{o.mais}}" aria-label="{{o.addLabel}}" style="height: 44px; border: 0; border-radius: 22px; background: #1E7A66; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+              Adicionar
+            </button>
+          </sc-if>
+          <sc-if value="{{o.dentro}}" hint-placeholder-val="{{false}}">
+            <div style="height: 44px; border-radius: 22px; background: #1E7A66; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between">
+              <button type="button" onClick="{{o.menos}}" aria-label="{{o.menosLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <sc-if value="{{o.ehUm}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></sc-if>
+                <sc-if value="{{o.maisDeUm}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></sc-if>
+              </button>
+              <span aria-live="polite" style="font-size: 16px; font-weight: 700">{{o.qtd}}</span>
+              <button type="button" onClick="{{o.mais}}" aria-label="{{o.maisLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+              </button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{vazio}}" hint-placeholder-val="{{false}}">
+      <div style="padding: 24px 16px; border-radius: 16px; background: #F4F8F7; text-align: center; font-size: 14px; line-height: 20px; color: #4A4F4C">Nenhuma oferta desta categoria no encarte atual.</div>
+    </sc-if>
+
+    <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px">
+      <span style="align-self: flex-start; font-size: 12px; line-height: 16px; font-weight: 600; color: #001F26; background: #BEEAF6; padding: 2px 8px; border-radius: 8px">Anúncio</span>
+      <div style="height: 90px; border-radius: 16px; background: #F4F8F7; border: 1px solid #D9DDD9; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #4A4F4C">[Banner do anunciante · 358×90]</div>
+    </div>
+  </main>
+
+  <sc-if value="{{snack}}" hint-placeholder-val="{{false}}">
+    <div role="status" style="position: absolute; left: 16px; right: 16px; bottom: 92px; min-height: 48px; padding: 4px 8px 4px 16px; border-radius: 4px; background: #2D322E; color: #EEF2EB; display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.25)">
+      <span style="flex: 1">{{snackTexto}}</span>
+      <a href="Lista.dc.html" style="height: 40px; padding: 0 12px; display: flex; align-items: center; color: #8EBCB2; font-weight: 600; text-decoration: none">Ver lista</a>
+    </div>
+  </sc-if>
+
+  <nav aria-label="Navegação principal" style="height: 80px; flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #EEF0EC; padding-top: 12px; box-sizing: border-box">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path></svg></span>Início
+    </a>
+    <a href="Busca.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>Buscar
+    </a>
+    <a href="Mercados.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #1B1D1C; font-size: 12px; line-height: 16px; font-weight: 700">
+      <span style="width: 64px; height: 32px; border-radius: 16px; background: #D6E7E3; color: #0E372E; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9v11h16V9"></path><path d="M3 9h18"></path><path d="M10 20v-6h4v6"></path></svg></span>Mercados
+    </a>
+    <a href="Lista.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"></path></svg></span>Lista
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'Tudo', lista: {}, snack: null };
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  aviso(msg) {
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ snack: null }), 3000);
+    return msg;
+  }
+  renderVals() {
+    const todos = [
+      { id: 'pow', nome: 'Isotônico Powerade 500ml', preco: '4,99', clube: '3,99', cat: 'Bebidas' },
+      { id: 'cafe', nome: 'Café Gourmet 3 Corações 250g', preco: '29,90', clube: '24,99', cat: 'Mercearia' },
+      { id: 'ling', nome: 'Linguiça Mista Perdigão kg', preco: '17,90', clube: '15,90', cat: 'Açougue' },
+      { id: 'chick', nome: 'Mini Chicken Perdigão 1kg', preco: '22,90', clube: '16,99', cat: 'Açougue' },
+      { id: 'bisc', nome: 'Biscoito Choco Biscuit Bauducco 80g', preco: '8,99', clube: '7,99', cat: 'Mercearia' },
+      { id: 'hein', nome: 'Cerveja Heineken Lata 473ml', preco: '5,49', clube: '4,99', cat: 'Bebidas' },
+      { id: 'omo', nome: 'Sabão em pó Omo 1,6kg', preco: '28,90', clube: '26,90', cat: 'Limpeza' },
+      { id: 'leite', nome: 'Leite Fermentado 480g', preco: '8,55', clube: '6,49', cat: 'Frios e laticínios' },
+    ];
+    const c = this.state.cat;
+    const L = this.state.lista;
+    const setItem = (id, q, msg) => {
+      const novo = Object.assign({}, L);
+      if (q > 0) novo[id] = q; else delete novo[id];
+      this.setState({ lista: novo, snack: this.aviso(msg) });
+    };
+    const card = 'display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 16px; background: #FFFFFF; ';
+    const itens = todos.filter((i) => c === 'Tudo' || i.cat === c).map((p) => {
+      const q = L[p.id] || 0;
+      return {
+        nome: p.nome, preco: p.preco, clube: p.clube,
+        prefixo: q ? q + '× de' : '',
+        qtd: q, fora: q === 0, dentro: q > 0, ehUm: q === 1, maisDeUm: q > 1,
+        addLabel: 'Adicionar ' + p.nome + ' à lista',
+        maisLabel: 'Mais um ' + p.nome,
+        menosLabel: q === 1 ? 'Tirar ' + p.nome + ' da lista' : 'Menos um ' + p.nome,
+        mais: () => setItem(p.id, q + 1, q ? (q + 1) + '× ' + p.nome : 'Adicionado no Big Mais'),
+        menos: () => setItem(p.id, q - 1, q > 1 ? (q - 1) + '× ' + p.nome : 'Tirado da lista'),
+        cardStyle: card + (q ? 'border: 2px solid #1E7A66; padding: 7px' : 'border: 1px solid #D9DDD9'),
+      };
+    });
+    const base = 'flex: none; height: 32px; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; ';
+    const cats = ['Tudo', 'Açougue', 'Bebidas', 'Mercearia', 'Frios e laticínios', 'Limpeza'];
+    return {
+      chips: cats.map((n) => {
+        const on = n === c;
+        return { label: n, on, pick: () => this.setState({ cat: n }), style: base + (on ? 'border: 0; padding-left: 8px; background: #D6E7E3; color: #0E372E' : 'border: 1px solid #707971; background: transparent; color: #4A4F4C') };
+      }),
+      itens, vazio: itens.length === 0,
+      snack: !!this.state.snack, snackTexto: this.state.snack || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

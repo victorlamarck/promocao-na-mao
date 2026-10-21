@@ -1,0 +1,92 @@
+---
+// Início (protótipo Web-Inicio.dc.html): destaque, mercados, ofertas de hoje e a lista ao lado.
+import Base from '../layouts/Base.astro';
+import CardOferta from '../components/CardOferta.tsx';
+import Anuncio from '../components/Anuncio.astro';
+import { dados } from '../lib/dados';
+import { diaMes, mercado, intercalar, atualizadoEm } from '../lib/formato';
+
+const { ofertas, redes, lojas, anuncios } = await dados();
+
+// Ofertas de hoje: revezando as redes (uma de cada por vez), para não ficar só no último encarte importado.
+const porRede = Map.groupBy(ofertas, (o) => o.rede_id);
+const hoje = [];
+for (let i = 0; hoje.length < 24 && i < ofertas.length; i++)
+  for (const lista of porRede.values()) if (lista[i] && hoje.length < 24) hoje.push(lista[i]);
+
+const grade = intercalar(hoje, anuncios.filter((a) => a.formato === 'feed'), 8);
+const banner = anuncios.find((a) => a.formato === 'banner');
+const ultima = redes.map((r) => r.atualizado_em).sort().at(-1);
+const pontos = lojas.map((l) => [l.rede_id, Number(l.lat), Number(l.lng)]);
+---
+<Base titulo="Promoção na Mão" comLista>
+  <section class="destaque">
+    <div style="flex: 1 1 360px">
+      <h1>As ofertas dos mercados de GV numa lista só</h1>
+      <p>Junte o que você precisa, veja em qual mercado está em oferta e mande a lista pronta para quem vai às compras.</p>
+      {ultima && <p class="suave">{atualizadoEm(ultima)}</p>}
+    </div>
+    <a href="#ofertas" class="botao botao-claro botao-grande">Ver ofertas de hoje</a>
+  </section>
+
+  <section class="secao" aria-labelledby="mercados">
+    <div class="secao-topo">
+      <div>
+        <h2 id="mercados">Mercados</h2>
+        <span class="suave" id="mercados-ordem">Em ordem alfabética</span>
+      </div>
+      <button type="button" class="botao" id="perto">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+        Perto de mim
+      </button>
+    </div>
+    <div class="grade-mercados" id="grade-mercados">
+      {redes.map((r) => (
+        <a class="mercado-card" href={`/mercado/${r.slug}/`} data-rede={r.id}>
+          <span class="avatar" style={`background: ${mercado(r.slug).cor}`}>{mercado(r.slug).sigla}</span>
+          <span>
+            <strong>{r.nome}</strong>
+            <span class="suave"><span data-dist></span>{r.ofertas} ofertas · até {diaMes(r.ate)}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+    {redes.length === 0 && <p class="tracejado">Ainda não há encartes vigentes. Volte amanhã!</p>}
+  </section>
+
+  <section class="secao" id="ofertas" aria-labelledby="titulo-ofertas">
+    <h2 id="titulo-ofertas">Ofertas de hoje</h2>
+    <div class="grade-ofertas">
+      {grade.map((x) => ('oferta' in x ? <CardOferta o={x.oferta} /> : <Anuncio anuncio={x.anuncio} />))}
+    </div>
+    <Anuncio anuncio={banner} faixa />
+  </section>
+
+  <script type="application/json" id="lojas" set:html={JSON.stringify(pontos)}></script>
+  <script>
+    // "Perto de mim": pede a localização só quando a pessoa toca; negou → fica em ordem alfabética.
+    import { distanciaKm, textoDistancia } from '../lib/formato';
+    const botao = document.getElementById('perto') as HTMLButtonElement;
+    botao.addEventListener('click', () => {
+      const ordem = document.getElementById('mercados-ordem')!;
+      ordem.textContent = 'Procurando você…';
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        const lojas: [number, number, number][] = JSON.parse(document.getElementById('lojas')!.textContent!);
+        const perto = new Map<number, number>();
+        for (const [rede, lat, lng] of lojas) {
+          const km = distanciaKm(coords.latitude, coords.longitude, lat, lng);
+          perto.set(rede, Math.min(km, perto.get(rede) ?? Infinity));
+        }
+        const cards = [...document.querySelectorAll<HTMLElement>('#grade-mercados [data-rede]')];
+        cards.sort((a, b) => (perto.get(+a.dataset.rede!) ?? Infinity) - (perto.get(+b.dataset.rede!) ?? Infinity));
+        for (const c of cards) {
+          const km = perto.get(+c.dataset.rede!);
+          c.querySelector('[data-dist]')!.textContent = km == null ? '' : `${textoDistancia(km)} · `;
+          c.parentElement!.appendChild(c);
+        }
+        ordem.textContent = 'Do mais perto ao mais longe de você';
+        botao.hidden = true;
+      }, () => { ordem.textContent = 'Sem a sua localização: em ordem alfabética'; }, { timeout: 10000, maximumAge: 600000 });
+    });
+  </script>
+</Base>

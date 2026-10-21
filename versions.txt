@@ -1,0 +1,33 @@
+v 0.2.3
+
+- Corrige erro ao abrir o app que impedia salvar a cor, a lista e as ofertas no celular
+_______________________________________________________________________________________________________________________
+
+v 0.2.2
+
+- Corrige o app fechando ao abrir (versões 0.2.0 e 0.2.1)
+- Links de anúncio só abrem endereços seguros
+_______________________________________________________________________________________________________________________
+
+v 0.2.1
+
+- Novas versões chegam à Google Play automaticamente
+_______________________________________________________________________________________________________________________
+
+v 2.0.32
+
+- Checklist: perguntas numéricas abrem o teclado de números
+_______________________________________________________________________________________________________________________
+
+v 2.0.31
+
+- Chamados: "Novo chamado" só aparece quando há assunto liberado
+- Holerite: botão Falar com o RH respeita a liberação de cada holerite
+- Visitantes: aviso de CPF já cadastrado não se repete ao editar
+- Folha de Ponto: tela não pisca mais ao reenviar o código
+_______________________________________________________________________________________________________________________
+
+v 2.0.30
+
+- Visitantes: lista atualizada após editar um cadastro
+______________________________________________________

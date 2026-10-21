@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Formatos de anúncio — Promoção na Mão</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+h1,h2,.f{font-family:'Fredoka','Nunito',system-ui,sans-serif!important;font-weight:600!important}
+a{color:#1E7A66}a:hover{color:#0E372E}
+</style>
+</helmet>
+<div style="width: 960px; height: 844px; box-sizing: border-box; padding: 48px; display: flex; flex-direction: column; gap: 28px; background: #F4F8F7; font-family: 'Nunito', system-ui, sans-serif; color: #1B1D1C">
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-size: 36px; line-height: 44px; font-weight: 600">Formatos de anúncio</h1>
+    <p style="margin: 0; font-size: 16px; line-height: 24px; color: #4A4F4C">Onde o anúncio aparece, quem compra e a regra de cada formato.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+    <sc-for list="{{formatos}}" as="f" hint-placeholder-count="4">
+      <div style="display: flex; gap: 16px; padding: 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D9DDD9">
+        <div style="width: 120px; height: 150px; flex: none; border-radius: 16px; background: #F4F8F7; border: 1px solid #D9DDD9; box-sizing: border-box; padding: 8px; display: flex; flex-direction: column; gap: 5px">
+          <div style="height: 14px; border-radius: 7px; background: #E4E7E3"></div>
+          <div style="height: {{f.antes}}px; border-radius: 4px; background: #EEF0EC"></div>
+          <div style="height: {{f.altura}}px; border-radius: 5px; background: #BEEAF6; border: 1px solid #0F4D5C"></div>
+          <div style="flex: 1; border-radius: 4px; background: #EEF0EC"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+          <span style="align-self: flex-start; font-size: 12px; line-height: 16px; font-weight: 600; color: #001F26; background: #BEEAF6; padding: 2px 8px; border-radius: 8px">{{f.selo}}</span>
+          <h2 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600">{{f.nome}}</h2>
+          <span style="font-size: 14px; line-height: 20px"><strong>Onde:</strong> {{f.onde}}</span>
+          <span style="font-size: 14px; line-height: 20px"><strong>Para quem:</strong> {{f.quem}}</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4F4C">{{f.regra}}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px 24px; border-radius: 16px; background: #D6E7E3; color: #0E372E">
+    <h2 style="margin: 0; font-size: 16px; line-height: 24px; font-weight: 600">Regras que valem para todos</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; font-size: 14px; line-height: 20px">
+      <span>Sempre com o selo “Anúncio” ou “Patrocinado”.</span>
+      <span>Nunca cobre o preço nem a validade de uma oferta.</span>
+      <span>No máximo 1 anúncio a cada 8 ofertas na lista.</span>
+      <span>Sem pop-up, tela cheia ou vídeo com som.</span>
+      <span>Nunca na tela da Lista de compras.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      formatos: [
+        { selo: 'Anúncio', nome: 'Card no meio das ofertas', antes: 34, altura: 34, onde: 'lista do Início, depois de cada 8 ofertas', quem: 'comércio local (padaria, farmácia, loja)', regra: 'Mesmo tamanho de uma oferta.' },
+        { selo: 'Patrocinado', nome: 'Resultado patrocinado', antes: 4, altura: 30, onde: 'primeiro resultado da busca', quem: 'mercados e marcas', regra: 'Só aparece quando combina com o que a pessoa buscou.' },
+        { selo: 'Anúncio', nome: 'Banner na página', antes: 56, altura: 18, onde: 'página do mercado e da oferta', quem: 'qualquer anunciante', regra: '358×90 (mercado) e 358×100 (oferta); fica abaixo do conteúdo principal.' },
+        { selo: 'Patrocinado', nome: 'Mercado em destaque', antes: 4, altura: 24, onde: 'primeira posição em “Mercados de GV”', quem: 'os próprios mercados', regra: 'Um mercado por vez, com o selo visível.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

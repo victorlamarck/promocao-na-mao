@@ -1,0 +1,10 @@
+# Abertura nativa (igual nos dois flavors). Regenerar: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#1E7A66"
+  image: assets/icone/abertura.png
+  android_12:
+    image: assets/icone/abertura.png
+    color: "#1E7A66"
+  android: true
+  ios: true
+  web: false

@@ -1,0 +1,40 @@
+---
+// Uma página por oferta vigente: destino do link que o app compartilha (/oferta/<id>) e boa para o
+// Google ("arroz camil 5kg big mais"). Oferta vencida some no próximo build → cai no 404 ("encarte venceu").
+import Base from '../../layouts/Base.astro';
+import CardOferta from '../../components/CardOferta.tsx';
+import { dados } from '../../lib/dados';
+import { mercado, nomeDaOferta, reais, valeAte } from '../../lib/formato';
+
+export async function getStaticPaths() {
+  const { ofertas } = await dados();
+  return ofertas.map((o) => ({ params: { id: String(o.id) }, props: { o } }));
+}
+
+const { o } = Astro.props;
+const nome = nomeDaOferta(o);
+const m = mercado(o.rede_slug);
+const preco = o.preco == null ? 'preço no mercado' : reais(o.preco);
+---
+<Base titulo={`${nome} · ${o.rede_nome}`} descricao={`${nome} por ${preco} no ${o.rede_nome} em Governador Valadares. ${valeAte(o.validade_fim)}.`} imagem={`/previa/${o.id}.png`} comLista>
+  <section class="secao">
+    <a href={`/mercado/${o.rede_slug}/`} class="suave">← Ofertas do {o.rede_nome}</a>
+    <div class="detalhe">
+      <CardOferta o={o} principal />
+      <div class="secao" style="gap: 8px">
+        <p style="margin: 0"><strong>{valeAte(o.validade_fim)}</strong> no {o.rede_nome}.</p>
+        {m.clube && o.preco_clube != null && <p class="suave" style="margin: 0">O preço com {m.clube} vale para quem tem o cadastro do {o.rede_nome}.</p>}
+        <p class="tracejado" style="margin: 0"><span class="suave">Como está no encarte:</span><br>{o.texto_original}</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <a class="botao" href={`https://www.google.com/maps/search/${encodeURIComponent(`${o.rede_nome} Governador Valadares`)}`} target="_blank" rel="noopener">Como chegar</a>
+          <a class="botao" href={`/mercado/${o.rede_slug}/`}>Mais ofertas do {o.rede_nome}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .detalhe { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 640px) { .detalhe { grid-template-columns: 1fr; } }
+</style>

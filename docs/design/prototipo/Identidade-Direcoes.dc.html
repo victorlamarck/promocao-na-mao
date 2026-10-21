@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Identidade visual — 3 direções</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700&amp;family=Caveat:wght@600;700&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&amp;family=Outfit:wght@400;500;700;800&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; min-height: 1040px; box-sizing: border-box; padding: 56px; background: #F7F7F4; color: #1B1D1C; font-family: 'DM Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 32px">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-size: 40px; line-height: 48px; font-weight: 700">Identidade visual · 3 direções</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 24px; color: #4A4F4C; max-width: 720px">A cor principal é escolha de quem usa o app. A marca fica no símbolo, na tipografia e no jeito de falar. Toque nas bolinhas para trocar a cor de cada direção.</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <sc-for list="{{direcoes}}" as="d" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column; gap: 20px; padding: 24px; border-radius: 24px; background: #FFFFFF; border: 1px solid #DADDD8">
+        <span style="font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #4A4F4C">{{d.rotulo}}</span>
+
+        <div style="display: flex; align-items: center; gap: 16px">
+          <div style="{{d.iconeStyle}}">
+            <sc-if value="{{d.ehA}}" hint-placeholder-val="{{false}}">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 22 22 10h14v14L24 36a3 3 0 0 1-4.2 0L10 26.2a3 3 0 0 1 0-4.2z" fill="#FFFFFF"></path><circle cx="30.5" cy="15.5" r="2.6" fill="{{d.seed}}"></circle><path d="M18.5 23.5c1.6 2.6 4.6 3.6 7.4 2.4" stroke="{{d.seed}}" stroke-width="2.6" stroke-linecap="round"></path></svg>
+            </sc-if>
+            <sc-if value="{{d.ehB}}" hint-placeholder-val="{{false}}">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="12" y="8" width="26" height="32" rx="4" fill="#FFFFFF"></rect><circle cx="12" cy="15" r="2" fill="{{d.seed}}" stroke="#FFFFFF" stroke-width="1.5"></circle><circle cx="12" cy="24" r="2" fill="{{d.seed}}" stroke="#FFFFFF" stroke-width="1.5"></circle><circle cx="12" cy="33" r="2" fill="{{d.seed}}" stroke="#FFFFFF" stroke-width="1.5"></circle><path d="m18 17 2.5 2.5L25 15" stroke="{{d.seed}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M28 18h5M18 26h15M18 32h10" stroke="{{d.seed}}" stroke-width="2.6" stroke-linecap="round"></path></svg>
+            </sc-if>
+            <sc-if value="{{d.ehC}}" hint-placeholder-val="{{false}}">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M6 12h6l5 18h19l4-12H21" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path><path d="m24 21 4 4 7-7" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="19" cy="37" r="3" fill="#FFFFFF"></circle><circle cx="33" cy="37" r="3" fill="#FFFFFF"></circle></svg>
+            </sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="{{d.marcaStyle}}">{{d.marca}}</span>
+            <span style="font-size: 13px; line-height: 18px; color: #4A4F4C">{{d.subtitulo}}</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; line-height: 16px; font-weight: 700; color: #4A4F4C">Jeito de falar</span>
+          <div style="{{d.balaoStyle}}">{{d.voz}}</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px">
+          <span style="{{d.aaStyle}}">Aa</span>
+          <div style="display: flex; flex-direction: column; gap: 2px; font-size: 13px; line-height: 18px">
+            <span><strong>Títulos:</strong> {{d.fonteTitulo}}</span>
+            <span><strong>Textos:</strong> {{d.fonteTexto}}</span>
+            <span style="color: #4A4F4C">{{d.forma}}</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; line-height: 16px; font-weight: 700; color: #4A4F4C">Cor do app (escolha de quem usa)</span>
+          <div style="display: flex; gap: 8px">
+            <sc-for list="{{d.cores}}" as="c" hint-placeholder-count="5">
+              <button type="button" onClick="{{c.pick}}" aria-label="{{c.label}}" aria-pressed="{{c.on}}" style="{{c.style}}"></button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="{{d.telaStyle}}">
+          <div style="{{d.heroStyle}}">
+            <span style="{{d.heroLabelStyle}}">Sua lista</span>
+            <span style="{{d.heroTituloStyle}}">5 itens em 3 mercados</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <div style="{{d.cardStyle}}">
+              <div style="height: 56px; border-radius: 8px; background: #EEF0EC"></div>
+              <span style="font-size: 12px; line-height: 16px; font-weight: 600">Café 3 Corações 250g</span>
+              <span style="{{d.precoStyle}}">R$ 21,90</span>
+              <span style="{{d.btnStyle}}">+ Adicionar</span>
+            </div>
+            <div style="{{d.cardOnStyle}}">
+              <div style="height: 56px; border-radius: 8px; background: #EEF0EC"></div>
+              <span style="font-size: 12px; line-height: 16px; font-weight: 600">Arroz Camil 5kg</span>
+              <span style="{{d.precoStyle}}">R$ 23,80</span>
+              <span style="{{d.stepperStyle}}"><span>−</span><span>2</span><span>+</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 12px; line-height: 16px; font-weight: 700; color: #4A4F4C">Outros nomes nessa linha</span>
+          <span style="font-size: 14px; line-height: 20px">{{d.nomes}}</span>
+        </div>
+      </section>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { escolha: { A: 0, B: 1, C: 2 } };
+  }
+  renderVals() {
+    const paleta = [
+      { hex: '#1E7A66', nome: 'verde-água' },
+      { hex: '#5B4BC4', nome: 'roxo' },
+      { hex: '#2F5D8C', nome: 'azul-petróleo' },
+      { hex: '#A8326E', nome: 'framboesa' },
+      { hex: '#3F4A44', nome: 'grafite' },
+    ];
+    const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const mix = (h, alvo, t) => {
+      const a = hexRgb(h), b = hexRgb(alvo);
+      return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+    };
+    const defs = [
+      {
+        id: 'A', rotulo: 'Direção A · Vizinho amigo', marca: 'Promoção na Mão', subtitulo: 'Etiqueta sorridente: a promoção que chega como aviso de vizinho',
+        voz: 'Opa! O café que você sempre leva baixou no Atacadão. Bora pôr na lista?',
+        titulo: "'Fredoka', sans-serif", texto: "'Nunito', sans-serif", fonteTitulo: 'Fredoka', fonteTexto: 'Nunito',
+        forma: 'Cantos bem arredondados, botões em pílula', raio: 20, nomes: 'Promoção na Mão · Promo na Mão · Cestinha',
+      },
+      {
+        id: 'B', rotulo: 'Direção B · Caderninho da casa', marca: 'Listinha', subtitulo: 'A lista de papel da cozinha, agora com as ofertas da cidade',
+        voz: 'Anotado! Arroz no Supermercados BH, café no Atacadão. Quer mandar a lista pro Zé?',
+        titulo: "'Caveat', cursive", texto: "'DM Sans', sans-serif", fonteTitulo: 'Caveat (só em destaques)', fonteTexto: 'DM Sans',
+        forma: 'Cantos médios, linhas finas de caderno', raio: 12, nomes: 'Listinha · Lista de Casa · Anota Aí',
+      },
+      {
+        id: 'C', rotulo: 'Direção C · Carrinho esperto', marca: 'Juntaí', subtitulo: 'Carrinho com check: juntar ofertas e resolver a compra rápido',
+        voz: 'Lista pronta: 5 itens em 3 mercados. Compartilhe e pronto.',
+        titulo: "'Outfit', sans-serif", texto: "'Outfit', sans-serif", fonteTitulo: 'Outfit Extra Bold', fonteTexto: 'Outfit',
+        forma: 'Geométrico, cantos retos suaves, alto contraste', raio: 8, nomes: 'Juntaí · Cestô · Economizô',
+      },
+    ];
+    return {
+      direcoes: defs.map((d) => {
+        const seed = paleta[this.state.escolha[d.id]].hex;
+        const claro = mix(seed, '#FFFFFF', 0.82);
+        const escuro = mix(seed, '#000000', 0.55);
+        const r = d.raio;
+        const tituloPeso = d.id === 'B' ? 700 : d.id === 'C' ? 800 : 600;
+        return {
+          rotulo: d.rotulo, marca: d.marca, subtitulo: d.subtitulo, voz: d.voz, seed,
+          fonteTitulo: d.fonteTitulo, fonteTexto: d.fonteTexto, forma: d.forma, nomes: d.nomes,
+          ehA: d.id === 'A', ehB: d.id === 'B', ehC: d.id === 'C',
+          iconeStyle: 'width: 72px; height: 72px; flex: none; border-radius: ' + (d.id === 'C' ? 18 : 22) + 'px; background: ' + seed + '; display: flex; align-items: center; justify-content: center',
+          marcaStyle: 'font-family: ' + d.titulo + '; font-weight: ' + tituloPeso + '; font-size: ' + (d.id === 'B' ? 40 : 28) + 'px; line-height: 1.1; color: ' + escuro + (d.id === 'C' ? '; letter-spacing: -0.5px' : ''),
+          aaStyle: 'font-family: ' + d.titulo + '; font-weight: ' + tituloPeso + '; font-size: 56px; line-height: 1; color: ' + seed,
+          balaoStyle: 'font-family: ' + d.texto + '; font-size: 15px; line-height: 22px; padding: 12px 16px; border-radius: ' + Math.max(8, r) + 'px ' + Math.max(8, r) + 'px ' + Math.max(8, r) + 'px 4px; background: ' + claro + '; color: ' + escuro,
+          cores: paleta.map((p, i) => {
+            const on = i === this.state.escolha[d.id];
+            return {
+              on, label: 'Usar ' + p.nome,
+              pick: () => this.setState({ escolha: Object.assign({}, this.state.escolha, { [d.id]: i }) }),
+              style: 'width: 36px; height: 36px; border-radius: 18px; cursor: pointer; background: ' + p.hex + '; border: 3px solid ' + (on ? '#FFFFFF' : p.hex) + '; box-shadow: 0 0 0 2px ' + (on ? '#1B1D1C' : 'transparent'),
+            };
+          }),
+          telaStyle: 'display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 20px; background: ' + mix(seed, '#FFFFFF', 0.94) + '; font-family: ' + d.texto + '; color: #1B1D1C',
+          heroStyle: 'display: flex; flex-direction: column; padding: 14px 16px; border-radius: ' + (r + 4) + 'px; background: ' + seed + '; color: #FFFFFF',
+          heroLabelStyle: 'font-size: 12px; line-height: 16px; color: ' + claro,
+          heroTituloStyle: 'font-family: ' + d.titulo + '; font-weight: ' + tituloPeso + '; font-size: ' + (d.id === 'B' ? 26 : 20) + 'px; line-height: 1.2',
+          cardStyle: 'display: flex; flex-direction: column; gap: 4px; padding: 8px; border-radius: ' + r + 'px; background: #FFFFFF; border: 1px solid #DADDD8',
+          cardOnStyle: 'display: flex; flex-direction: column; gap: 4px; padding: 7px; border-radius: ' + r + 'px; background: #FFFFFF; border: 2px solid ' + seed,
+          precoStyle: 'font-family: ' + (d.id === 'B' ? d.texto : d.titulo) + '; font-weight: 700; font-size: 18px; line-height: 24px; color: ' + escuro,
+          btnStyle: 'height: 32px; border-radius: ' + (d.id === 'C' ? 8 : 16) + 'px; background: ' + seed + '; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700',
+          stepperStyle: 'height: 32px; padding: 0 12px; border-radius: ' + (d.id === 'C' ? 8 : 16) + 'px; background: ' + seed + '; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 700',
+        };
+      }),
+    };
+  }
+}
+</script>
+</body>
+</html>

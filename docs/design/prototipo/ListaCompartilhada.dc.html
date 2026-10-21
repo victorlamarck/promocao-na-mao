@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Lista recebida — Promoção na Mão</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+h1,h2,.f{font-family:'Fredoka','Nunito',system-ui,sans-serif!important;font-weight:600!important}
+a{color:#1E7A66}a:hover{color:#0E372E}
+input[type=checkbox]{accent-color:#1E7A66}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; background: #F4F8F7; font-family: 'Nunito', system-ui, sans-serif; color: #1B1D1C; overflow: hidden">
+
+  <header style="height: 64px; flex: none; padding: 0 16px 0 4px; display: flex; align-items: center; gap: 4px">
+    <a href="Lista.dc.html" aria-label="Voltar" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; color: #1B1D1C">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+    </a>
+    <div style="flex: 1; display: flex; flex-direction: column">
+      <span class="f" style="font-size: 20px; line-height: 28px">Lista da Ana</span>
+      <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">Atualizada há 5 min</span>
+    </div>
+  </header>
+
+  <main style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 4px 16px 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 16px; background: #1E7A66; color: #FFFFFF">
+      <span style="font-size: 14px; line-height: 20px; color: #D6E7E3; font-weight: 600">Ana compartilhou com você</span>
+      <span class="f" style="font-size: 24px; line-height: 32px">{{progresso}}</span>
+      <div style="height: 8px; border-radius: 4px; background: rgba(255,255,255,0.25); overflow: hidden">
+        <div style="{{barra}}"></div>
+      </div>
+      <span style="font-size: 12px; line-height: 16px">Marque o que já pegou. A Ana vê na hora.</span>
+    </div>
+
+    <sc-for list="{{grupos}}" as="g" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #D9DDD9; border-radius: 16px; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #F4F8F7">
+          <span style="width: 32px; height: 32px; flex: none; border-radius: 16px; background: {{g.cor}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px">{{g.sigla}}</span>
+          <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+            <span style="font-size: 16px; line-height: 24px; font-weight: 600">{{g.nome}}</span>
+            <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">{{g.sub}}</span>
+          </div>
+          <sc-if value="{{g.temMapa}}" hint-placeholder-val="{{true}}">
+            <a href="#" aria-label="{{g.mapaLabel}}" style="width: 44px; height: 44px; flex: none; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #1E7A66">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            </a>
+          </sc-if>
+        </div>
+        <sc-for list="{{g.itens}}" as="i" hint-placeholder-count="2">
+          <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 4px 16px; border-top: 1px solid #E4E7E3; cursor: pointer">
+            <input type="checkbox" checked="{{i.pego}}" onChange="{{i.toggle}}" style="width: 22px; height: 22px; margin: 0; flex: none">
+            <span style="{{i.nomeStyle}}">{{i.nome}}</span>
+            <span style="font-size: 14px; line-height: 20px; font-weight: 700; color: #4A4F4C">{{i.qtd}}×</span>
+          </label>
+        </sc-for>
+      </section>
+    </sc-for>
+  </main>
+
+  <footer style="flex: none; padding: 12px 16px 16px; background: #EEF0EC">
+    <button type="button" onClick="{{terminar}}" style="{{botaoStyle}}">{{botaoTexto}}</button>
+  </footer>
+
+  <sc-if value="{{snack}}" hint-placeholder-val="{{false}}">
+    <div role="status" style="position: absolute; left: 16px; right: 16px; bottom: 88px; min-height: 48px; padding: 4px 16px; border-radius: 4px; background: #2D322E; color: #EEF2EB; display: flex; align-items: center; font-size: 14px; line-height: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.25)">{{snackTexto}}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { pegos: { hein: true }, snack: null };
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    const M = {
+      AT: { nome: 'Atacadão', cor: '#0F766E', ate: '25/10' },
+      BH: { nome: 'Supermercados BH', cor: '#6D28D9', ate: '31/10' },
+      CD: { nome: 'Coelho Diniz', cor: '#B45309', ate: '04/11' },
+    };
+    const its = [
+      { id: 'hein', nome: 'Cerveja Heineken Lata 473ml', m: 'AT', q: 12 },
+      { id: 'cafe', nome: 'Café Gourmet 3 Corações 250g', m: 'AT', q: 1 },
+      { id: 'pow', nome: 'Isotônico Powerade 500ml', m: 'AT', q: 2 },
+      { id: 'arroz', nome: 'Arroz Agulhinha Camil 5kg', m: 'BH', q: 1 },
+      { id: 'det', nome: 'Detergente Ypê 500ml', m: 'BH', q: 3 },
+      { id: 'coca', nome: 'Coca-Cola Lata 220ml', m: 'CD', q: 6 },
+      { id: 'pao', nome: 'Pão francês', m: null, q: 10 },
+    ];
+    const pegos = this.state.pegos;
+    const feitos = its.filter((i) => pegos[i.id]).length;
+    const tudo = feitos === its.length;
+    const grupos = ['AT', 'BH', 'CD', null].map((m) => {
+      const g = its.filter((i) => i.m === m);
+      const f = g.filter((i) => pegos[i.id]).length;
+      return {
+        nome: m ? M[m].nome : 'Onde preferir', sigla: m || '?', cor: m ? M[m].cor : '#707971',
+        sub: f + ' de ' + g.length + ' pegos' + (m ? ' · ofertas até ' + M[m].ate : ''),
+        temMapa: !!m, mapaLabel: m ? 'Ver ' + M[m].nome + ' no mapa' : '',
+        itens: g.map((i) => {
+          const pego = !!pegos[i.id];
+          return {
+            nome: i.nome, qtd: i.q, pego,
+            toggle: () => this.setState({ pegos: Object.assign({}, pegos, { [i.id]: !pego }) }),
+            nomeStyle: 'flex: 1; min-width: 0; font-size: 15px; line-height: 20px; font-weight: 600; ' + (pego ? 'text-decoration: line-through; color: #4A4F4C' : ''),
+          };
+        }),
+      };
+    });
+    const btn = 'width: 100%; height: 48px; border-radius: 24px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; ';
+    return {
+      progresso: feitos + ' de ' + its.length + ' itens pegos',
+      barra: 'height: 100%; border-radius: 4px; background: #D6E7E3; width: ' + Math.round((feitos / its.length) * 100) + '%',
+      grupos,
+      botaoTexto: tudo ? 'Avisar a Ana que terminei' : 'Avisar a Ana que terminei (' + (its.length - feitos) + ' faltando)',
+      botaoStyle: btn + (tudo ? 'border: 0; background: #1E7A66; color: #FFFFFF' : 'border: 1px solid #707971; background: transparent; color: #1E7A66'),
+      terminar: () => {
+        clearTimeout(this._t);
+        this._t = setTimeout(() => this.setState({ snack: null }), 3000);
+        this.setState({ snack: 'A Ana foi avisada' });
+      },
+      snack: !!this.state.snack, snackTexto: this.state.snack || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

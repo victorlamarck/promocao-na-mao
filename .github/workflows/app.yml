@@ -1,0 +1,53 @@
+# App Flutter (celular). Só roda se mudar app/: análise + testes.
+# O web NÃO sai daqui: é o site em Astro (site/, .github/workflows/site.yml).
+# Publicar no Google Play: .github/workflows/android.yml (no botão).
+# A config fica nos secrets (Settings → Secrets and variables → Actions):
+#   FIREBASE_OPTIONS_DEV / FIREBASE_OPTIONS_PROD  conteúdo de app/lib/firebase_options_<flavor>.dart
+#   APP_CONFIG_PROD                                conteúdo de app/config/prod.json
+name: App
+
+on:
+  pull_request:
+    paths: ['app/**', '.github/workflows/app.yml']
+  push:
+    branches: [main, dev]
+    paths: ['app/**', '.github/workflows/app.yml']
+  workflow_dispatch:
+
+concurrency: app-${{ github.ref }}
+
+defaults:
+  run:
+    working-directory: app
+
+# Token da esteira só lê o repositório (nada aqui escreve no GitHub).
+permissions:
+  contents: read
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.3 # a mesma da máquina de desenvolvimento
+          channel: stable
+          cache: true
+      - name: Config dos secrets
+        env:
+          FIREBASE_OPTIONS_DEV: ${{ secrets.FIREBASE_OPTIONS_DEV }}
+          FIREBASE_OPTIONS_PROD: ${{ secrets.FIREBASE_OPTIONS_PROD }}
+          APP_CONFIG_PROD: ${{ secrets.APP_CONFIG_PROD }}
+        run: |
+          for s in FIREBASE_OPTIONS_DEV FIREBASE_OPTIONS_PROD APP_CONFIG_PROD; do
+            [ -n "${!s}" ] || { echo "::error::falta o secret $s"; exit 1; }
+          done
+          printf '%s\n' "$FIREBASE_OPTIONS_DEV" > lib/firebase_options_dev.dart
+          printf '%s\n' "$FIREBASE_OPTIONS_PROD" > lib/firebase_options_prod.dart
+          printf '%s\n' "$APP_CONFIG_PROD" > config/prod.json
+          jq -e . config/prod.json > /dev/null || { echo "::error::APP_CONFIG_PROD não é um JSON válido"; exit 1; }
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+

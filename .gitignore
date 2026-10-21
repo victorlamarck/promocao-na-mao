@@ -1,0 +1,4 @@
+.claude/settings.local.json
+
+# chaves de conta de serviço do Google (nunca no git; vão para os secrets da esteira)
+/promocaonamao-*.json

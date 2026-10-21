@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Minha lista — Promoção na Mão</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+h1,h2,.f{font-family:'Fredoka','Nunito',system-ui,sans-serif!important;font-weight:600!important}
+a{color:#1E7A66}a:hover{color:#0E372E}
+input[type=checkbox],input[type=radio]{accent-color:#1E7A66}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; background: #F4F8F7; font-family: 'Nunito', system-ui, sans-serif; color: #1B1D1C; overflow: hidden">
+
+  <header style="padding: 12px 8px 8px 16px; display: flex; align-items: center; gap: 4px">
+    <div style="flex: 1; display: flex; flex-direction: column; padding-top: 6px">
+      <h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600">Minha lista</h1>
+      <span style="font-size: 14px; line-height: 20px; color: #4A4F4C">{{resumo}}</span>
+    </div>
+    <button type="button" onClick="{{abrirShare}}" style="height: 40px; padding: 0 16px 0 12px; border: 0; border-radius: 20px; background: #1E7A66; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"></path></svg>
+      Compartilhar
+    </button>
+  </header>
+
+  <main style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 4px 16px 24px">
+
+    <sc-if value="{{compartilhada}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: #D6E7E3; color: #0E372E">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg>
+        <span style="flex: 1; font-size: 14px; line-height: 20px">{{textoCompartilhada}}</span>
+      </div>
+    </sc-if>
+
+    <sc-for list="{{grupos}}" as="g" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #D9DDD9; border-radius: 16px; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #F4F8F7">
+          <span style="width: 32px; height: 32px; flex: none; border-radius: 16px; background: {{g.cor}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px">{{g.sigla}}</span>
+          <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+            <span style="font-size: 16px; line-height: 24px; font-weight: 600">{{g.nome}}</span>
+            <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">{{g.sub}}</span>
+          </div>
+          <span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #4A4F4C">{{g.contagem}}</span>
+        </div>
+        <sc-for list="{{g.itens}}" as="i" hint-placeholder-count="2">
+          <div style="display: flex; align-items: center; gap: 4px; min-height: 56px; padding: 4px 8px 4px 16px; border-top: 1px solid #E4E7E3">
+            <label style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer">
+              <input type="checkbox" checked="{{i.pego}}" onChange="{{i.toggle}}" style="width: 20px; height: 20px; margin: 0; flex: none">
+              <span style="{{i.nomeStyle}}">{{i.nome}}</span>
+            </label>
+            <div style="display: flex; align-items: center; border: 1px solid #707971; border-radius: 20px; height: 40px">
+              <button type="button" onClick="{{i.menos}}" aria-label="{{i.menosLabel}}" style="width: 40px; height: 40px; border: 0; background: transparent; color: #4A4F4C; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg>
+              </button>
+              <span style="min-width: 20px; text-align: center; font-size: 14px; font-weight: 700">{{i.qtd}}</span>
+              <button type="button" onClick="{{i.mais}}" aria-label="{{i.maisLabel}}" style="width: 40px; height: 40px; border: 0; background: transparent; color: #4A4F4C; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+              </button>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+    </sc-for>
+
+    <a href="Main.dc.html" style="height: 48px; border-radius: 24px; border: 1px dashed #707971; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; text-decoration: none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      Adicionar mais ofertas
+    </a>
+  </main>
+
+  <nav aria-label="Navegação principal" style="height: 80px; flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #EEF0EC; padding-top: 12px; box-sizing: border-box">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path></svg></span>Início
+    </a>
+    <a href="Busca.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>Buscar
+    </a>
+    <a href="Mercados.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9v11h16V9"></path><path d="M3 9h18"></path><path d="M10 20v-6h4v6"></path></svg></span>Mercados
+    </a>
+    <a href="Lista.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #1B1D1C; font-size: 12px; line-height: 16px; font-weight: 700">
+      <span style="width: 64px; height: 32px; border-radius: 16px; background: #D6E7E3; color: #0E372E; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"></path></svg></span>Lista
+    </a>
+  </nav>
+
+  <sc-if value="{{snack}}" hint-placeholder-val="{{false}}">
+    <div role="status" style="position: absolute; left: 16px; right: 16px; bottom: 92px; min-height: 48px; padding: 4px 16px; border-radius: 4px; background: #2D322E; color: #EEF2EB; display: flex; align-items: center; font-size: 14px; line-height: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.25)">{{snackTexto}}</div>
+  </sc-if>
+
+  <sc-if value="{{shareAberto}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end">
+      <button type="button" aria-label="Fechar" onClick="{{fecharShare}}" style="flex: 1; border: 0; background: rgba(23,29,25,0.4); cursor: pointer"></button>
+      <div role="dialog" aria-label="Compartilhar lista" style="background: #F4F8F7; border-radius: 28px 28px 0 0; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px">
+        <span style="align-self: center; width: 32px; height: 4px; border-radius: 2px; background: #707971; margin: 8px 0 4px"></span>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 20px; line-height: 28px; font-weight: 600">Compartilhar lista</span>
+          <span style="font-size: 14px; line-height: 20px; color: #4A4F4C">É sempre o mesmo link: quem receber vê a lista atualizada, separada por mercado.</span>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; background: #FFFFFF; border-radius: 16px; overflow: hidden">
+          <legend style="font-size: 14px; line-height: 20px; font-weight: 600; padding: 0 0 8px">Quem receber pode</legend>
+          <sc-for list="{{permissoes}}" as="p" hint-placeholder-count="2">
+            <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 16px; border-top: 1px solid #E4E7E3; cursor: pointer">
+              <input type="radio" name="permissao" checked="{{p.on}}" onChange="{{p.pick}}" style="width: 20px; height: 20px; margin: 0; flex: none">
+              <span style="display: flex; flex-direction: column">
+                <span style="font-size: 14px; line-height: 20px; font-weight: 600">{{p.titulo}}</span>
+                <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">{{p.sub}}</span>
+              </span>
+            </label>
+          </sc-for>
+        </fieldset>
+        <div style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 4px 0 16px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D9DDD9">
+          <span style="flex: 1; min-width: 0; font-size: 14px; color: #4A4F4C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">promocaonamao.com.br/l/K7Q2M</span>
+          <button type="button" onClick="{{copiar}}" style="height: 40px; padding: 0 12px; border: 0; background: transparent; color: #1E7A66; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Copiar link</button>
+        </div>
+        <a href="ListaCompartilhada.dc.html" style="height: 48px; border-radius: 24px; background: #1E7A66; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; text-decoration: none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"></path></svg>
+          Enviar pelo WhatsApp
+        </a>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      itens: [
+        { id: 'hein', nome: 'Cerveja Heineken Lata 473ml', m: 'AT', q: 12 },
+        { id: 'cafe', nome: 'Café Gourmet 3 Corações 250g', m: 'AT', q: 1 },
+        { id: 'pow', nome: 'Isotônico Powerade 500ml', m: 'AT', q: 2 },
+        { id: 'arroz', nome: 'Arroz Agulhinha Camil 5kg', m: 'BH', q: 1 },
+        { id: 'det', nome: 'Detergente Ypê 500ml', m: 'BH', q: 3 },
+        { id: 'coca', nome: 'Coca-Cola Lata 220ml', m: 'CD', q: 6 },
+        { id: 'pao', nome: 'Pão francês', m: null, q: 10 },
+      ],
+      pegos: {}, share: false, permissao: 'ver', compartilhada: false, snack: null,
+    };
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  aviso(msg) {
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ snack: null }), 3000);
+    return msg;
+  }
+  renderVals() {
+    const M = {
+      AT: { nome: 'Atacadão', cor: '#0F766E', ate: '25/10' },
+      BH: { nome: 'Supermercados BH', cor: '#6D28D9', ate: '31/10' },
+      CD: { nome: 'Coelho Diniz', cor: '#B45309', ate: '04/11' },
+      BM: { nome: 'Big Mais', cor: '#1D4ED8', ate: '03/11' },
+    };
+    const its = this.state.itens;
+    const pegos = this.state.pegos;
+    const setQ = (id, d) => {
+      const novo = its.map((i) => (i.id === id ? Object.assign({}, i, { q: i.q + d }) : i)).filter((i) => i.q > 0);
+      const saiu = novo.length < its.length;
+      this.setState(saiu ? { itens: novo, snack: this.aviso('Tirado da lista') } : { itens: novo });
+    };
+    const ordem = ['AT', 'BH', 'CD', 'BM', null];
+    const grupos = ordem.map((m) => {
+      const doGrupo = its.filter((i) => i.m === m);
+      if (!doGrupo.length) return null;
+      const feitos = doGrupo.filter((i) => pegos[i.id]).length;
+      return {
+        nome: m ? M[m].nome : 'Sem mercado definido',
+        sigla: m || '?', cor: m ? M[m].cor : '#707971',
+        sub: m ? 'Ofertas valem até ' + M[m].ate : 'Itens anotados à mão',
+        contagem: feitos + '/' + doGrupo.length,
+        itens: doGrupo.map((i) => {
+          const pego = !!pegos[i.id];
+          return {
+            nome: i.nome, qtd: i.q, pego,
+            toggle: () => this.setState({ pegos: Object.assign({}, pegos, { [i.id]: !pego }) }),
+            mais: () => setQ(i.id, 1), menos: () => setQ(i.id, -1),
+            maisLabel: 'Mais um ' + i.nome, menosLabel: i.q === 1 ? 'Tirar ' + i.nome : 'Menos um ' + i.nome,
+            nomeStyle: 'flex: 1; min-width: 0; font-size: 14px; line-height: 20px; font-weight: 600; ' + (pego ? 'text-decoration: line-through; color: #4A4F4C' : ''),
+          };
+        }),
+      };
+    }).filter(Boolean);
+    const nMerc = grupos.filter((g) => g.sigla !== '?').length;
+    const perm = this.state.permissao;
+    return {
+      resumo: its.length + ' itens em ' + nMerc + ' mercados',
+      grupos,
+      compartilhada: this.state.compartilhada,
+      textoCompartilhada: perm === 'ver' ? 'Lista compartilhada. Quem recebeu só pode ver.' : 'Lista compartilhada. Quem recebeu pode marcar o que já pegou.',
+      shareAberto: this.state.share,
+      abrirShare: () => this.setState({ share: true }),
+      fecharShare: () => this.setState({ share: false }),
+      copiar: () => this.setState({ share: false, compartilhada: true, snack: this.aviso('Link copiado') }),
+      permissoes: [
+        { id: 'ver', titulo: 'Só ver a lista', sub: 'Bom para mandar para quem vai ao mercado' },
+        { id: 'marcar', titulo: 'Ver e marcar o que já pegou', sub: 'Você acompanha o que já está no carrinho' },
+      ].map((p) => ({ titulo: p.titulo, sub: p.sub, on: p.id === perm, pick: () => this.setState({ permissao: p.id }) })),
+      snack: !!this.state.snack, snackTexto: this.state.snack || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

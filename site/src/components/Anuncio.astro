@@ -1,0 +1,23 @@
+---
+// Anúncio vendido pelo dev (tabela anuncio) ou, sem anúncio, o convite "Anuncie aqui".
+// Regras (docs/design.md): sempre com selo, nunca cobre preço/validade, máx. 1 a cada 8 ofertas.
+import type { Anuncio } from '../lib/dados';
+import { contatoAnuncie } from '../lib/config';
+
+interface Props { anuncio?: Anuncio; faixa?: boolean }
+const { anuncio, faixa = false } = Astro.props;
+---
+{anuncio ? (
+  <a class:list={['anuncio', { 'anuncio-faixa': faixa }]} href={anuncio.link_url ?? undefined} rel="sponsored noopener" target="_blank">
+    <span class="selo">Anúncio</span>
+    {anuncio.imagem_url && <img src={anuncio.imagem_url} alt="" loading="lazy">}
+    <strong>{anuncio.titulo}</strong>
+    {anuncio.texto && <span class="suave">{anuncio.texto}</span>}
+  </a>
+) : (
+  <a class:list={['anuncio', { 'anuncio-faixa': faixa }]} href={contatoAnuncie} rel="noopener" target={contatoAnuncie.startsWith('http') ? '_blank' : undefined}>
+    <span class="selo">Anúncio</span>
+    <span class="suave" style="flex: 1 1 240px">Seu comércio aqui, para quem está montando a lista de compras em GV.</span>
+    <strong class="verde">Anuncie aqui</strong>
+  </a>
+)}

@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Busca from '../components/Busca.tsx';
+import { dados } from '../lib/dados';
+
+const { redes } = await dados();
+---
+<Base titulo="Buscar ofertas" comLista indexar={false}>
+  <!-- client:only: o termo vem do endereço, que só existe no navegador -->
+  <Busca client:only="preact" redes={redes.map((r) => ({ slug: r.slug, nome: r.nome }))} />
+  <script>
+    // Mantém o termo na caixa de busca do topo.
+    const q = new URLSearchParams(location.search).get('q');
+    if (q) (document.getElementById('q') as HTMLInputElement).value = q;
+  </script>
+</Base>

@@ -1,0 +1,13 @@
+# Ícones do flavor prod. Regenerar: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/icone/icone.png"
+  android: true
+  adaptive_icon_background: "#1E7A66"
+  adaptive_icon_foreground: "assets/icone/frente.png"
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/icone/icone.png"
+    background_color: "#1E7A66"
+    theme_color: "#1E7A66"

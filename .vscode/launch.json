@@ -1,0 +1,53 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "app (dev)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define-from-file=config/dev.json"
+      ]
+    },
+    {
+      "name": "app (prod)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": [
+        "-d",
+        "chrome",
+        "--dart-define-from-file=config/prod.json"
+      ]
+    },
+    {
+      "name": "celular (dev)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": [
+        "--flavor",
+        "dev",
+        "--dart-define-from-file=config/dev.json"
+      ]
+    },
+    {
+      "name": "celular (prod)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": [
+        "--flavor",
+        "prod",
+        "--dart-define-from-file=config/prod.json"
+      ]
+    }
+  ]
+}

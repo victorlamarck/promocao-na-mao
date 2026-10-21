@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Busca — Promoção na Mão</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+h1,h2,.f{font-family:'Fredoka','Nunito',system-ui,sans-serif!important;font-weight:600!important}
+a{color:#1E7A66}a:hover{color:#0E372E}
+input[type=radio]{accent-color:#1E7A66}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; background: #F4F8F7; font-family: 'Nunito', system-ui, sans-serif; color: #1B1D1C; overflow: hidden">
+
+  <header style="padding: 12px 16px 8px; display: flex; flex-direction: column; gap: 12px">
+    <label style="display: flex; align-items: center; gap: 16px; height: 56px; padding: 0 8px 0 16px; border-radius: 28px; background: #EEF0EC">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B1D1C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar produto</span>
+      <input type="search" value="arroz 5 kg" style="flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 16px; color: #1B1D1C; outline: none">
+      <button type="button" aria-label="Limpar busca" style="width: 40px; height: 40px; border: 0; border-radius: 20px; background: transparent; color: #4A4F4C; display: flex; align-items: center; justify-content: center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+      </button>
+    </label>
+    <div style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 0 16px 4px">
+      <sc-for list="{{chips}}" as="c" hint-placeholder-count="5">
+        <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="{{c.style}}">
+          <sc-if value="{{c.on}}" hint-placeholder-val="{{false}}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
+          </sc-if>
+          {{c.label}}
+        </button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px 16px 24px">
+    <div style="display: flex; justify-content: space-between; align-items: center; min-height: 48px">
+      <span style="font-size: 14px; line-height: 20px; color: #4A4F4C"><strong style="color: #1B1D1C">{{total}}</strong> {{onde}}</span>
+      <button type="button" onClick="{{trocarOrdem}}" style="height: 40px; padding: 0 12px 0 16px; border-radius: 20px; border: 1px solid #707971; background: transparent; font: inherit; font-size: 14px; font-weight: 600; color: #1E7A66; display: flex; align-items: center; gap: 8px; cursor: pointer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"></path></svg>
+        {{ordemLabel}}
+      </button>
+    </div>
+
+    <div style="display: flex; gap: 12px; padding: 12px; border-radius: 16px; background: #F4F8F7; border: 1px solid #D9DDD9">
+      <div style="width: 64px; height: 64px; flex: none; border-radius: 8px; background: #E4E7E3; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #4A4F4C">[IMAGEM]</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+        <span style="align-self: flex-start; font-size: 12px; line-height: 16px; font-weight: 600; color: #001F26; background: #BEEAF6; padding: 2px 8px; border-radius: 8px">Patrocinado</span>
+        <span style="font-size: 14px; line-height: 20px; font-weight: 600">Arroz [Marca anunciante] 5kg</span>
+        <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">[Mercado anunciante] · R$ [PREÇO]</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{itens}}" as="o" hint-placeholder-count="4">
+        <div style="{{o.cardStyle}}">
+          <a href="Oferta.dc.html" style="display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: #1B1D1C">
+            <div style="height: 96px; border-radius: 8px; background: #EEF0EC; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #4A4F4C">imagem</div>
+            <span style="font-size: 13px; line-height: 18px; font-weight: 600; min-height: 36px; padding: 0 2px">{{o.nome}}</span>
+            <span style="display: flex; align-items: baseline; gap: 4px; padding: 0 2px">
+              <span style="font-size: 12px; color: #4A4F4C">{{o.prefixo}}</span>
+              <span style="font-size: 20px; line-height: 26px; font-family: 'Fredoka', 'Nunito', sans-serif; font-weight: 600; color: #0E372E">R$ {{o.preco}}</span>
+            </span>
+            <span style="font-size: 12px; color: #4A4F4C; padding: 0 2px">R$ {{o.kg}} o kg</span>
+          </a>
+          <sc-if value="{{o.fora}}" hint-placeholder-val="{{true}}">
+            <span style="font-size: 12px; line-height: 16px; color: #4A4F4C; padding: 0 2px; min-height: 40px; display: flex; align-items: center">{{o.dica}}</span>
+            <button type="button" onClick="{{o.mais}}" aria-label="{{o.addLabel}}" style="height: 44px; border: 0; border-radius: 22px; background: #1E7A66; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+              Adicionar
+            </button>
+          </sc-if>
+          <sc-if value="{{o.dentro}}" hint-placeholder-val="{{false}}">
+            <button type="button" onClick="{{o.trocar}}" aria-label="{{o.trocarLabel}}" style="min-height: 40px; border: 0; background: transparent; padding: 0 2px; font: inherit; font-size: 12px; line-height: 16px; color: #0E372E; display: flex; align-items: center; gap: 6px; cursor: pointer; text-align: left">
+              <span style="width: 8px; height: 8px; flex: none; border-radius: 4px; background: {{o.cor}}"></span>
+              <span style="flex: 1; min-width: 0">no <strong>{{o.mercado}}</strong></span>
+              <span style="font-weight: 600; text-decoration: underline">trocar</span>
+            </button>
+            <div style="height: 44px; border-radius: 22px; background: #1E7A66; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between">
+              <button type="button" onClick="{{o.menos}}" aria-label="{{o.menosLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <sc-if value="{{o.ehUm}}" hint-placeholder-val="{{true}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></sc-if>
+                <sc-if value="{{o.maisDeUm}}" hint-placeholder-val="{{false}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></sc-if>
+              </button>
+              <span aria-live="polite" style="font-size: 16px; font-weight: 700">{{o.qtd}}</span>
+              <button type="button" onClick="{{o.mais}}" aria-label="{{o.maisLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+              </button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{vazio}}" hint-placeholder-val="{{false}}">
+      <div style="padding: 24px 16px; border-radius: 16px; background: #F4F8F7; text-align: center; font-size: 14px; line-height: 20px; color: #4A4F4C">Este mercado não tem arroz 5 kg no encarte desta semana.</div>
+    </sc-if>
+    <p style="margin: 8px 0 0; font-size: 12px; line-height: 16px; color: #4A4F4C; text-align: center">Mostramos só ofertas que valem hoje.</p>
+  </main>
+
+  <sc-if value="{{snack}}" hint-placeholder-val="{{false}}">
+    <div role="status" style="position: absolute; left: 16px; right: 16px; bottom: 92px; min-height: 48px; padding: 4px 8px 4px 16px; border-radius: 4px; background: #2D322E; color: #EEF2EB; display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.25)">
+      <span style="flex: 1">{{snackTexto}}</span>
+      <a href="Lista.dc.html" style="height: 40px; padding: 0 12px; display: flex; align-items: center; color: #8EBCB2; font-weight: 600; text-decoration: none">Ver lista</a>
+    </div>
+  </sc-if>
+
+  <nav aria-label="Navegação principal" style="height: 80px; flex: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #EEF0EC; padding-top: 12px; box-sizing: border-box">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path></svg></span>Início
+    </a>
+    <a href="Busca.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #1B1D1C; font-size: 12px; line-height: 16px; font-weight: 700">
+      <span style="width: 64px; height: 32px; border-radius: 16px; background: #D6E7E3; color: #0E372E; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>Buscar
+    </a>
+    <a href="Mercados.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9v11h16V9"></path><path d="M3 9h18"></path><path d="M10 20v-6h4v6"></path></svg></span>Mercados
+    </a>
+    <a href="Lista.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #4A4F4C; font-size: 12px; line-height: 16px; font-weight: 600">
+      <span style="width: 64px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"></path></svg></span>Lista
+    </a>
+  </nav>
+
+  <sc-if value="{{sheetAberto}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end">
+      <button type="button" aria-label="Fechar" onClick="{{fechar}}" style="flex: 1; border: 0; background: rgba(23,29,25,0.4); cursor: pointer"></button>
+      <div role="dialog" aria-label="Escolher mercado" style="background: #F4F8F7; border-radius: 28px 28px 0 0; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px">
+        <span style="align-self: center; width: 32px; height: 4px; border-radius: 2px; background: #707971; margin: 8px 0 4px"></span>
+        <div style="display: flex; flex-direction: column">
+          <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">Onde você vai comprar?</span>
+          <span style="font-size: 20px; line-height: 28px; font-weight: 600">{{sheet.nome}}</span>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; background: #FFFFFF; border-radius: 16px; overflow: hidden">
+          <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Mercado</legend>
+          <sc-for list="{{sheet.opcoes}}" as="op" hint-placeholder-count="3">
+            <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-top: 1px solid #E4E7E3; cursor: pointer">
+              <input type="radio" name="mercado" checked="{{op.on}}" onChange="{{op.pick}}" style="width: 20px; height: 20px; margin: 0">
+              <span style="width: 8px; height: 8px; border-radius: 4px; background: {{op.cor}}"></span>
+              <span style="flex: 1; display: flex; flex-direction: column">
+                <span style="font-size: 14px; line-height: 20px; font-weight: 600">{{op.mercado}}</span>
+                <sc-if value="{{op.menor}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #1E7A66">Mais barato</span></sc-if>
+              </span>
+              <span style="font-size: 16px; line-height: 24px; font-weight: 700">{{op.preco}}</span>
+            </label>
+          </sc-for>
+        </fieldset>
+        <button type="button" onClick="{{confirmar}}" style="height: 48px; border: 0; border-radius: 24px; background: #1E7A66; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">{{sheet.cta}}</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mercado: null, ordem: 'preco', lista: {}, aberto: null, escolha: null, snack: null };
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  aviso(msg) {
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ snack: null }), 3000);
+    return msg;
+  }
+  renderVals() {
+    const brl = (n) => 'R$ ' + n.toFixed(2).replace('.', ',');
+    const cor = { BM: '#1D4ED8', CD: '#B45309', AT: '#0F766E', BH: '#6D28D9' };
+    const nome = { BM: 'Big Mais', CD: 'Coelho Diniz', AT: 'Atacadão', BH: 'Supermercados BH' };
+    const catalogo = [
+      { id: 'arroz', nome: 'Arroz Agulhinha Camil Tipo 1 5kg', p: { BH: 23.80, AT: 24.50, CD: 25.90, BM: 26.90 } },
+      { id: 'tio', nome: 'Arroz Tio João Tipo 1 5kg', p: { BM: 26.90, AT: 27.90 } },
+      { id: 'prato', nome: 'Arroz Prato Fino Tipo 1 5kg', p: { BH: 27.90, CD: 28.50 } },
+    ];
+    const mer = this.state.mercado;
+    const preco = (p) => (mer ? p.p[mer] : Math.min.apply(null, Object.values(p.p)));
+    const melhor = (p) => Object.keys(p.p).reduce((a, b) => (p.p[b] < p.p[a] ? b : a));
+    let lista = catalogo.filter((p) => !mer || p.p[mer] != null);
+    lista.sort((a, b) => this.state.ordem === 'preco' ? preco(a) - preco(b) : Object.keys(b.p).length - Object.keys(a.p).length);
+    const L = this.state.lista;
+    const setItem = (id, item, msg) => {
+      const novo = Object.assign({}, L);
+      if (item) novo[id] = item; else delete novo[id];
+      this.setState({ lista: novo, snack: this.aviso(msg) });
+    };
+    const card = 'display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 16px; background: #FFFFFF; ';
+    const base = 'flex: none; height: 32px; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; ';
+    const chipIds = [null, 'BM', 'CD', 'AT', 'BH'];
+    const ab = catalogo.find((p) => p.id === this.state.aberto);
+    let sheet = { nome: '', opcoes: [], cta: '' };
+    if (ab) {
+      const ord = Object.keys(ab.p).sort((a, b) => ab.p[a] - ab.p[b]);
+      sheet = { nome: ab.nome, cta: 'Comprar no ' + nome[this.state.escolha], opcoes: ord.map((i, idx) => ({ mercado: nome[i], cor: cor[i], preco: brl(ab.p[i]), menor: idx === 0, on: i === this.state.escolha, pick: () => this.setState({ escolha: i }) })) };
+    }
+    return {
+      chips: chipIds.map((id) => {
+        const on = id === mer;
+        return { label: id ? nome[id] : 'Todos', on, pick: () => this.setState({ mercado: id }), style: base + (on ? 'border: 0; padding-left: 8px; background: #D6E7E3; color: #0E372E' : 'border: 1px solid #707971; background: transparent; color: #4A4F4C') };
+      }),
+      ordemLabel: this.state.ordem === 'preco' ? 'Menor preço' : 'Mais mercados',
+      trocarOrdem: () => this.setState({ ordem: this.state.ordem === 'preco' ? 'mercados' : 'preco' }),
+      total: lista.length + (lista.length === 1 ? ' produto' : ' produtos'),
+      onde: mer ? 'no ' + nome[mer] : 'em oferta hoje',
+      vazio: lista.length === 0,
+      itens: lista.map((p) => {
+        const alvo = mer || melhor(p);
+        const na = L[p.id];
+        const q = na ? na.q : 0;
+        const v = na ? p.p[na.m] : p.p[alvo];
+        return {
+          nome: p.nome,
+          prefixo: na ? q + '× de' : (mer ? '' : 'a partir de'),
+          preco: v.toFixed(2).replace('.', ','), kg: (v / 5).toFixed(2).replace('.', ','),
+          dica: mer ? 'no ' + nome[mer] : 'mais barato no ' + nome[alvo],
+          mercado: na ? nome[na.m] : '', cor: na ? cor[na.m] : '#707971',
+          qtd: q, fora: !na, dentro: !!na, ehUm: q === 1, maisDeUm: q > 1,
+          addLabel: 'Adicionar ' + p.nome + ' à lista',
+          maisLabel: 'Mais um ' + p.nome,
+          menosLabel: q === 1 ? 'Tirar ' + p.nome + ' da lista' : 'Menos um ' + p.nome,
+          trocarLabel: 'Trocar mercado de ' + p.nome,
+          mais: () => setItem(p.id, { m: na ? na.m : alvo, q: q + 1 }, na ? (q + 1) + '× ' + p.nome : 'Adicionado no ' + nome[alvo]),
+          menos: () => setItem(p.id, q > 1 ? { m: na.m, q: q - 1 } : null, q > 1 ? (q - 1) + '× ' + p.nome : 'Tirado da lista'),
+          trocar: () => this.setState({ aberto: p.id, escolha: na.m }),
+          cardStyle: card + (na ? 'border: 2px solid #1E7A66; padding: 7px' : 'border: 1px solid #D9DDD9'),
+        };
+      }),
+      sheet, sheetAberto: !!ab,
+      fechar: () => this.setState({ aberto: null }),
+      confirmar: () => {
+        const id = this.state.aberto, esc = this.state.escolha;
+        this.setState({ lista: Object.assign({}, L, { [id]: { m: esc, q: L[id].q } }), aberto: null, snack: this.aviso('Agora no ' + nome[esc]) });
+      },
+      snack: !!this.state.snack, snackTexto: this.state.snack || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

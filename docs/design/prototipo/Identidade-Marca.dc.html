@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Promoção na Mão — marca</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; min-height: 1320px; box-sizing: border-box; padding: 56px; background: #F7F7F4; color: #1B1D1C; font-family: 'Nunito', system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px">
+
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 13px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; color: #4A4F4C">Direção A · refinamento</span>
+      <h1 style="margin: 0; font-family: 'Fredoka', sans-serif; font-size: 44px; line-height: 52px; font-weight: 600">Promoção na Mão</h1>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px">
+      <span style="font-size: 13px; font-weight: 700; color: #4A4F4C">Cor do app: {{corNome}}</span>
+      <div style="display: flex; gap: 8px">
+        <sc-for list="{{cores}}" as="c" hint-placeholder-count="5">
+          <button type="button" onClick="{{c.pick}}" aria-label="{{c.label}}" aria-pressed="{{c.on}}" style="{{c.style}}"></button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px">
+
+    <section style="grid-column: span 7; display: flex; flex-direction: column; gap: 16px; padding: 28px; border-radius: 24px; background: #FFFFFF; border: 1px solid #DADDD8">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 800; color: #4A4F4C">Logo</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <div style="height: 180px; border-radius: 16px; background: #FFFFFF; border: 1px dashed #DADDD8; display: flex; align-items: center; justify-content: center; gap: 14px">
+          <svg width="64" height="64" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="{{seed}}"></path><circle cx="31" cy="15" r="2.8" fill="#FFFFFF"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"></path></svg>
+          <span style="font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 34px; line-height: 1; color: {{escuro}}">Promoção <span style="color: {{seed}}">na Mão</span></span>
+        </div>
+        <div style="height: 180px; border-radius: 16px; background: {{seed}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+          <svg width="56" height="56" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="#FFFFFF"></path><circle cx="31" cy="15" r="2.8" fill="{{seed}}"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="{{seed}}" stroke-width="2.8" stroke-linecap="round"></path></svg>
+          <span style="font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 28px; line-height: 1.05; color: #FFFFFF; text-align: center">Promoção<br>na Mão</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; font-size: 14px; line-height: 20px; color: #4A4F4C">
+        <span><strong style="color: #1B1D1C">Símbolo:</strong> etiqueta de preço com sorriso. O furo da etiqueta vira o olho.</span>
+        <span><strong style="color: #1B1D1C">Área livre:</strong> a altura do furo em volta do logo.</span>
+      </div>
+    </section>
+
+    <section style="grid-column: span 5; display: flex; flex-direction: column; gap: 16px; padding: 28px; border-radius: 24px; background: #FFFFFF; border: 1px solid #DADDD8">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 800; color: #4A4F4C">Ícone do app</h2>
+      <div style="display: flex; align-items: flex-end; gap: 20px">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <div style="width: 112px; height: 112px; border-radius: 26px; background: {{seed}}; display: flex; align-items: center; justify-content: center">
+            <svg width="76" height="76" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="#FFFFFF"></path><circle cx="31" cy="15" r="2.8" fill="{{seed}}"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="{{seed}}" stroke-width="2.8" stroke-linecap="round"></path></svg>
+          </div>
+          <span style="font-size: 12px; color: #4A4F4C">Na cor escolhida</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <div style="width: 72px; height: 72px; border-radius: 17px; background: #FFFFFF; border: 1px solid #DADDD8; display: flex; align-items: center; justify-content: center">
+            <svg width="50" height="50" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="{{seed}}"></path><circle cx="31" cy="15" r="2.8" fill="#FFFFFF"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"></path></svg>
+          </div>
+          <span style="font-size: 12px; color: #4A4F4C">Fundo claro</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+          <div style="width: 48px; height: 48px; border-radius: 12px; background: #1B1D1C; display: flex; align-items: center; justify-content: center">
+            <svg width="32" height="32" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="{{claroDark}}"></path><circle cx="31" cy="15" r="2.8" fill="#1B1D1C"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="#1B1D1C" stroke-width="2.8" stroke-linecap="round"></path></svg>
+          </div>
+          <span style="font-size: 12px; color: #4A4F4C">Escuro</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 16px; padding: 16px; border-radius: 16px; background: #2B302D">
+        <sc-for list="{{tela}}" as="t" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 64px">
+            <div style="{{t.style}}">
+              <sc-if value="{{t.nosso}}" hint-placeholder-val="{{false}}">
+                <svg width="38" height="38" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="#FFFFFF"></path><circle cx="31" cy="15" r="2.8" fill="{{seed}}"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="{{seed}}" stroke-width="2.8" stroke-linecap="round"></path></svg>
+              </sc-if>
+            </div>
+            <span style="font-size: 11px; line-height: 14px; color: #FFFFFF; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 64px">{{t.nome}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-size: 13px; line-height: 18px; color: #4A4F4C">O nome embaixo do ícone fica curto: sugestão de nome de exibição <strong style="color: #1B1D1C">“Promoção”</strong> ou <strong style="color: #1B1D1C">“Na Mão”</strong>.</span>
+    </section>
+
+    <section style="grid-column: span 7; display: flex; flex-direction: column; gap: 16px; padding: 28px; border-radius: 24px; background: #FFFFFF; border: 1px solid #DADDD8">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 800; color: #4A4F4C">Componentes · claro e escuro</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <sc-for list="{{temas}}" as="t" hint-placeholder-count="2">
+          <div style="{{t.fundo}}">
+            <span style="{{t.legenda}}">{{t.nome}}</span>
+            <div style="{{t.hero}}">
+              <span style="{{t.heroLabel}}">Sua lista</span>
+              <span style="font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 24px; line-height: 30px">5 itens em 3 mercados</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+              <div style="{{t.card}}">
+                <div style="{{t.img}}"></div>
+                <span style="font-size: 13px; line-height: 18px; font-weight: 700">Café 3 Corações 250g</span>
+                <span style="{{t.preco}}">R$ 21,90</span>
+                <span style="{{t.btn}}">+ Adicionar</span>
+              </div>
+              <div style="{{t.cardOn}}">
+                <div style="{{t.img}}"></div>
+                <span style="font-size: 13px; line-height: 18px; font-weight: 700">Arroz Camil 5kg</span>
+                <span style="{{t.preco}}">R$ 23,80</span>
+                <span style="{{t.stepper}}"><span>−</span><span>2</span><span>+</span></span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap">
+              <span style="{{t.chipOn}}">✓ Todos</span>
+              <span style="{{t.chip}}">Atacadão</span>
+              <span style="{{t.chip}}">Big Mais</span>
+            </div>
+            <div style="{{t.snack}}"><span>Café adicionado no Atacadão</span><span style="{{t.snackAcao}}">Ver lista</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="grid-column: span 5; display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: 28px; border-radius: 24px; background: #FFFFFF; border: 1px solid #DADDD8">
+        <h2 style="margin: 0; font-size: 14px; font-weight: 800; color: #4A4F4C">Tipografia</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 32px; line-height: 40px">Ofertas de hoje</span><span style="font-size: 12px; color: #4A4F4C; white-space: nowrap">Fredoka 600 · 32</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 22px; line-height: 28px">Minha lista</span><span style="font-size: 12px; color: #4A4F4C; white-space: nowrap">Fredoka 600 · 22</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 20px; line-height: 26px; color: {{escuro}}">R$ 21,90</span><span style="font-size: 12px; color: #4A4F4C; white-space: nowrap">Preço · Fredoka 600 · 20</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 16px; line-height: 24px">Arroz Agulhinha Camil Tipo 1 5kg</span><span style="font-size: 12px; color: #4A4F4C; white-space: nowrap">Nunito 400 · 16</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 14px; line-height: 20px; font-weight: 700">Adicionar</span><span style="font-size: 12px; color: #4A4F4C; white-space: nowrap">Botão · Nunito 700 · 14</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 12px; line-height: 16px; color: #4A4F4C">Ofertas valem até 25/10</span><span style="font-size: 12px; color: #4A4F4C; white-space: nowrap">Nunito 400 · 12</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: 24px; background: #FFFFFF; border: 1px solid #DADDD8">
+        <h2 style="margin: 0; font-size: 14px; font-weight: 800; color: #4A4F4C">Jeito de falar</h2>
+        <sc-for list="{{falas}}" as="f" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 12px; font-weight: 800; color: #4A4F4C">{{f.quando}}</span>
+            <span style="{{balao}}">{{f.texto}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1320}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cor: 0 };
+  }
+  renderVals() {
+    const paleta = [
+      { hex: '#1E7A66', nome: 'verde-água' },
+      { hex: '#5B4BC4', nome: 'roxo' },
+      { hex: '#2F5D8C', nome: 'azul-petróleo' },
+      { hex: '#A8326E', nome: 'framboesa' },
+      { hex: '#3F4A44', nome: 'grafite' },
+    ];
+    const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const mix = (h, alvo, t) => {
+      const a = rgb(h), b = rgb(alvo);
+      return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('');
+    };
+    const seed = paleta[this.state.cor].hex;
+    const claro = mix(seed, '#FFFFFF', 0.82);
+    const escuro = mix(seed, '#000000', 0.5);
+    const primDark = mix(seed, '#FFFFFF', 0.45);
+    const onPrimDark = mix(seed, '#000000', 0.7);
+    const tema = (dark) => {
+      const fundo = dark ? '#141715' : mix(seed, '#FFFFFF', 0.95);
+      const sup = dark ? '#1E2220' : '#FFFFFF';
+      const txt = dark ? '#E3E6E2' : '#1B1D1C';
+      const borda = dark ? '#3A403C' : '#DADDD8';
+      const p = dark ? primDark : seed;
+      const onP = dark ? onPrimDark : '#FFFFFF';
+      return {
+        nome: dark ? 'Escuro' : 'Claro',
+        fundo: 'display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 20px; background: ' + fundo + '; color: ' + txt,
+        legenda: 'font-size: 12px; font-weight: 800; color: ' + (dark ? '#A9B0AB' : '#4A4F4C'),
+        hero: 'display: flex; flex-direction: column; padding: 14px 16px; border-radius: 22px; background: ' + p + '; color: ' + onP,
+        heroLabel: 'font-size: 12px; font-weight: 700; color: ' + (dark ? onP : claro),
+        card: 'display: flex; flex-direction: column; gap: 4px; padding: 8px; border-radius: 16px; background: ' + sup + '; border: 1px solid ' + borda,
+        cardOn: 'display: flex; flex-direction: column; gap: 4px; padding: 7px; border-radius: 16px; background: ' + sup + '; border: 2px solid ' + p,
+        img: 'height: 52px; border-radius: 10px; background: ' + (dark ? '#2A2F2C' : '#EEF0EC'),
+        preco: "font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 18px; line-height: 24px; color: " + (dark ? primDark : escuro),
+        btn: 'height: 36px; border-radius: 18px; background: ' + p + '; color: ' + onP + '; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800',
+        stepper: 'height: 36px; padding: 0 14px; border-radius: 18px; background: ' + p + '; color: ' + onP + '; display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 800',
+        chip: 'height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid ' + (dark ? '#5C635E' : '#8A918C') + '; display: flex; align-items: center; font-size: 13px; font-weight: 700',
+        chipOn: 'height: 30px; padding: 0 12px; border-radius: 15px; background: ' + (dark ? mix(seed, '#000000', 0.45) : claro) + '; color: ' + (dark ? '#FFFFFF' : escuro) + '; display: flex; align-items: center; font-size: 13px; font-weight: 800',
+        snack: 'display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 10px; font-size: 13px; background: ' + (dark ? '#E3E6E2' : '#2D322E') + '; color: ' + (dark ? '#1B1D1C' : '#EEF2EB'),
+        snackAcao: 'font-weight: 800; color: ' + (dark ? seed : mix(seed, '#FFFFFF', 0.5)),
+      };
+    };
+    return {
+      seed, escuro, claroDark: primDark,
+      corNome: paleta[this.state.cor].nome,
+      cores: paleta.map((p, i) => {
+        const on = i === this.state.cor;
+        return {
+          on, label: 'Usar ' + p.nome, pick: () => this.setState({ cor: i }),
+          style: 'width: 36px; height: 36px; border-radius: 18px; cursor: pointer; background: ' + p.hex + '; border: 3px solid ' + (on ? '#FFFFFF' : p.hex) + '; box-shadow: 0 0 0 2px ' + (on ? '#1B1D1C' : 'transparent'),
+        };
+      }),
+      tela: [
+        { nome: 'Promoção', nosso: true, style: 'width: 56px; height: 56px; border-radius: 14px; background: ' + seed + '; display: flex; align-items: center; justify-content: center' },
+        { nome: 'Agenda', nosso: false, style: 'width: 56px; height: 56px; border-radius: 14px; background: #4A524D' },
+        { nome: 'Fotos', nosso: false, style: 'width: 56px; height: 56px; border-radius: 14px; background: #5B625E' },
+        { nome: 'Mensagens', nosso: false, style: 'width: 56px; height: 56px; border-radius: 14px; background: #4A524D' },
+      ],
+      temas: [tema(false), tema(true)],
+      balao: 'font-size: 15px; line-height: 22px; padding: 10px 14px; border-radius: 16px 16px 16px 4px; background: ' + claro + '; color: ' + escuro,
+      falas: [
+        { quando: 'Oferta nova', texto: 'Opa! O café que você sempre leva baixou no Atacadão.' },
+        { quando: 'Lista vazia', texto: 'Sua lista tá vazia. Bora dar uma olhada nas ofertas de hoje?' },
+        { quando: 'Lista compartilhada', texto: 'Prontinho! Mandamos a lista. Você vê na hora o que já foi pro carrinho.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

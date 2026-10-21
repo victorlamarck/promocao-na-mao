@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Promoção na Mão — site</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<style>
+body{margin:0;background:#F4F8F7}
+h1,h2,.f{font-family:'Fredoka','Nunito',system-ui,sans-serif!important;font-weight:600!important}
+a{color:#1E7A66}a:hover{color:#0E372E}
+input::placeholder{color:#4A4F4C}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #1E7A66;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F4F8F7; color: #1B1D1C; font-family: 'Nunito', system-ui, sans-serif">
+
+  <header style="background: #FFFFFF; border-bottom: 1px solid #D9DDD9">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 12px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #1B1D1C">
+        <svg width="40" height="40" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 22.5 21.5 9H37v15.5L23.5 38a3.4 3.4 0 0 1-4.8 0L8 27.3a3.4 3.4 0 0 1 0-4.8z" fill="#1E7A66"></path><circle cx="31" cy="15" r="2.8" fill="#FFFFFF"></circle><path d="M17 24c1.9 3 5.4 4.2 8.6 2.8" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"></path></svg>
+        <span class="f" style="font-size: 24px; line-height: 28px">Promoção <span style="color: #1E7A66">na Mão</span></span>
+      </a>
+      <label style="flex: 1 1 320px; min-width: 0; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; border-radius: 999px; background: #EEF0EC">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1D1C" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar produto</span>
+        <input type="search" placeholder="Buscar nos encartes de GV: arroz, café, cerveja…" style="flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 16px; color: #1B1D1C; outline: none">
+      </label>
+      <button type="button" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #707971; background: transparent; font: inherit; font-size: 14px; font-weight: 700; color: #1B1D1C; display: flex; align-items: center; gap: 6px; cursor: pointer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+        Centro, Gov. Valadares
+      </button>
+      <a href="#lista" style="height: 40px; padding: 0 16px; border-radius: 999px; background: #1E7A66; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; text-decoration: none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"></path></svg>
+        Minha lista · {{totalItens}}
+      </a>
+    </div>
+  </header>
+
+  <div style="max-width: 1240px; margin: 0 auto; padding: 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+    <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 28px">
+
+      <section style="border-radius: 24px; background: #1E7A66; color: #FFFFFF; padding: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px">
+        <div style="flex: 1 1 360px; display: flex; flex-direction: column; gap: 8px">
+          <h1 style="margin: 0; font-size: 36px; line-height: 42px; text-wrap: balance">As ofertas dos mercados de GV numa lista só</h1>
+          <p style="margin: 0; font-size: 16px; line-height: 24px; color: #D6E7E3; max-width: 520px">Junte o que você precisa, veja em qual mercado está em oferta e mande a lista pronta para quem vai às compras.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start">
+          <a href="#ofertas" style="height: 48px; padding: 0 24px; border-radius: 999px; background: #D6E7E3; color: #0E372E; display: flex; align-items: center; font-size: 15px; font-weight: 800; text-decoration: none">Ver ofertas de hoje</a>
+          <span style="font-size: 12px; line-height: 16px; color: #D6E7E3">Encartes atualizados hoje · app em breve</span>
+        </div>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+          <div style="display: flex; flex-direction: column">
+            <h2 style="margin: 0; font-size: 22px; line-height: 28px">Mercados perto de você</h2>
+            <span style="font-size: 13px; line-height: 18px; color: #4A4F4C">Do mais perto ao mais longe do Centro</span>
+          </div>
+          <a href="#" style="font-size: 14px; font-weight: 700; text-decoration: none">Ver todos os encartes</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px">
+          <sc-for list="{{perto}}" as="m" hint-placeholder-count="4">
+            <button type="button" onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="{{m.style}}">
+              <span style="width: 44px; height: 44px; flex: none; border-radius: 22px; background: {{m.cor}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px">{{m.sigla}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; text-align: left">
+                <span style="font-size: 15px; line-height: 20px; font-weight: 700">{{m.nome}}</span>
+                <span style="font-size: 12px; line-height: 16px; color: #4A4F4C">{{m.dist}} · até {{m.ate}}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section id="ofertas" style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+          <h2 style="margin: 0; font-size: 22px; line-height: 28px">{{tituloOfertas}}</h2>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+              <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="{{c.style}}">{{c.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px">
+          <sc-for list="{{itens}}" as="o" hint-placeholder-count="8">
+            <div style="{{o.cardStyle}}">
+              <div style="height: 120px; border-radius: 8px; background: #EEF0EC; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #4A4F4C">imagem do encarte</div>
+              <span style="font-size: 14px; line-height: 20px; font-weight: 600; min-height: 40px">{{o.nome}}</span>
+              <span style="display: flex; align-items: baseline; gap: 6px">
+                <span style="font-size: 12px; color: #4A4F4C">{{o.prefixo}}</span>
+                <span class="f" style="font-size: 22px; line-height: 28px; color: #0E372E">R$ {{o.preco}}</span>
+              </span>
+              <sc-if value="{{o.fora}}" hint-placeholder-val="{{true}}">
+                <span style="font-size: 12px; line-height: 16px; color: #4A4F4C; min-height: 36px; display: flex; align-items: center">{{o.dica}}</span>
+                <button type="button" onClick="{{o.mais}}" aria-label="{{o.addLabel}}" style="height: 44px; border: 0; border-radius: 999px; background: #1E7A66; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                  Adicionar
+                </button>
+              </sc-if>
+              <sc-if value="{{o.dentro}}" hint-placeholder-val="{{false}}">
+                <button type="button" onClick="{{o.trocar}}" aria-label="{{o.trocarLabel}}" style="min-height: 36px; border: 0; background: transparent; padding: 0; font: inherit; font-size: 12px; line-height: 16px; color: #0E372E; display: flex; align-items: center; gap: 6px; cursor: pointer; text-align: left">
+                  <span style="width: 8px; height: 8px; flex: none; border-radius: 4px; background: {{o.cor}}"></span>
+                  <span style="flex: 1; min-width: 0">no <strong>{{o.mercado}}</strong></span>
+                  <span style="font-weight: 700; text-decoration: underline">trocar</span>
+                </button>
+                <div style="height: 44px; border-radius: 999px; background: #1E7A66; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between">
+                  <button type="button" onClick="{{o.menos}}" aria-label="{{o.menosLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg>
+                  </button>
+                  <span aria-live="polite" style="font-size: 16px; font-weight: 800">{{o.qtd}}</span>
+                  <button type="button" onClick="{{o.mais}}" aria-label="{{o.maisLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                  </button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; border-radius: 16px; background: #FFFFFF; border: 1px solid #D9DDD9">
+          <span style="font-size: 12px; line-height: 16px; font-weight: 700; color: #001F26; background: #BEEAF6; padding: 2px 8px; border-radius: 8px">Anúncio</span>
+          <span style="flex: 1 1 240px; font-size: 14px; color: #4A4F4C">[Banner do anunciante · 728×90 no computador, 320×100 no celular]</span>
+        </div>
+      </section>
+    </main>
+
+    <aside id="lista" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 24px; background: #FFFFFF; border: 1px solid #D9DDD9">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <div style="display: flex; flex-direction: column">
+          <h2 style="margin: 0; font-size: 22px; line-height: 28px">Minha lista</h2>
+          <span style="font-size: 13px; line-height: 18px; color: #4A4F4C">{{resumo}}</span>
+        </div>
+        <button type="button" onClick="{{alternarShare}}" style="height: 40px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; background: #1E7A66; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"></path></svg>
+          Compartilhar
+        </button>
+      </div>
+
+      <sc-if value="{{shareAberto}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 16px; background: #D6E7E3; color: #0E372E">
+          <span style="font-size: 14px; line-height: 20px; font-weight: 700">Sempre o mesmo link, sempre atualizado</span>
+          <div style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 4px 0 12px; border-radius: 12px; background: #FFFFFF">
+            <span style="flex: 1; min-width: 0; font-size: 13px; color: #4A4F4C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">promocaonamao.com.br/l/K7Q2M</span>
+            <button type="button" onClick="{{copiar}}" style="height: 36px; padding: 0 10px; border: 0; background: transparent; color: #1E7A66; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer">{{copiarTexto}}</button>
+          </div>
+          <a href="Web-ListaRecebida.dc.html" style="height: 44px; border-radius: 999px; background: #1E7A66; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 700; text-decoration: none">Enviar pelo WhatsApp</a>
+        </div>
+      </sc-if>
+
+      <sc-for list="{{grupos}}" as="g" hint-placeholder-count="3">
+        <div style="display: flex; flex-direction: column; border: 1px solid #D9DDD9; border-radius: 16px; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #F4F8F7">
+            <span style="width: 10px; height: 10px; border-radius: 5px; background: {{g.cor}}"></span>
+            <span style="flex: 1; font-size: 14px; line-height: 20px; font-weight: 800">{{g.nome}}</span>
+            <span style="font-size: 12px; color: #4A4F4C">{{g.contagem}}</span>
+          </div>
+          <sc-for list="{{g.itens}}" as="i" hint-placeholder-count="2">
+            <div style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 12px; border-top: 1px solid #E4E7E3; font-size: 14px; line-height: 20px">
+              <span style="flex: 1; min-width: 0">{{i.nome}}</span>
+              <span style="font-weight: 800">{{i.qtd}}×</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 16px; border: 1px dashed #707971">
+        <span style="font-size: 14px; line-height: 20px; font-weight: 700">Sua lista fica salva neste navegador</span>
+        <span style="font-size: 13px; line-height: 18px; color: #4A4F4C">Entre com o Google para ver a mesma lista no celular e no app, quando ele sair.</span>
+        <button type="button" style="align-self: flex-start; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #707971; background: transparent; font: inherit; font-size: 14px; font-weight: 700; color: #1E7A66; cursor: pointer">Entrar com Google</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer style="border-top: 1px solid #D9DDD9; background: #FFFFFF">
+    <div style="max-width: 1240px; margin: 0 auto; padding: 20px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; line-height: 18px; color: #4A4F4C">
+      <span>Promoção na Mão · ofertas dos encartes de Governador Valadares</span>
+      <span style="display: flex; gap: 16px; flex-wrap: wrap"><a href="#">Para mercados</a><a href="#">Anuncie</a><a href="#">Privacidade</a></span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      lista: { arroz: { m: 'BH', q: 1 }, cafe: { m: 'AT', q: 1 }, hein: { m: 'AT', q: 12 }, coca: { m: 'CD', q: 6 } },
+      mercado: null, cat: 'Destaques', share: false, copiado: false,
+    };
+  }
+  renderVals() {
+    const nome = { BM: 'Big Mais', CD: 'Coelho Diniz', AT: 'Atacadão', BH: 'Supermercados BH' };
+    const cor = { BM: '#1D4ED8', CD: '#B45309', AT: '#0F766E', BH: '#6D28D9' };
+    const dist = { AT: 0.8, BH: 1.4, CD: 2.1, BM: 3.5 };
+    const ate = { AT: '25/10', BH: '31/10', CD: '04/11', BM: '03/11' };
+    const cat = {
+      arroz: { nome: 'Arroz Agulhinha Camil 5kg', c: 'Mercearia', p: { BH: 23.80, AT: 24.50, CD: 25.90, BM: 26.90 } },
+      cafe: { nome: 'Café Gourmet 3 Corações 250g', c: 'Mercearia', p: { AT: 21.90, BH: 27.50, BM: 29.90 } },
+      feij: { nome: 'Feijão Carioca Kicaldo 1kg', c: 'Mercearia', p: { CD: 7.49, BH: 7.99, BM: 8.29 } },
+      coca: { nome: 'Coca-Cola Lata 220ml', c: 'Bebidas', p: { CD: 2.79, AT: 2.89, BM: 2.99 } },
+      hein: { nome: 'Cerveja Heineken Lata 473ml', c: 'Bebidas', p: { AT: 5.29, BM: 5.49, BH: 5.59, CD: 5.79 } },
+      orig: { nome: 'Cerveja Original Lata 473ml', c: 'Bebidas', p: { BH: 5.68, AT: 5.79, BM: 5.89 } },
+      ling: { nome: 'Linguiça Mista Perdigão kg', c: 'Açougue', p: { BM: 17.90, CD: 18.90 } },
+      det: { nome: 'Detergente Ypê 500ml', c: 'Limpeza', p: { BH: 2.29, AT: 2.39, CD: 2.49 } },
+      omo: { nome: 'Sabão em pó Omo 1,6kg', c: 'Limpeza', p: { AT: 24.90, BH: 27.90, BM: 28.90 } },
+      leite: { nome: 'Leite Integral Itambé 1L', c: 'Mercearia', p: { BH: 4.59, AT: 4.79, CD: 4.99 } },
+    };
+    const destaques = ['feij', 'arroz', 'det', 'orig', 'cafe', 'ling', 'omo', 'leite', 'coca', 'hein'];
+    const L = this.state.lista, mer = this.state.mercado, c = this.state.cat;
+    const brl = (n) => n.toFixed(2).replace('.', ',');
+    const melhor = (p) => Object.keys(p.p).reduce((a, b) => (p.p[b] < p.p[a] ? b : a));
+    const setItem = (id, item) => {
+      const novo = Object.assign({}, L);
+      if (item) novo[id] = item; else delete novo[id];
+      this.setState({ lista: novo });
+    };
+    const chipBase = 'height: 36px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ';
+    const ids = destaques.filter((id) => (c === 'Destaques' || cat[id].c === c) && (!mer || cat[id].p[mer] != null));
+    const card = 'display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 16px; background: #FFFFFF; ';
+    const itens = ids.map((id) => {
+      const p = cat[id];
+      const alvo = mer || melhor(p);
+      const na = L[id];
+      const q = na ? na.q : 0;
+      const ordem = Object.keys(p.p).sort((a, b) => p.p[a] - p.p[b]);
+      return {
+        nome: p.nome, prefixo: na ? q + '× de' : (mer ? '' : 'a partir de'),
+        preco: brl(na ? p.p[na.m] : p.p[alvo]),
+        dica: mer ? 'no ' + nome[mer] : 'mais barato no ' + nome[alvo],
+        mercado: na ? nome[na.m] : '', cor: na ? cor[na.m] : '#707971',
+        qtd: q, fora: !na, dentro: !!na,
+        addLabel: 'Adicionar ' + p.nome + ' à lista', maisLabel: 'Mais um ' + p.nome,
+        menosLabel: q === 1 ? 'Tirar ' + p.nome + ' da lista' : 'Menos um ' + p.nome,
+        trocarLabel: 'Trocar mercado de ' + p.nome,
+        mais: () => setItem(id, { m: na ? na.m : alvo, q: q + 1 }),
+        menos: () => setItem(id, q > 1 ? { m: na.m, q: q - 1 } : null),
+        trocar: () => setItem(id, { m: ordem[(ordem.indexOf(na.m) + 1) % ordem.length], q: q }),
+        cardStyle: card + (na ? 'border: 2px solid #1E7A66; padding: 9px' : 'border: 1px solid #D9DDD9'),
+      };
+    });
+    const lids = Object.keys(L);
+    const grupos = Object.keys(dist).sort((a, b) => dist[a] - dist[b]).map((m) => {
+      const its = lids.filter((i) => L[i].m === m);
+      if (!its.length) return null;
+      return { nome: nome[m], cor: cor[m], contagem: its.length + (its.length === 1 ? ' item' : ' itens'), itens: its.map((i) => ({ nome: cat[i].nome, qtd: L[i].q })) };
+    }).filter(Boolean);
+    return {
+      totalItens: lids.length,
+      resumo: lids.length + ' itens em ' + grupos.length + ' mercados',
+      grupos,
+      perto: Object.keys(dist).sort((a, b) => dist[a] - dist[b]).map((m) => {
+        const on = mer === m;
+        return {
+          sigla: m, nome: nome[m], cor: cor[m], ate: ate[m], on,
+          dist: dist[m] < 1 ? Math.round(dist[m] * 1000) + ' m' : dist[m].toFixed(1).replace('.', ',') + ' km',
+          pick: () => this.setState({ mercado: on ? null : m }),
+          style: 'display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; font: inherit; color: #1B1D1C; cursor: pointer; ' + (on ? 'background: #D6E7E3; border: 2px solid #1E7A66; padding: 11px' : 'background: #FFFFFF; border: 1px solid #D9DDD9'),
+        };
+      }),
+      tituloOfertas: mer ? 'Ofertas no ' + nome[mer] : 'Ofertas de hoje',
+      cats: ['Destaques', 'Mercearia', 'Bebidas', 'Açougue', 'Limpeza'].map((n) => {
+        const on = n === c;
+        return { label: n, on, pick: () => this.setState({ cat: n }), style: chipBase + (on ? 'border: 0; background: #D6E7E3; color: #0E372E' : 'border: 1px solid #707971; background: transparent; color: #4A4F4C') };
+      }),
+      itens,
+      shareAberto: this.state.share,
+      alternarShare: () => this.setState({ share: !this.state.share, copiado: false }),
+      copiar: () => this.setState({ copiado: true }),
+      copiarTexto: this.state.copiado ? 'Copiado' : 'Copiar',
+    };
+  }
+}
+</script>
+</body>
+</html>

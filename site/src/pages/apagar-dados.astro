@@ -1,0 +1,68 @@
+---
+// Como apagar seus dados: link pedido pela Google Play ("Segurança dos dados → exclusão de dados").
+// Tem de abrir sem o app e citar o nome do app, os passos, o que é apagado e o que fica. Mudou? Mude a data.
+import Base from '../layouts/Base.astro';
+const email = 'oi.promocaonamao@gmail.com';
+const assunto = encodeURIComponent('Apagar meus dados - Promoção na Mão');
+---
+<Base titulo="Como apagar seus dados" descricao="Como apagar a sua lista e os seus dados do Promoção na Mão, no app ou por e-mail.">
+  <article class="texto">
+    <h1>Como apagar seus dados do Promoção na Mão</h1>
+    <p class="suave">Atualizada em 21 de outubro de 2026</p>
+
+    <p>
+      O Promoção na Mão (app e site, da VL Desenvolvimento e Tecnologia LTDA) não tem cadastro: não pedimos
+      nome, e-mail nem telefone. O único dado seu que fica no nosso banco é a <strong>lista de compras</strong>
+      (os itens que você anotou ou adicionou e o nome que você escolheu mostrar ao compartilhar).
+    </p>
+
+    <h2>No app ou no site: na hora</h2>
+    <ol>
+      <li>Abra a aba <strong>Lista</strong>.</li>
+      <li>Toque em <strong>Compartilhar</strong>.</li>
+      <li>Toque em <strong>Apagar minha lista</strong> e confirme.</li>
+    </ol>
+    <p>
+      A lista e todos os itens saem do nosso banco de dados na hora, e quem recebeu o link deixa de vê-la.
+      No app, para tirar só um item, toque na lixeira ao lado dele.
+    </p>
+
+    <h2>Sem o app, ou se perdeu o acesso à lista: por e-mail</h2>
+    <p>
+      Escreva para <a href={`mailto:${email}?subject=${assunto}`}>{email}</a> com o assunto
+      "Apagar meus dados" e o <strong>link da lista</strong> (começa com <code>promocaonamao.com.br/l/</code>).
+      Apagamos em até <strong>15 dias</strong> e respondemos confirmando.
+    </p>
+    <p>
+      O link é como achamos a sua lista: como não pedimos nome, e-mail nem telefone, é a única coisa que liga
+      uma lista a quem a criou. Não sabe onde está? Procure na conversa do WhatsApp em que você mandou a lista.
+      Sem o link, não temos como saber qual lista é a sua, e não apagamos no chute (poderia ser a de outra
+      pessoa). Mas ela não fica para sempre: lista sem nenhuma mudança por <strong>6 meses</strong> é apagada sozinha.
+    </p>
+
+    <h2>O que é apagado e o que fica</h2>
+    <ul>
+      <li><strong>Lista de compras e itens:</strong> apagados na hora pelo botão, ou em até 15 dias pelo e-mail.
+        Lista sem nenhuma mudança por <strong>6 meses</strong> é apagada sozinha.</li>
+      <li><strong>Cópias de segurança:</strong> guardamos uma cópia do banco por dia, por <strong>30 dias</strong>.
+        Depois disso a lista apagada some também das cópias.</li>
+      <li><strong>Dados no celular</strong> (o código da sua lista, a cor do app, os mercados com aviso ligado e as
+        ofertas salvas para usar sem internet): somem quando você desinstala o app ou limpa os dados dele.</li>
+      <li><strong>Relatório de travamentos e estatística de uso</strong> (Firebase, do Google): não têm o seu nome
+        nem o código da sua lista, e o Google os apaga automaticamente (relatórios de travamento em até 90 dias).</li>
+      <li><strong>Anúncios do Google no app</strong> (AdMob): usam o ID de publicidade do celular, que não fica com
+        a gente. Para apagar ou trocar, vá em <strong>Configurações → Privacidade → Anúncios</strong> do Android.</li>
+      <li><strong>Avisos de ofertas novas:</strong> desligue o sino na página do mercado ou as notificações do app
+        nas configurações do celular. Não guardamos nada disso no nosso banco.</li>
+    </ul>
+
+    <p>Mais detalhes na <a href="/privacidade/">política de privacidade</a>.</p>
+  </article>
+</Base>
+
+<style>
+  .texto { line-height: 1.6; }
+  .texto h1 { font-size: 30px; line-height: 36px; }
+  .texto h2 { font-size: 20px; margin-top: 28px; }
+  .texto p, .texto ul, .texto ol { margin: 8px 0; }
+</style>

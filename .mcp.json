@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "firebase": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "firebase",
+        "mcp",
+        "--tools",
+        "crashlytics_get_issue,crashlytics_list_events,crashlytics_batch_get_events,crashlytics_list_notes,crashlytics_get_report,firebase_list_projects,firebase_list_apps,firebase_get_project"
+      ],
+      "env": {
+        "NODE_COMPILE_CACHE": "${LOCALAPPDATA}/firebase-mcp-cache"
+      }
+    }
+  }
+}

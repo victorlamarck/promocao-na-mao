@@ -1,0 +1,58 @@
+# Compila o app de iPhone (sem assinatura, sem conta Apple) para saber se o projeto iOS está de pé:
+# flavors, ícones, tela de abertura, pacotes. Não publica nada.
+# macOS gasta 10× os minutos grátis do GitHub (estourou a cota em 20/10/2026): só no botão,
+# depois de mexer no iOS ou nos pacotes.
+name: iOS
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: app
+
+# Token da esteira só lê o repositório (nada aqui escreve no GitHub).
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    # macos-latest (arm64) ficou sem máquina livre 2× em 20/10/2026; Intel tem fila menor
+    runs-on: macos-15-intel
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.3 # a mesma da máquina de desenvolvimento
+          channel: stable
+          cache: true
+      - name: Config dos secrets
+        env:
+          FIREBASE_OPTIONS_DEV: ${{ secrets.FIREBASE_OPTIONS_DEV }}
+          FIREBASE_OPTIONS_PROD: ${{ secrets.FIREBASE_OPTIONS_PROD }}
+          APP_CONFIG_PROD: ${{ secrets.APP_CONFIG_PROD }}
+        run: |
+          for s in FIREBASE_OPTIONS_DEV FIREBASE_OPTIONS_PROD APP_CONFIG_PROD; do
+            [ -n "${!s}" ] || { echo "::error::falta o secret $s"; exit 1; }
+          done
+          printf '%s\n' "$FIREBASE_OPTIONS_DEV" > lib/firebase_options_dev.dart
+          printf '%s\n' "$FIREBASE_OPTIONS_PROD" > lib/firebase_options_prod.dart
+          printf '%s\n' "$APP_CONFIG_PROD" > config/prod.json
+          # Só para compilar: o script "Firebase do flavor" exige o arquivo; o app de verdade usa o do Firebase.
+          for f in dev prod; do
+            mkdir -p ios/config/$f
+            printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict/></plist>\n' > ios/config/$f/GoogleService-Info.plist
+          done
+      - name: Xcode 26 (o Firebase iOS 13+ exige Swift 6.2)
+        working-directory: .
+        run: |
+          x=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          [ -n "$x" ] || { echo "::error::sem Xcode 26 nesta máquina: $(ls -d /Applications/Xcode*.app)"; exit 1; }
+          sudo xcode-select -s "$x" && xcodebuild -version
+      - run: flutter config --enable-swift-package-manager
+      - run: flutter pub get
+      - name: Simulador (dev, debug)
+        run: flutter build ios --simulator --debug --flavor dev --dart-define-from-file=config/dev.json
+      - name: Aparelho (prod, release, sem assinatura)
+        run: flutter build ios --release --no-codesign --flavor prod --dart-define-from-file=config/prod.json

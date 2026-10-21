@@ -1,0 +1,8 @@
+---
+// Todas as /l/<código> caem nesta página (rewrite do Firebase Hosting); o código é lido no navegador.
+import Base from '../../layouts/Base.astro';
+import ListaRecebida from '../../components/ListaRecebida.tsx';
+---
+<Base titulo="Lista de compras" descricao="Uma lista de compras compartilhada com você. Marque o que já pegou." indexar={false} botaoLista={false} imagem="/previa/lista.png">
+  <ListaRecebida client:only="preact" />
+</Base>
