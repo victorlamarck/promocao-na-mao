@@ -140,6 +140,8 @@ lib/
   "Anotar item" cria item sem mercado.
 - Compartilhar: "Só ver" ou "Ver e marcar o que já pegou"; copiar link ou WhatsApp. Quem recebe
   marca o que pegou e quem mandou vê na hora (Supabase Realtime, canal `lista-<id>`).
+- "Esvaziar lista" (embaixo dos itens, com confirmação): `lista_esvaziar` (migration 18) tira todos os itens de uma vez;
+  a lista e os links compartilhados continuam valendo (quem recebeu vê a lista vazia).
 - "Apagar minha lista" (no fim da folha de compartilhar, com confirmação): `lista_apagar` (migration 10);
   os links param de abrir e o próximo "Adicionar" cria outra lista.
 - Selo de validade (`SeloValidade`, `avisoValidade` em `core/formato.dart`): "Vence hoje" / "Vence amanhã"

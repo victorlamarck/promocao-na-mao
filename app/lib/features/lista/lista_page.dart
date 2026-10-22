@@ -74,6 +74,12 @@ class _ListaPageState extends State<ListaPage> {
                   GruposDaLista(l),
                   TextButton.icon(
                       onPressed: () => context.go('/'), icon: const Icon(Icons.add), label: const Text('Adicionar mais ofertas')),
+                  TextButton.icon(
+                    onPressed: () => _esvaziar(context),
+                    style: TextButton.styleFrom(foregroundColor: context.cores.error),
+                    icon: const Icon(Icons.remove_shopping_cart_outlined),
+                    label: const Text('Esvaziar lista'),
+                  ),
                 ],
                 if (l.erro) Erro(onTentar: l.carregar, texto: 'Não conseguimos carregar a lista.'),
               ]),
@@ -81,6 +87,32 @@ class _ListaPageState extends State<ListaPage> {
           );
         },
       );
+
+  Future<void> _esvaziar(BuildContext context) async {
+    final n = Lista.minha.quantidadeTotal;
+    final sim = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Esvaziar a lista?'),
+        content: Text('${n == 1 ? 'O item sai' : 'Os $n itens saem'} da lista. Quem recebeu o link continua com ele e vê a '
+            'lista vazia. Não dá para desfazer.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancelar')),
+          FilledButton(
+              onPressed: () => Navigator.pop(c, true),
+              style: FilledButton.styleFrom(backgroundColor: c.cores.error, foregroundColor: c.cores.onError),
+              child: const Text('Esvaziar')),
+        ],
+      ),
+    );
+    if (sim != true || !context.mounted) return;
+    try {
+      await Lista.minha.esvaziar();
+      if (context.mounted) avisar(context, 'Lista esvaziada', verLista: false);
+    } catch (_) {
+      if (context.mounted) avisar(context, 'Não deu para esvaziar agora. Confira a internet e tente de novo.', verLista: false);
+    }
+  }
 }
 
 /// Folha "Compartilhar lista": permissão, nome, copiar link ou WhatsApp.

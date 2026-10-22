@@ -171,6 +171,9 @@ class Lista extends ChangeNotifier {
 
   Future<void> nomear(String nome) => _rpc('lista_nomear', {'nome_dono': nome});
 
+  /// Tira todos os itens (migration 18); a lista e os links compartilhados continuam valendo.
+  Future<void> esvaziar() => _rpc('lista_esvaziar', {});
+
   /// Apaga a lista no servidor (migration 10): os links compartilhados param de abrir.
   Future<void> apagar() async {
     if (_codigo == null) return;
