@@ -1,7 +1,7 @@
 name: promocao_na_mao
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.2.4+8
+version: 0.3.0+9
 
 environment:
   sdk: ^3.13.3
