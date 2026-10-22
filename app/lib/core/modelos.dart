@@ -45,6 +45,13 @@ class Oferta {
   final String redeNome, redeSlug;
   final List<Map<String, dynamic>> itens;
 
+  /// Código do produto do catálogo (migration 20), para o aviso "produto em oferta"; nulo se a oferta não tem
+  /// produto ou se as alternativas ("A ou B") são produtos diferentes.
+  String? get produtoCodigo {
+    final codigos = itens.map((i) => i['produto_codigo'] as String?).toSet();
+    return codigos.length == 1 ? codigos.first : null;
+  }
+
   /// Nome para o card, montado dos itens (o texto do encarte às vezes traz preço e regras):
   /// "Macarrão Espaguete ou Macarrão Cortado Don Sapore". Sem itens, o texto do encarte.
   String get nome {

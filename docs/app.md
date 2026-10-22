@@ -298,6 +298,12 @@ Testar sem enviar: `node extracao/avisar.mjs --teste` (autoteste) e
 **No app** (`features/avisos/avisos.dart`): o sino na tela do mercado pede a permissão de notificação
 (Android 13+), assina/desassina o tópico e guarda os mercados ligados no aparelho. Tocar na notificação
 abre `data.rota`. Ícone: `res/drawable/ic_notificacao.xml` (etiqueta branca), cor da marca.
+
+**Produto em oferta** (migration 20 do privado): o sino na tela da **oferta** assina `produto-<codigo>`, o código do
+produto do catálogo que vem em `itens[].produto_codigo` (`Oferta.produtoCodigo`; sem sino se a oferta não tem
+produto ou se as alternativas são produtos diferentes). Depois do catálogo, `avisar.mjs --produtos` manda
+"<produto> em oferta — R$ X no <mercado>, até dd/mm", abrindo `/oferta/<id>`; o mesmo produto no máximo a cada
+7 dias. Os produtos ligados ficam no aparelho (`avisos_produtos`); desligar é pelo sino de uma oferta do produto.
 shortcut: só Android; o iPhone precisa da chave APNs (conta Apple) e da capability "Push Notifications".
 
 **Só o dev faz (uma vez por projeto, promocaonamao-f08a7 e promocaonamao-1):**
