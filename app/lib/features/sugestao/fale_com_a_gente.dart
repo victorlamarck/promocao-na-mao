@@ -57,7 +57,8 @@ class _FaleComAGenteState extends State<_FaleComAGente> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) => SingleChildScrollView(
+        // rola quando falta altura (teclado aberto em paisagem ou celular pequeno)
         padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.viewInsetsOf(context).bottom),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, spacing: 16, children: [
           Text('Fale com a gente', style: fredoka(22)),

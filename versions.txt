@@ -1,5 +1,6 @@
 v 0.4.0
 
+- Boas-vindas: 3 telas mostram o app na primeira vez que você abre
 - Escolha o tema claro ou escuro, junto com a cor do app
 - Fale com a gente: mande sugestões ou avise de problemas pelo app
 - A cor grafite agora é cinza de verdade

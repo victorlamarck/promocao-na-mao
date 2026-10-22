@@ -182,6 +182,9 @@ build local = "dev") e a plataforma. Está na política de privacidade do site.
 - Em seguida `core/abertura.dart` continua na mesma escala (48 unidades = 192 dp): a etiqueta balança
   pelo furo, o sorriso se desenha e tudo some em ~1 s, com as ofertas carregando por baixo. Pulada quando o
   app abre por link, no web e com "remover animações" do sistema.
+- Depois dela, só na primeira abertura, as **boas-vindas** (`features/boas_vindas/`): 3 telas (ofertas de GV, comparar,
+  lista compartilhada) com "Pular". "Primeira vez" = nada guardado no aparelho (SharedPreferences vazio), lido antes
+  do Supabase: quem atualiza o app já tem cache/cor/lista e não vê. Não aparecem por link nem no web.
 
 ## Links do site abrem o app (Android)
 
