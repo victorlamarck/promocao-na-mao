@@ -13,8 +13,8 @@ import '../anuncios/espaco_anuncio.dart';
 
 final _db = Supabase.instance.client;
 
-/// Tela 5 do protótipo: a oferta explicada em português simples, com "Adicionar à lista" fixo embaixo.
-/// (Sem "Onde comprar": comparar mercados fica para depois — docs/decisoes.md.)
+/// Tela 5 do protótipo: a oferta explicada em português simples, com "Adicionar à lista" fixo embaixo,
+/// e a comparação com os outros mercados (comparar_oferta): o mesmo produto e, embaixo, os parecidos.
 class OfertaPage extends StatefulWidget {
   const OfertaPage({super.key, required this.id});
   final int id;
@@ -26,13 +26,17 @@ class OfertaPage extends StatefulWidget {
 class _OfertaPageState extends State<OfertaPage> {
   late var _dados = _carregar();
 
-  Future<(Oferta?, List<String>, Anuncio?)> _carregar() async {
+  Future<(Oferta?, List<String>, Anuncio?, Comparacao)> _carregar() async {
     final j = await _db.from('oferta_lista').select().eq('id', widget.id).maybeSingle();
-    if (j == null) return (null, <String>[], null); // venceu ou não existe
+    if (j == null) return (null, <String>[], null, const Comparacao.vazia()); // venceu ou não existe
     final o = Oferta.fromJson(j);
     final lojas = await _db.from('loja').select('id, nome').eq('rede_id', o.redeId).order('nome');
     final banners = await anunciosDoFormato('banner');
-    return (o, _ondeVale(o, lojas), banners.isEmpty ? null : banners[widget.id % banners.length]);
+    // A comparação é um extra: se falhar, a oferta aparece mesmo assim.
+    final comparacao = await _db
+        .rpc('comparar_oferta', params: {'oferta_id': o.id})
+        .then((r) => Comparacao.fromJson(r as Map<String, dynamic>), onError: (_) => const Comparacao.vazia());
+    return (o, _ondeVale(o, lojas), banners.isEmpty ? null : banners[widget.id % banners.length], comparacao);
   }
 
   /// Nomes das lojas onde a oferta vale, aplicando o "exceto"/"somente" do encarte.
@@ -79,7 +83,7 @@ class _OfertaPageState extends State<OfertaPage> {
                     FilledButton(onPressed: () => context.go('/'), child: const Text('Ver ofertas de hoje')),
                   ]),
                 ),
-              _ => _Detalhe(o, s.data!.$2, s.data!.$3),
+              _ => _Detalhe(o, s.data!.$2, s.data!.$3, s.data!.$4),
             },
           );
         },
@@ -87,10 +91,11 @@ class _OfertaPageState extends State<OfertaPage> {
 }
 
 class _Detalhe extends StatelessWidget {
-  const _Detalhe(this.o, this.lojas, this.banner);
+  const _Detalhe(this.o, this.lojas, this.banner, this.comparacao);
   final Oferta o;
   final List<String> lojas;
   final Anuncio? banner;
+  final Comparacao comparacao;
 
   @override
   Widget build(BuildContext context) {
@@ -150,10 +155,58 @@ class _Detalhe extends StatelessWidget {
           ]),
         ),
       ),
+      _EmOutrosMercados(o, comparacao),
       const SizedBox(height: 8),
       TextButton(onPressed: () => context.push('/mercado/${o.redeSlug}'), child: Text('Ver o encarte completo do ${o.redeNome}')),
       const SizedBox(height: 12),
       EspacoAnuncioView(anuncio: banner),
+    ]);
+  }
+}
+
+/// Decisão do dev (22/10): primeiro o mesmo produto em outros encartes; embaixo os parecidos (outra marca ou
+/// tamanho), pelo preço do kg/litro. "Mais barato" = sai mais em conta por kg/litro que esta oferta.
+class _EmOutrosMercados extends StatefulWidget {
+  const _EmOutrosMercados(this.o, this.comparacao);
+  final Oferta o;
+  final Comparacao comparacao;
+
+  @override
+  State<_EmOutrosMercados> createState() => _EmOutrosMercadosState();
+}
+
+class _EmOutrosMercadosState extends State<_EmOutrosMercados> {
+  static const _visiveis = 5;
+  var _todos = false;
+
+  bool _maisBarato(Oferta x) {
+    final esta = widget.o.porUnidadeValor;
+    return esta != null && x.porUnidadeTipo == widget.o.porUnidadeTipo && (x.porUnidadeValor ?? esta) < esta;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Comparacao(:mesmo, :similares) = widget.comparacao;
+    if (mesmo.isEmpty && similares.isEmpty) return const SizedBox.shrink();
+    Widget titulo(String t, [String? sub]) => Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 10),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t, style: fredoka(20)),
+            if (sub != null) Text(sub, style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
+          ]),
+        );
+    Widget card(Oferta x) => Padding(
+        padding: const EdgeInsets.only(bottom: 10), child: CardOferta(x, mostrarPorUnidade: true, maisBarato: _maisBarato(x)));
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if (mesmo.isNotEmpty) ...[titulo('O mesmo produto em outros encartes'), ...mesmo.map(card)],
+      if (similares.isNotEmpty) ...[
+        titulo('Parecidos', 'Outra marca ou tamanho. Compare pelo preço do kg ou do litro.'),
+        ...(_todos ? similares : similares.take(_visiveis)).map(card),
+        if (!_todos && similares.length > _visiveis)
+          TextButton(
+              onPressed: () => setState(() => _todos = true),
+              child: Text('Ver mais ${similares.length - _visiveis} parecidos')),
+      ],
     ]);
   }
 }

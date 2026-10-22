@@ -21,13 +21,24 @@ class Oferta {
         redeSlug = j['rede_slug'] as String,
         itens = (j['itens'] as List).cast<Map<String, dynamic>>(),
         precoReferencia = _num(j['preco_referencia']),
-        unidadeReferencia = j['unidade_referencia'] as String?;
+        unidadeReferencia = j['unidade_referencia'] as String?,
+        precoComparado = _num(j['preco_comparado']),
+        unidadeComparada = j['unidade_comparada'] as String?;
 
   final int id;
   final String textoOriginal;
   final double? preco, precoDe, precoClube, precoReferencia;
   final String precoPor;
   final String? condicao, restricaoTipo, secao, unidadeReferencia;
+
+  /// Só nas ofertas de comparar_oferta: R$/kg, l ou un do item que casou (numa oferta "A ou B" o
+  /// precoReferencia é nulo, mas o item comparado tem preço por unidade).
+  final double? precoComparado;
+  final String? unidadeComparada;
+
+  /// R$/kg, l ou un para mostrar e comparar: o do item comparado, senão o da oferta.
+  double? get porUnidadeValor => precoComparado ?? precoReferencia;
+  String? get porUnidadeTipo => unidadeComparada ?? unidadeReferencia;
   final List<int> restricaoLojas;
   final DateTime validadeFim;
   final int redeId;
@@ -43,6 +54,33 @@ class Oferta {
     if (marcas.length == 1) return junta([itens.map((i) => i['nome']).whereType<String>().toSet().join(' ou '), marcas.first]);
     return itens.map((i) => junta([i['nome'], i['marca']])).toSet().join(' ou ');
   }
+}
+
+/// Ids das ofertas com o menor R$/kg, R$/l ou R$/un entre as que têm a mesma unidade (selo "Mais barato").
+/// Só conta unidade com 2 ofertas ou mais: sozinha não é "mais barata" que nada.
+Set<int> maisBaratas(List<Oferta> ofertas) {
+  final porTipo = <String, List<Oferta>>{};
+  for (final o in ofertas) {
+    if (o.porUnidadeValor != null && o.porUnidadeTipo != null) (porTipo[o.porUnidadeTipo!] ??= []).add(o);
+  }
+  return {
+    for (final grupo in porTipo.values.where((g) => g.length > 1))
+      for (final o in grupo)
+        if (o.porUnidadeValor == grupo.map((o) => o.porUnidadeValor!).reduce((a, b) => a < b ? a : b)) o.id,
+  };
+}
+
+/// Resposta de comparar_oferta: o mesmo produto em outros encartes e os parecidos (outra marca ou tamanho).
+class Comparacao {
+  Comparacao.fromJson(Map<String, dynamic> j)
+      : mesmo = (j['mesmo'] as List).map((o) => Oferta.fromJson(o as Map<String, dynamic>)).toList(),
+        similares = (j['similares'] as List).map((o) => Oferta.fromJson(o as Map<String, dynamic>)).toList();
+
+  const Comparacao.vazia()
+      : mesmo = const [],
+        similares = const [];
+
+  final List<Oferta> mesmo, similares;
 }
 
 class Rede {

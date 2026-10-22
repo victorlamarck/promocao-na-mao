@@ -155,16 +155,19 @@ class SeloValidade extends StatelessWidget {
 
 /// Card de uma oferta: mercado e validade, nome, preço (o elemento mais forte), clube, "antes", condição, Adicionar.
 class CardOferta extends StatelessWidget {
-  const CardOferta(this.oferta, {super.key, this.mostrarPorUnidade = false, this.mostrarMercado = true});
+  const CardOferta(this.oferta, {super.key, this.mostrarPorUnidade = false, this.mostrarMercado = true, this.maisBarato = false});
   final Oferta oferta;
   final bool mostrarPorUnidade, mostrarMercado;
+
+  /// Selo "Mais barato por kg/litro" (busca e comparação).
+  final bool maisBarato;
 
   @override
   Widget build(BuildContext context) {
     final o = oferta;
     final c = context.cores;
     final clube = Mercado.de(o.redeSlug).clube ?? 'clube';
-    final unidade = mostrarPorUnidade ? porUnidade(o.precoReferencia, o.unidadeReferencia) : null;
+    final unidade = mostrarPorUnidade ? porUnidade(o.porUnidadeValor, o.porUnidadeTipo) : null;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -181,6 +184,9 @@ class CardOferta extends StatelessWidget {
                 ),
               ]),
             SeloValidade(o.validadeFim),
+            if (maisBarato)
+              Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
+                  cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
             Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
             Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, spacing: 8, children: [
               Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
