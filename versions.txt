@@ -1,3 +1,10 @@
+v 0.3.0
+
+- Compare preços: veja o mesmo produto e parecidos em outros mercados, pelo preço do kg ou do litro
+- Na busca, um selo mostra a oferta mais barata por kg ou litro
+- Esvazie a lista de uma vez, com confirmação
+_______________________________________________________________________________________________________________________
+
 v 0.2.4
 
 - Mostra na tela inicial quando as ofertas foram atualizadas pela última vez
