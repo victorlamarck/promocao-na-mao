@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:promocao_na_mao/features/lista/grupos.dart';
 import 'package:promocao_na_mao/features/lista/lista.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +23,16 @@ class _CarregaState extends State<_Carrega> {
   Widget build(BuildContext context) => const SizedBox();
 }
 
+ItemLista _item(int qtd, double? preco, [double? clube]) => ItemLista.fromJson(
+    {'id': 1, 'texto': 'x', 'quantidade': qtd, 'pego': false, 'preco': preco, 'preco_clube': clube});
+
 void main() {
+  test('total do mercado: preço × quantidade, clube quando tem, anotados fora', () {
+    expect(totalDoMercado([_item(2, 4.5), _item(1, null)]), (9.0, null));
+    expect(totalDoMercado([_item(2, 4.5, 4.0), _item(1, 3.0)]), (12.0, 11.0));
+  });
+
+
   // Crashlytics (0.1.0): "setState() or markNeedsBuild() called during build ... dispatching notifications for Lista".
   testWidgets('carregar no initState não avisa no meio do build', (tester) async {
     SharedPreferences.setMockInitialValues({});

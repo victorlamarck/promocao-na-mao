@@ -162,6 +162,8 @@ build local = "dev") e a plataforma. Está na política de privacidade do site.
   mais em conta que esta oferta. Se a comparação falhar, a oferta aparece sem ela.
 - **Busca:** selo "Mais barato por kg/litro" no menor R$/unidade entre os resultados já carregados com a mesma
   unidade (`maisBaratas` em `core/modelos.dart`; precisa de 2 ou mais).
+- **Lista:** cada mercado mostra o total da compra (preço × quantidade) e, se tiver, o total com o clube
+  (`totalDoMercado` em `features/lista/grupos.dart`). Anotados à mão (sem preço) ficam fora.
 
 ## Sem internet (sinal ruim no mercado)
 
@@ -326,6 +328,5 @@ Fredoka 600 e Nunito 400/600/700/800 ficam **dentro do app** (`assets/fontes/`, 
 
 - Recorte da imagem do encarte (a extração ainda não marca a posição da etiqueta).
 - Comparação na lista: quanto a lista custaria em cada mercado (a tela da oferta e a busca já comparam).
-- Comparação no site (a página `/oferta/<id>` ainda não mostra "parecidos").
 - AdSense testado de verdade (precisa da conta aprovada); AdMob no celular.
 - Builds Android/iOS publicados (assinatura, lojas). Plataformas e flavors já criados; o iOS nunca foi compilado.
