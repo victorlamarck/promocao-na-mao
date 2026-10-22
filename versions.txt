@@ -1,3 +1,12 @@
+v 0.4.0
+
+- Boas-vindas: 3 telas mostram o app na primeira vez que você abre
+- Escolha o tema claro ou escuro, junto com a cor do app
+- Fale com a gente: mande sugestões ou avise de problemas pelo app
+- A cor grafite agora é cinza de verdade
+- Corrige o app fechando ao trocar de aba rápido
+_______________________________________________________________________________________________________________________
+
 v 0.3.0
 
 - Compare preços: veja o mesmo produto e parecidos em outros mercados, pelo preço do kg ou do litro

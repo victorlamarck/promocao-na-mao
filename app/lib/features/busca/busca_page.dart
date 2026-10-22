@@ -42,8 +42,13 @@ class _BuscaPageState extends State<BuscaPage> {
   void initState() {
     super.initState();
     _db.from('rede_com_ofertas').select().order('nome').then(
-        (r) => setState(() => _redes = r.map(Rede.fromJson).toList()), onError: (_) {});
+        (r) => mounted ? setState(() => _redes = r.map(Rede.fromJson).toList()) : null, onError: (_) {});
     if (_campo.text.isNotEmpty) _buscar();
+  }
+
+  /// A resposta pode chegar depois de a pessoa sair da tela: setState aí derrubava o app (Crashlytics 0.3.0).
+  void _atualizar() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -58,9 +63,9 @@ class _BuscaPageState extends State<BuscaPage> {
     _total = null;
     final termo = _campo.text;
     if (termo.trim().isEmpty) return setState(() => _patrocinados = []);
-    _resultados.proxima(() => setState(() {}));
+    _resultados.proxima(_atualizar);
     anunciosDaBusca(termo).then((a) {
-      if (termo == _campo.text) setState(() => _patrocinados = a);
+      if (mounted && termo == _campo.text) setState(() => _patrocinados = a);
     }, onError: (_) {});
   }
 
@@ -142,7 +147,7 @@ class _BuscaPageState extends State<BuscaPage> {
                 for (final o in _resultados.itens)
                   ...[CardOferta(o, mostrarPorUnidade: true, maisBarato: baratas.contains(o.id)), const SizedBox(height: 10)],
                 if (_resultados.erro)
-                  Erro(onTentar: () => _resultados.proxima(() => setState(() {})))
+                  Erro(onTentar: () => _resultados.proxima(_atualizar))
                 else if (_resultados.fim && _resultados.itens.isEmpty)
                   const Padding(
                     padding: EdgeInsets.all(24),
@@ -150,7 +155,7 @@ class _BuscaPageState extends State<BuscaPage> {
                         textAlign: TextAlign.center, style: TextStyle(height: 1.4)),
                   )
                 else if (!_resultados.fim)
-                  VerMais(carregando: _resultados.carregando, onPressed: () => _resultados.proxima(() => setState(() {}))),
+                  VerMais(carregando: _resultados.carregando, onPressed: () => _resultados.proxima(_atualizar)),
               ]),
       ),
     ]);
