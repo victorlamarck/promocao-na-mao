@@ -3,6 +3,7 @@
 // Google ("arroz camil 5kg big mais"). Oferta vencida some no próximo build → cai no 404 ("encarte venceu").
 import Base from '../../layouts/Base.astro';
 import CardOferta from '../../components/CardOferta.tsx';
+import Comparacao from '../../components/Comparacao.tsx';
 import { dados } from '../../lib/dados';
 import { mercado, nomeDaOferta, reais, valeAte } from '../../lib/formato';
 
@@ -32,6 +33,8 @@ const preco = o.preco == null ? 'preço no mercado' : reais(o.preco);
       </div>
     </div>
   </section>
+  <!-- client:idle (não visible): no build o componente não desenha nada, então não haveria o que observar -->
+  <Comparacao client:idle id={o.id} />
 </Base>
 
 <style>
