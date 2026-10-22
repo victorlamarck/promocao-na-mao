@@ -328,6 +328,5 @@ Fredoka 600 e Nunito 400/600/700/800 ficam **dentro do app** (`assets/fontes/`, 
 
 - Recorte da imagem do encarte (a extração ainda não marca a posição da etiqueta).
 - Comparação na lista: quanto a lista custaria em cada mercado (a tela da oferta e a busca já comparam).
-- Comparação no site (a página `/oferta/<id>` ainda não mostra "parecidos").
 - AdSense testado de verdade (precisa da conta aprovada); AdMob no celular.
 - Builds Android/iOS publicados (assinatura, lojas). Plataformas e flavors já criados; o iOS nunca foi compilado.

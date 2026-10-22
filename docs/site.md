@@ -142,5 +142,6 @@ um endereço só (`SITE_URL` e `APP_URL` usam o www). No Firebase do projeto `pr
 
 - Destaque pago de mercado (`mercado_destaque`) na lista de mercados; AdSense.
 - Imagem do encarte no card (a extração ainda não marca a posição da etiqueta).
-- Comparação entre mercados ("a partir de", "trocar") e "Entrar com Google": fora por decisão do dev.
+- Comparação na lista ("a partir de", "trocar") e "Entrar com Google": fora por decisão do dev. A página da oferta
+  compara (`components/Comparacao.tsx`, `comparar_oferta` no navegador): o mesmo produto em outros encartes e os parecidos.
 - Tema escuro (o protótipo web é só claro) e escolha de cor (só no app).
