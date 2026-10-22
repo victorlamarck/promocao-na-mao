@@ -95,7 +95,10 @@ jobs:
           mkdir -p ../novidades && tr -d '\r' < ../release.txt > ../novidades/whatsnew-pt-BR
       - run: flutter pub get
       - run: flutter test
-      - run: flutter build appbundle --release --flavor prod --dart-define-from-file=config/prod.json
+      # VERSAO: vai junto com as sugestões e relatos de problema do app (config.dart)
+      - run: |
+          flutter build appbundle --release --flavor prod --dart-define-from-file=config/prod.json \
+            --dart-define=VERSAO=$(sed -n 's/^version: *//p' pubspec.yaml)
       - uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}

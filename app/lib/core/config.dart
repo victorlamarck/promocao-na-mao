@@ -13,6 +13,10 @@ const supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: ehProd 
 const supabaseChavePublica = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY',
     defaultValue: ehProd ? '' : 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH');
 
+/// Versão do app ("0.3.1+10"), enviada junto com as sugestões e os relatos de problema.
+/// A esteira Android passa --dart-define=VERSAO=<a do pubspec>; build local fica "dev".
+const versaoDoApp = String.fromEnvironment('VERSAO', defaultValue: 'dev');
+
 /// Endereço público do site, para os links compartilhados (vazio: o endereço aberto no navegador).
 const appUrl = String.fromEnvironment('APP_URL');
 
