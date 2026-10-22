@@ -6,6 +6,16 @@ import '../../core/tema.dart';
 import '../../core/widgets.dart';
 import 'lista.dart';
 
+/// Quanto dá a compra num mercado: preço × quantidade dos itens com preço; com clube usa o preço de clube
+/// quando o item tem (null se nenhum tem). Itens anotados à mão (sem preço) ficam fora.
+// shortcut: "leve 3 pague 2" conta como preço cheio por unidade; ajustar se o extrator passar a dar o preço da regra.
+(double, double?) totalDoMercado(List<ItemLista> itens) {
+  final comPreco = itens.where((i) => i.preco != null);
+  final total = comPreco.fold<double>(0.0, (t, i) => t + i.preco! * i.quantidade);
+  if (!comPreco.any((i) => i.precoClube != null)) return (total, null);
+  return (total, comPreco.fold<double>(0.0, (t, i) => t + (i.precoClube ?? i.preco!) * i.quantidade));
+}
+
 /// Itens agrupados por mercado; anotados à mão por último. Usado na Minha lista e na lista recebida.
 class GruposDaLista extends StatelessWidget {
   const GruposDaLista(this.lista, {super.key, this.semMercado = 'Sem mercado definido'});
@@ -42,6 +52,8 @@ class _Grupo extends StatelessWidget {
         : validades.isEmpty
             ? ''
             : 'Ofertas valem até ${diaMes(validades.first)}';
+    final (total, totalClube) = totalDoMercado(itens);
+    final clube = Mercado.de(primeiro.redeSlug).clube;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Card(
@@ -50,7 +62,14 @@ class _Grupo extends StatelessWidget {
           ListTile(
             leading: AvatarMercado(primeiro.redeSlug, tamanho: 40),
             title: Text(primeiro.redeNome ?? semMercado, style: const TextStyle(fontWeight: FontWeight.w800)),
-            subtitle: Text(sub),
+            subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (sub.isNotEmpty) Text(sub),
+              if (total > 0)
+                Text.rich(TextSpan(children: [
+                  TextSpan(text: 'Total ${reais(total)}', style: TextStyle(fontWeight: FontWeight.w800, color: context.corPreco)),
+                  if (totalClube != null && totalClube < total) TextSpan(text: ' · ${reais(totalClube)} com ${clube ?? 'clube'}'),
+                ])),
+            ]),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               Text('$pegos/${itens.length}', style: TextStyle(fontWeight: FontWeight.w800, color: c.onSurfaceVariant)),
               if (primeiro.redeNome != null)
