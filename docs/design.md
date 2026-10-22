@@ -57,7 +57,11 @@ Navegação: **4 abas** — Início, Buscar, Mercados, Lista.
 | roxo | `#5B4BC4` |
 | azul-petróleo | `#2F5D8C` |
 | framboesa | `#A8326E` |
-| grafite | `#3F4A44` |
+| grafite | `#3F4A44` (gerado no modo "neutral" do Material: no padrão virava verde, igual ao verde-água) |
+
+- **Tema**: Automático (o do aparelho, padrão), Claro ou Escuro, na mesma folha da cor ("Aparência", ícone de
+  paleta na Início); os dois ficam guardados no aparelho. Os círculos da folha mostram a cor que o app usa no tema
+  atual. Teste `app/test/tema_test.dart`: nenhuma cor pode gerar um tema parecido com o de outra.
 
   Tons derivados da cor escolhida (como no Material 3): fundo claro = cor misturada 95% com branco;
   realce = 82% branco; texto escuro = 50% preto. **Tema claro e escuro** (escuro: fundo `#141715`,

@@ -35,18 +35,19 @@ Future<void> main() async {
     };
   }
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseChavePublica);
-  await carregarCorDoApp();
+  await carregarAparencia();
   Lista.minha.iniciar(); // sem await: o app abre enquanto a lista carrega
   iniciarAdsense();
   iniciarAvisos(); // sem await: tocar numa notificação abre o mercado quando o app já está de pé
   _telasNoAnalytics();
-  runApp(ValueListenableBuilder(
-    valueListenable: corDoApp,
-    builder: (_, cor, _) => MaterialApp.router(
+  runApp(ListenableBuilder(
+    listenable: Listenable.merge([corDoApp, temaDoApp]),
+    builder: (_, _) => MaterialApp.router(
       title: 'Promoção na Mão',
       debugShowCheckedModeBanner: false,
-      theme: temaApp(cor, Brightness.light),
-      darkTheme: temaApp(cor, Brightness.dark),
+      theme: temaApp(corDoApp.value, Brightness.light),
+      darkTheme: temaApp(corDoApp.value, Brightness.dark),
+      themeMode: temaDoApp.value,
       routerConfig: rotas,
       builder: (_, filho) => Abertura(
         // aberto por link (/l/..., /oferta/...) ou no navegador: direto para a tela
