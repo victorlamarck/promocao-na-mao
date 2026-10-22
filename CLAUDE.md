@@ -22,7 +22,7 @@ Só leitura pela chave publishable (RLS) e funções `security definer`; nada es
 - Views: `oferta_lista` (uma linha por oferta vigente), `rede_com_ofertas` (mercados com ofertas hoje; `atualizado_em`
   = última importação), `anuncio_vigente`; tabela `loja` (lat/lng).
 - Funções: `buscar_ofertas(termo)`, `anuncios_da_busca(termo)`, `secoes_da_rede(slug)`, `lista_criar`, `lista_ler`,
-  `lista_adicionar`, `lista_quantidade`, `lista_marcar`, `lista_nomear`, `lista_apagar`. Tempo real: canal `lista-<id>`.
+  `lista_adicionar`, `lista_quantidade`, `lista_marcar`, `lista_nomear`, `lista_esvaziar`, `lista_apagar`. Tempo real: canal `lista-<id>`.
 - Mudança na API: primeiro o PR com a migration no repositório privado, depois o PR aqui.
 - Regras: "hoje" no fuso America/Sao_Paulo; ofertas vencidas são apagadas do banco todo dia.
 
