@@ -12,6 +12,7 @@ import '../anuncios/anuncios.dart';
 import '../anuncios/espaco_anuncio.dart';
 import '../lista/lista.dart';
 import '../mercado/mercados_page.dart';
+import '../sugestao/fale_com_a_gente.dart';
 
 final _db = Supabase.instance.client;
 
@@ -91,6 +92,8 @@ class _InicioPageState extends State<InicioPage> {
                   ),
                 ]),
               ),
+              IconButton(
+                  tooltip: 'Sugestão ou problema no app', onPressed: () => faleComAGente(context), icon: const Icon(Icons.feedback_outlined)),
               IconButton(tooltip: 'Cor e tema do app', onPressed: () => _escolherCor(context), icon: const Icon(Icons.palette_outlined)),
             ]),
             const SizedBox(height: 12),
