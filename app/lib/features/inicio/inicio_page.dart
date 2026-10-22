@@ -47,11 +47,16 @@ class _InicioPageState extends State<InicioPage> {
     super.dispose();
   }
 
+  /// A resposta pode chegar depois de a pessoa trocar de aba: setState aí derrubava o app (Crashlytics 0.3.0).
+  void _atualizar() {
+    if (mounted) setState(() {});
+  }
+
   Future<void> _carregar() async {
     _ofertas.reiniciar();
     setState(() { _mercados = mercadosOrdenados(); });
-    await _ofertas.proxima(() => setState(() {}));
-    anunciosDoFormato('feed').then((a) => setState(() => _anuncios = a), onError: (_) {});
+    await _ofertas.proxima(_atualizar);
+    anunciosDoFormato('feed').then((a) => mounted ? setState(() => _anuncios = a) : null, onError: (_) {});
   }
 
   Future<void> _anotarItem() async {
@@ -158,10 +163,10 @@ class _InicioPageState extends State<InicioPage> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: _ofertas.erro
-                ? Erro(onTentar: () => _ofertas.proxima(() => setState(() {})))
+                ? Erro(onTentar: () => _ofertas.proxima(_atualizar))
                 : _ofertas.fim
                     ? Text('Mostramos só ofertas que valem hoje.', textAlign: TextAlign.center, style: TextStyle(color: c.onSurfaceVariant))
-                    : VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(() => setState(() {}))),
+                    : VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(_atualizar)),
           ),
         ),
       ]),

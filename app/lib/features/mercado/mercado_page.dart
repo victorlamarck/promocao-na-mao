@@ -39,7 +39,7 @@ class _MercadoPageState extends State<MercadoPage> {
   @override
   void initState() {
     super.initState();
-    _ofertas.proxima(() => setState(() {}));
+    _ofertas.proxima(_atualizar);
     _db.from('rede_com_ofertas').select().eq('slug', widget.slug).maybeSingle().then(
         (j) => mounted ? setState(() => _rede = j == null ? null : Rede.fromJson(j)) : null, onError: (_) {});
     _db.rpc('secoes_da_rede', params: {'slug': widget.slug}).then(
@@ -47,10 +47,15 @@ class _MercadoPageState extends State<MercadoPage> {
     anunciosDoFormato('banner').then((a) => mounted ? setState(() => _banners = a) : null, onError: (_) {});
   }
 
+  /// A resposta pode chegar depois de a pessoa sair da tela: setState aí derrubava o app (Crashlytics 0.3.0).
+  void _atualizar() {
+    if (mounted) setState(() {});
+  }
+
   void _filtrar(String? secao) {
     setState(() => _secao = secao);
     _ofertas.reiniciar();
-    _ofertas.proxima(() => setState(() {}));
+    _ofertas.proxima(_atualizar);
   }
 
   @override
@@ -112,11 +117,11 @@ class _MercadoPageState extends State<MercadoPage> {
           const SizedBox(height: 10),
         ],
         if (_ofertas.erro)
-          Erro(onTentar: () => _ofertas.proxima(() => setState(() {})))
+          Erro(onTentar: () => _ofertas.proxima(_atualizar))
         else if (_ofertas.fim && _ofertas.itens.isEmpty)
           const Padding(padding: EdgeInsets.all(24), child: Text('Nenhuma oferta desta categoria no encarte atual.', textAlign: TextAlign.center))
         else if (!_ofertas.fim)
-          VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(() => setState(() {}))),
+          VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(_atualizar)),
       ]),
     );
   }
