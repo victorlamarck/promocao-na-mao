@@ -97,4 +97,37 @@ void main() {
     expect(textoDistancia(0.8), '800 m');
     expect(textoDistancia(1.44), '1,4 km');
   });
+
+  Oferta comUnidade(int id, double? valor, String? tipo, {bool comparada = false}) => Oferta.fromJson({
+        ...{'id': id, 'texto_original': 'Item $id', 'preco': 4.99, 'preco_por': 'embalagem', 'validade_fim': '2026-11-03',
+            'rede_id': 4, 'rede_nome': 'Big Mais', 'rede_slug': 'big-mais', 'itens': []},
+        if (comparada) ...{'preco_comparado': valor, 'unidade_comparada': tipo}
+        else ...{'preco_referencia': valor, 'unidade_referencia': tipo},
+      });
+
+  test('selo "mais barato": menor R\$ por unidade entre as da mesma unidade', () {
+    final ofertas = [
+      comUnidade(1, 9.90, 'l'),
+      comUnidade(2, 7.14, 'l'), // mais barata por litro
+      comUnidade(3, 4.00, 'kg'), // única por kg: não ganha selo
+      comUnidade(4, null, null), // "A ou B" sem preço por unidade
+      comUnidade(5, 7.14, 'l', comparada: true), // empate: as duas ganham
+    ];
+    expect(maisBaratas(ofertas), {2, 5});
+    expect(maisBaratas([]), isEmpty);
+  });
+
+  test('comparação: preço do item comparado vale mais que o da oferta', () {
+    final c = Comparacao.fromJson({
+      'mesmo': [],
+      'similares': [
+        {'id': 9, 'texto_original': 'Iate ou Coroa 2L', 'preco': 3.99, 'preco_por': 'embalagem', 'validade_fim': '2026-10-25',
+         'rede_id': 1, 'rede_nome': 'Coelho Diniz', 'rede_slug': 'coelho-diniz', 'itens': [],
+         'preco_referencia': null, 'unidade_referencia': null, 'preco_comparado': 1.995, 'unidade_comparada': 'l'},
+      ],
+    });
+    expect(c.mesmo, isEmpty);
+    expect((c.similares.single.porUnidadeValor, c.similares.single.porUnidadeTipo), (1.995, 'l'));
+    expect(oferta(1).porUnidadeValor, isNull);
+  });
 }

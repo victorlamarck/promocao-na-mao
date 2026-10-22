@@ -73,6 +73,7 @@ class _BuscaPageState extends State<BuscaPage> {
   @override
   Widget build(BuildContext context) {
     final buscou = _campo.text.trim().isNotEmpty;
+    final baratas = maisBaratas(_resultados.itens); // entre as já carregadas
     return Column(children: [
       Container(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -138,7 +139,8 @@ class _BuscaPageState extends State<BuscaPage> {
                 ]),
                 const SizedBox(height: 10),
                 for (final a in _patrocinados) ...[EspacoAnuncioView(anuncio: a, selo: 'Patrocinado'), const SizedBox(height: 10)],
-                for (final o in _resultados.itens) ...[CardOferta(o, mostrarPorUnidade: true), const SizedBox(height: 10)],
+                for (final o in _resultados.itens)
+                  ...[CardOferta(o, mostrarPorUnidade: true, maisBarato: baratas.contains(o.id)), const SizedBox(height: 10)],
                 if (_resultados.erro)
                   Erro(onTentar: () => _resultados.proxima(() => setState(() {})))
                 else if (_resultados.fim && _resultados.itens.isEmpty)

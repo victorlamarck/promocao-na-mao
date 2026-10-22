@@ -147,6 +147,15 @@ lib/
 - Selo de validade (`SeloValidade`, `avisoValidade` em `core/formato.dart`): "Vence hoje" / "Vence amanhã"
   em amarelo no card e nos itens da lista; "Encarte venceu" em vermelho nos itens cuja oferta já acabou.
 
+## Comparação entre mercados (decisão de 22/10/2026)
+
+- **Tela da oferta:** `comparar_oferta(oferta_id)` (migration 17 do privado). Primeiro "O mesmo produto em outros
+  encartes" (mesmo produto do catálogo) e, embaixo, "Parecidos" (mesmo nome genérico, outra marca ou tamanho; 5 e
+  "Ver mais"). Tudo pelo R$/kg, litro ou unidade (`Oferta.porUnidadeValor`). Selo "Mais barato por litro" = sai
+  mais em conta que esta oferta. Se a comparação falhar, a oferta aparece sem ela.
+- **Busca:** selo "Mais barato por kg/litro" no menor R$/unidade entre os resultados já carregados com a mesma
+  unidade (`maisBaratas` em `core/modelos.dart`; precisa de 2 ou mais).
+
 ## Sem internet (sinal ruim no mercado)
 
 - A lista (a minha e a recebida) é salva no aparelho a cada leitura. Sem conexão, aparece a última versão
@@ -303,6 +312,7 @@ Fredoka 600 e Nunito 400/600/700/800 ficam **dentro do app** (`assets/fontes/`, 
 - Digital da chave de **publicação** no `ANDROID_SHA256` do prod, quando o app for para a Play Store.
 
 - Recorte da imagem do encarte (a extração ainda não marca a posição da etiqueta).
-- "Onde comprar" / "Mais barato" (comparação, depende do matching).
+- Comparação na lista: quanto a lista custaria em cada mercado (a tela da oferta e a busca já comparam).
+- Comparação no site (a página `/oferta/<id>` ainda não mostra "parecidos").
 - AdSense testado de verdade (precisa da conta aprovada); AdMob no celular.
 - Builds Android/iOS publicados (assinatura, lojas). Plataformas e flavors já criados; o iOS nunca foi compilado.
