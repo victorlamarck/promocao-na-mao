@@ -1,2 +1,3 @@
-- Mostra na tela inicial quando as ofertas foram atualizadas pela última vez
-- Mais ofertas do Big Mais, agora também as da loja online
+- Compare preços: veja o mesmo produto e parecidos em outros mercados, pelo preço do kg ou do litro
+- Na busca, um selo mostra a oferta mais barata por kg ou litro
+- Esvazie a lista de uma vez, com confirmação
