@@ -10,6 +10,7 @@ import '../../core/tema.dart';
 import '../../core/widgets.dart';
 import '../anuncios/anuncios.dart';
 import '../anuncios/espaco_anuncio.dart';
+import '../avisos/avisos.dart';
 
 final _db = Supabase.instance.client;
 
@@ -61,6 +62,7 @@ class _OfertaPageState extends State<OfertaPage> {
               title: const Text('Oferta'),
               centerTitle: true,
               actions: [
+                if (o?.produtoCodigo case final codigo?) BotaoAviso.produto(codigo: codigo, nome: o!.nome),
                 IconButton(
                   tooltip: 'Copiar link da oferta',
                   icon: const Icon(Icons.share_outlined),

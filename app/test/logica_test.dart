@@ -53,6 +53,15 @@ void main() {
         'Cerveja Pilsen Brahma ou Cerveja Pilsen Skol');
     expect(com([{'nome': 'Leite', 'marca': null}, {'nome': 'Leite', 'marca': null}]).nome, 'Leite');
     expect(com([]).nome, 'Mac Espag ou Cortado Don Sapore 400g R\$ 1,99');
+
+    // aviso de produto: só quando a oferta é de um produto só do catálogo
+    expect(com([{'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}]).produtoCodigo, 'cafe-pilao-500g');
+    expect(com([{'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}, {'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}]).produtoCodigo,
+        'cafe-pilao-500g');
+    expect(com([{'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}, {'nome': 'Café', 'produto_codigo': 'cafe-melitta-500g'}]).produtoCodigo,
+        isNull);
+    expect(com([{'nome': 'Café', 'produto_codigo': null}]).produtoCodigo, isNull);
+    expect(com([]).produtoCodigo, isNull);
   });
 
   test('1 anúncio a cada 8 ofertas, revezando os vendidos', () {

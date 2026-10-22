@@ -79,7 +79,7 @@ class _MercadoPageState extends State<MercadoPage> {
             ]),
           ),
         ]),
-        actions: [BotaoAviso(slug: widget.slug, nome: r?.nome ?? 'mercado')],
+        actions: [BotaoAviso.mercado(slug: widget.slug, nome: r?.nome ?? 'mercado')],
       ),
       body: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 24), children: [
         if (_secoes.length > 1)
