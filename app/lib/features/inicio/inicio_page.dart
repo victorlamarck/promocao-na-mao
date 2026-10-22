@@ -91,7 +91,7 @@ class _InicioPageState extends State<InicioPage> {
                   ),
                 ]),
               ),
-              IconButton(tooltip: 'Cor do app', onPressed: () => _escolherCor(context), icon: const Icon(Icons.palette_outlined)),
+              IconButton(tooltip: 'Cor e tema do app', onPressed: () => _escolherCor(context), icon: const Icon(Icons.palette_outlined)),
             ]),
             const SizedBox(height: 12),
             SearchBar(
@@ -210,11 +210,32 @@ void _escolherCor(BuildContext context) => showModalBottomSheet<void>(
       builder: (context) => Padding(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, spacing: 16, children: [
-          Text('Cor do app', style: fredoka(22)),
+          Text('Aparência', style: fredoka(22)),
+          const Text('Tema', style: TextStyle(fontWeight: FontWeight.w700)),
+          ValueListenableBuilder(
+            valueListenable: temaDoApp,
+            builder: (context, atual, _) => SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<ThemeMode>(
+                showSelectedIcon: false,
+                // sem ícone: "Automático" quebrava em duas linhas num celular de 412 dp
+                segments: const [
+                  ButtonSegment(value: ThemeMode.system, label: Text('Automático')),
+                  ButtonSegment(value: ThemeMode.light, label: Text('Claro')),
+                  ButtonSegment(value: ThemeMode.dark, label: Text('Escuro')),
+                ],
+                selected: {atual},
+                onSelectionChanged: (s) => escolherTemaDoApp(s.first),
+              ),
+            ),
+          ),
+          const Text('Cor', style: TextStyle(fontWeight: FontWeight.w700)),
           ValueListenableBuilder(
             valueListenable: corDoApp,
             builder: (context, atual, _) => Wrap(spacing: 12, children: [
               for (final (cor, nome) in coresDoApp)
+                // O círculo mostra a cor que o app usa neste tema (no escuro o grafite sumia no fundo).
+                if (temaApp(cor, Theme.of(context).brightness).colorScheme case final esquema)
                 Semantics(
                   label: 'Usar $nome',
                   selected: atual == cor,
@@ -225,11 +246,11 @@ void _escolherCor(BuildContext context) => showModalBottomSheet<void>(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: cor,
+                        color: esquema.primary,
                         shape: BoxShape.circle,
                         border: Border.all(color: atual == cor ? Theme.of(context).colorScheme.onSurface : Colors.transparent, width: 3),
                       ),
-                      child: atual == cor ? const Icon(Icons.check, color: Colors.white) : null,
+                      child: atual == cor ? Icon(Icons.check, color: esquema.onPrimary) : null,
                     ),
                   ),
                 ),

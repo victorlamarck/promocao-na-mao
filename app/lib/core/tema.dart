@@ -14,14 +14,26 @@ const coresDoApp = [
 /// Cor escolhida, lembrada no aparelho. O MaterialApp escuta e troca o tema na hora.
 final corDoApp = ValueNotifier<Color>(coresDoApp.first.$1);
 
-Future<void> carregarCorDoApp() async {
-  final valor = (await SharedPreferences.getInstance()).getInt('cor_do_app');
-  if (valor != null) corDoApp.value = Color(valor);
+/// Claro, escuro ou o do aparelho (padrão), lembrado no aparelho.
+final temaDoApp = ValueNotifier<ThemeMode>(ThemeMode.system);
+
+/// Cor e tema salvos, antes de abrir o app.
+Future<void> carregarAparencia() async {
+  final prefs = await SharedPreferences.getInstance();
+  final cor = prefs.getInt('cor_do_app');
+  if (cor != null) corDoApp.value = Color(cor);
+  final tema = ThemeMode.values.where((m) => m.name == prefs.getString('tema_do_app'));
+  if (tema.isNotEmpty) temaDoApp.value = tema.first;
 }
 
 Future<void> escolherCorDoApp(Color cor) async {
   corDoApp.value = cor;
   await (await SharedPreferences.getInstance()).setInt('cor_do_app', cor.toARGB32());
+}
+
+Future<void> escolherTemaDoApp(ThemeMode tema) async {
+  temaDoApp.value = tema;
+  await (await SharedPreferences.getInstance()).setString('tema_do_app', tema.name);
 }
 
 /// Identidade de cada mercado no app: cor, sigla e nome do programa de clube.
@@ -57,7 +69,13 @@ extension CoresDoTema on BuildContext {
 }
 
 ThemeData temaApp(Color semente, Brightness brilho) {
-  final esquema = ColorScheme.fromSeed(seedColor: semente, brightness: brilho);
+  // Cor quase cinza (grafite): o padrão do Material força saturação e o grafite virava verde, igual ao
+  // verde-água; o "neutral" mantém o cinza.
+  final cinza = HSLColor.fromColor(semente).saturation < 0.2;
+  final esquema = ColorScheme.fromSeed(
+      seedColor: semente,
+      brightness: brilho,
+      dynamicSchemeVariant: cinza ? DynamicSchemeVariant.neutral : DynamicSchemeVariant.tonalSpot);
   // Fontes embutidas (assets/fontes, pubspec.yaml): abrem iguais sem internet.
   final base = ThemeData(colorScheme: esquema, useMaterial3: true, fontFamily: 'Nunito');
   final arredondado = RoundedRectangleBorder(borderRadius: BorderRadius.circular(16));
