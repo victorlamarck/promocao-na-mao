@@ -1,3 +1,10 @@
+v 0.5.0
+
+- Veja quanto vai gastar em cada mercado da sua lista
+- Toque no sino de uma oferta e receba um aviso quando o produto entrar em oferta de novo
+- Comparação mais completa: muito mais produtos ligados entre os mercados
+_______________________________________________________________________________________________________________________
+
 v 0.4.0
 
 - Boas-vindas: 3 telas mostram o app na primeira vez que você abre
