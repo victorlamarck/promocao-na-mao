@@ -1,3 +1,4 @@
-- Compare preços: veja o mesmo produto e parecidos em outros mercados, pelo preço do kg ou do litro
-- Na busca, um selo mostra a oferta mais barata por kg ou litro
-- Esvazie a lista de uma vez, com confirmação
+- Escolha o tema claro ou escuro, junto com a cor do app
+- Fale com a gente: mande sugestões ou avise de problemas pelo app
+- A cor grafite agora é cinza de verdade
+- Corrige o app fechando ao trocar de aba rápido
