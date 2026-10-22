@@ -147,6 +147,13 @@ lib/
 - Selo de validade (`SeloValidade`, `avisoValidade` em `core/formato.dart`): "Vence hoje" / "Vence amanhã"
   em amarelo no card e nos itens da lista; "Encarte venceu" em vermelho nos itens cuja oferta já acabou.
 
+## Fale com a gente (sugestões e problemas)
+
+Ícone de mensagem na Início → folha "Fale com a gente" (`features/sugestao/`): Sugestão ou Problema no app, texto
+(até 1.000) e WhatsApp/e-mail opcional → `enviar_sugestao` (migration 19 do privado; tabela `sugestao`, lida no
+painel do Supabase). Vai junto a versão do app (`versaoDoApp`: a esteira Android passa `--dart-define=VERSAO`;
+build local = "dev") e a plataforma. Está na política de privacidade do site.
+
 ## Comparação entre mercados (decisão de 22/10/2026)
 
 - **Tela da oferta:** `comparar_oferta(oferta_id)` (migration 17 do privado). Primeiro "O mesmo produto em outros
@@ -175,6 +182,9 @@ lib/
 - Em seguida `core/abertura.dart` continua na mesma escala (48 unidades = 192 dp): a etiqueta balança
   pelo furo, o sorriso se desenha e tudo some em ~1 s, com as ofertas carregando por baixo. Pulada quando o
   app abre por link, no web e com "remover animações" do sistema.
+- Depois dela, só na primeira abertura, as **boas-vindas** (`features/boas_vindas/`): 3 telas (ofertas de GV, comparar,
+  lista compartilhada) com "Pular". "Primeira vez" = nada guardado no aparelho (SharedPreferences vazio), lido antes
+  do Supabase: quem atualiza o app já tem cache/cor/lista e não vê. Não aparecem por link nem no web.
 
 ## Links do site abrem o app (Android)
 

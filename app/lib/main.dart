@@ -13,6 +13,7 @@ import 'core/rotas.dart';
 import 'core/tema.dart';
 import 'features/anuncios/admob.dart' if (dart.library.js_interop) 'features/anuncios/adsense_web.dart';
 import 'features/avisos/avisos.dart';
+import 'features/boas_vindas/boas_vindas.dart';
 import 'features/lista/lista.dart';
 import 'firebase_options_dev.dart' as firebase_dev;
 import 'firebase_options_prod.dart' as firebase_prod;
@@ -34,25 +35,31 @@ Future<void> main() async {
       return true;
     };
   }
+  final novo = await primeiraVez(); // antes do Supabase e do cache gravarem algo
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseChavePublica);
-  await carregarCorDoApp();
+  await carregarAparencia();
   Lista.minha.iniciar(); // sem await: o app abre enquanto a lista carrega
   iniciarAdsense();
   iniciarAvisos(); // sem await: tocar numa notificação abre o mercado quando o app já está de pé
   _telasNoAnalytics();
-  runApp(ValueListenableBuilder(
-    valueListenable: corDoApp,
-    builder: (_, cor, _) => MaterialApp.router(
+  // aberto por link (/l/..., /oferta/...) ou no navegador: direto para a tela
+  final pular = kIsWeb || rotas.routeInformationProvider.value.uri.path != '/';
+  runApp(ListenableBuilder(
+    listenable: Listenable.merge([corDoApp, temaDoApp]),
+    builder: (_, _) => MaterialApp.router(
       title: 'Promoção na Mão',
       debugShowCheckedModeBanner: false,
-      theme: temaApp(cor, Brightness.light),
-      darkTheme: temaApp(cor, Brightness.dark),
+      theme: temaApp(corDoApp.value, Brightness.light),
+      darkTheme: temaApp(corDoApp.value, Brightness.dark),
+      themeMode: temaDoApp.value,
       routerConfig: rotas,
       builder: (_, filho) => Abertura(
-        // aberto por link (/l/..., /oferta/...) ou no navegador: direto para a tela
-        pular: kIsWeb || rotas.routeInformationProvider.value.uri.path != '/',
-        // faixa "DEV" no canto para não confundir com o app publicado
-        child: ehProd ? filho! : Banner(message: 'DEV', location: BannerLocation.topEnd, child: filho!),
+        pular: pular,
+        child: BoasVindas(
+          mostrar: novo && !pular,
+          // faixa "DEV" no canto para não confundir com o app publicado
+          child: ehProd ? filho! : Banner(message: 'DEV', location: BannerLocation.topEnd, child: filho!),
+        ),
       ),
     ),
   ));
