@@ -1,6 +1,6 @@
 ---
 name: subir-versao
-description: Sobe uma versão nova do app Android para o teste interno da Play. Atualiza os branches, vê o que mudou desde a última versão, escreve as notas (release.txt e versions.txt), testa o release no celular do dev, abre os PRs e, depois do merge no main, roda a esteira Android. Use quando o dev disser "subir versão", "nova versão do app", "gerar o .aab" ou rodar /subir-versao.
+description: Sobe uma versão nova do app Android para o teste interno da Play. Atualiza os branches, vê o que mudou desde a última versão, escreve as notas (release.txt e versions.txt), testa o release no celular do dev, abre os PRs e acompanha a esteira Android, que publica sozinha quando a versão nova chega ao main. Use quando o dev disser "subir versão", "nova versão do app", "gerar o .aab" ou rodar /subir-versao.
 argument-hint: "[X.Y.Z]"
 ---
 
@@ -67,12 +67,14 @@ A esteira Android recusa se o topo do `versions.txt` não for `v` + a versão do
 2. PR → `dev`. **(dev)** merge.
 3. PR `dev` → `main` (título "Dev"). **(dev)** merge.
 
-## 6. Gerar e mandar para a Play
+## 6. Mandar para a Play (sozinho)
 
-1. Atualize o `main` local (passo 1) e confira no `main` do GitHub que o pubspec tem a versão nova.
-2. `gh workflow run Android -R victorlamarck/promocao-na-mao --ref main` e acompanhe com `gh run watch`.
+1. O merge `dev` → `main` com a versão nova **dispara a esteira Android sozinho** (ela publica quando a linha
+   `version:` do pubspec muda no `main`). Não rode o botão: sairia um envio repetido.
+2. Acompanhe: `gh run list -R victorlamarck/promocao-na-mao -w Android -L 1` e `gh run watch <id>`.
    A esteira compila o `.aab` prod assinado e manda para o **teste interno como rascunho**.
-3. Falhou → mostre o passo e o erro do log (`gh run view --log-failed`); não tente de novo sem entender.
+3. Falhou → mostre o passo e o erro do log (`gh run view --log-failed`); não tente de novo sem entender. Corrigido
+   sem mudar a versão → aí sim o botão: `gh workflow run Android -R victorlamarck/promocao-na-mao --ref main`.
 4. **(dev)** No Play Console: liberar o rascunho do teste interno (e, quando quiser, promover para produção).
 
 ## 7. Fechar

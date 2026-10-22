@@ -1,5 +1,6 @@
-# Publica o app Android (flavor prod) no Google Play. Só no botão (Actions → Android → Run workflow),
-# a partir do main: publicar na loja é uma decisão, não efeito colateral de um push.
+# Publica o app Android (flavor prod) no Google Play. Sozinho quando chega ao main uma VERSÃO NOVA (a linha
+# "version:" do app/pubspec.yaml mudou; decisão do dev, 22/10/2026: subir a versão é a decisão de publicar),
+# ou no botão (Actions → Android → Run workflow, a partir do main) para reenviar.
 # A versão é a do app/pubspec.yaml: suba o número depois do "+" a cada envio (a Play recusa repetido).
 # Notas da versão: release.txt (vira o "Novidades" do Play) e o topo do versions.txt (docs/app.md#publicar-no-android).
 # Secrets (além dos do app.yml), passo a passo em docs/app.md#publicar-no-android:
@@ -11,6 +12,9 @@ name: Android
 
 # Vai sempre para o teste interno como rascunho: liberar (e promover a produção) é no Play Console.
 on:
+  push:
+    branches: [main]
+    paths: ['app/pubspec.yaml']
   workflow_dispatch:
 
 concurrency: android
@@ -24,8 +28,31 @@ permissions:
   contents: read
 
 jobs:
-  android:
+  # O pubspec também muda quando só se atualiza um pacote: publica só se a linha "version:" mudou no push.
+  versao:
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      publicar: ${{ steps.v.outputs.publicar }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # para ler o pubspec de antes do push
+      - id: v
+        env:
+          ANTES: ${{ github.event.before }}
+        run: |
+          agora=$(grep -m1 '^version:' pubspec.yaml)
+          antes=$(git show "$ANTES:app/pubspec.yaml" 2>/dev/null | grep -m1 '^version:' || true)
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || [ "$agora" != "$antes" ]; then
+            echo "publicar=true" >> "$GITHUB_OUTPUT"; echo "publicar: ${antes:-?} → $agora"
+          else
+            echo "publicar=false" >> "$GITHUB_OUTPUT"; echo "::notice::versão não mudou ($agora): nada a publicar"
+          fi
+
+  android:
+    needs: versao
+    if: needs.versao.outputs.publicar == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:

@@ -197,8 +197,11 @@ O build de release **exige a chave de publicação** (sem ela, falha avisando; n
 
 ### Pela esteira (`.github/workflows/android.yml`)
 
-Actions → **Android** → Run workflow (branch `main`). A esteira compila o `.aab` prod assinado e manda
-para o **teste interno como rascunho**; liberar e promover a produção é no Play Console.
+**Publica sozinha** quando chega ao `main` uma versão nova: um push no `main` que muda a linha `version:` do
+`app/pubspec.yaml` (decisão de 22/10/2026: subir a versão é a decisão de publicar; mudar só um pacote do pubspec
+não publica). O botão Actions → **Android** → Run workflow (branch `main`) fica para reenviar depois de uma falha.
+A esteira compila o `.aab` prod assinado e manda para o **teste interno como rascunho**; liberar e promover a
+produção é no Play Console. Rotina completa: skill `/subir-versao`.
 
 A cada versão nova:
 1. Suba a versão em `app/pubspec.yaml` (o número depois do `+` sempre; a Play recusa um versionCode repetido).
