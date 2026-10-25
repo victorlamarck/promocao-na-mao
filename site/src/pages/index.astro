@@ -41,7 +41,7 @@ const pontos = lojas.map((l) => [l.rede_id, Number(l.lat), Number(l.lng)]);
     <div class="grade-mercados" id="grade-mercados">
       {redes.map((r) => (
         <a class="mercado-card" href={`/mercado/${r.slug}/`} data-rede={r.id}>
-          <span class="avatar" style={`background: ${mercado(r.slug).cor}`}>{mercado(r.slug).sigla}</span>
+          <span class="avatar" style={`background: ${mercado(r.slug).cor}`}>{mercado(r.slug).logo ? <img src={mercado(r.slug).logo} alt="" /> : mercado(r.slug).sigla}</span>
           <span>
             <strong>{r.nome}</strong>
             <span class="suave"><span data-dist></span>{r.ofertas} ofertas · até {diaMes(r.ate)}</span>

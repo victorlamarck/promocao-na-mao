@@ -24,7 +24,7 @@ const visiveis = 8; // por seção; o resto abre em "Ver todas" (continua no HTM
   <section class="secao">
     <a href="/" class="suave">← Todos os mercados</a>
     <div style="display: flex; align-items: center; gap: 12px">
-      <span class="avatar" style={`background: ${m.cor}`}>{m.sigla}</span>
+      <span class="avatar" style={`background: ${m.cor}`}>{m.logo ? <img src={m.logo} alt="" /> : m.sigla}</span>
       <div>
         <h1 style="font-size: 32px; line-height: 38px">Ofertas {rede.nome}</h1>
         <span class="suave">{rede.ofertas} ofertas · {rede.lojas} {rede.lojas === 1 ? 'loja' : 'lojas'} em GV · {valeAte(rede.ate)}</span>

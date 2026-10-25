@@ -6,7 +6,7 @@ import 'formato.dart';
 import 'modelos.dart';
 import 'tema.dart';
 
-/// Bolinha com a sigla e a cor do mercado (sem logotipo).
+/// Logo do mercado num círculo; sem logo, a sigla na cor do mercado. Pequena (< 20), só a bolinha de cor.
 class AvatarMercado extends StatelessWidget {
   const AvatarMercado(this.slug, {super.key, this.tamanho = 48});
   final String? slug;
@@ -15,6 +15,15 @@ class AvatarMercado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final m = Mercado.de(slug);
+    if (m.logo != null && tamanho >= 20) {
+      // borda fina: os logos de fundo branco não somem sobre o card claro
+      return Container(
+        width: tamanho,
+        height: tamanho,
+        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: context.cores.outlineVariant)),
+        child: ClipOval(child: Image.asset(m.logo!, fit: BoxFit.cover, excludeFromSemantics: true)),
+      );
+    }
     return Container(
       width: tamanho,
       height: tamanho,

@@ -56,7 +56,7 @@ export default function ListaRecebida() {
         return (
           <section class="grupo" key={p.rede_id ?? 'sem'}>
             <div class="grupo-topo" style={{ padding: '12px 16px', gap: '12px' }}>
-              <span class="avatar" style={{ background: m.cor, width: '32px', height: '32px', fontSize: '13px' }}>{p.rede_id ? m.sigla : '?'}</span>
+              <span class="avatar" style={{ background: m.cor, width: '32px', height: '32px', fontSize: '13px' }}>{!p.rede_id ? '?' : m.logo ? <img src={m.logo} alt="" /> : m.sigla}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h2 style={{ fontSize: '20px', lineHeight: '26px' }}>{p.rede_nome ?? 'Onde preferir'}</h2>
                 <span class="suave">{feitos} de {itens.length} pegos</span>

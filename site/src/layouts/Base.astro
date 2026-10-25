@@ -142,6 +142,7 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   .mercado-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); color: var(--texto); text-decoration: none; }
   .mercado-card:hover { border-color: var(--verde); color: var(--texto); }
   .avatar { width: 44px; height: 44px; flex: none; border-radius: 22px; color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+  .avatar img { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 1px var(--linha); } /* logo: borda fina sobre o card branco */
   .mercado-card strong { display: block; font-size: 16px; }
 
   .grade-ofertas { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; } /* 2 colunas no celular */
