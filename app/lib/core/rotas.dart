@@ -58,8 +58,11 @@ class _ComAbas extends StatelessWidget {
             Widget icone(IconData i) => Badge.count(count: n, isLabelVisible: n > 0, child: Icon(i));
             return NavigationBar(
               selectedIndex: abas.currentIndex,
-              // tocar na aba que já está aberta volta ao começo dela
-              onDestinationSelected: (i) => abas.goBranch(i, initialLocation: i == abas.currentIndex),
+              onDestinationSelected: (i) {
+                // a aba guarda a tela, então a Lista recarrega ao voltar (sem internet, mostra o que já tinha)
+                if (i == 3) Lista.minha.carregar();
+                abas.goBranch(i, initialLocation: i == abas.currentIndex);
+              },
               destinations: [
                 const NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Início'),
                 const NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),
