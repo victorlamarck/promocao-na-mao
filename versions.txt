@@ -1,3 +1,11 @@
+v 0.6.0
+
+- Filtros na busca: escolha vários mercados e esconda as ofertas de atacado
+- Busca por menor preço por kg ou litro, e o "Menor preço" agora mostra as mais baratas primeiro
+- Início com ofertas de todos os mercados, revezando
+- Selo "Preço de atacado" nas ofertas de atacado
+_______________________________________________________________________________________________________________________
+
 v 0.5.0
 
 - Veja quanto vai gastar em cada mercado da sua lista

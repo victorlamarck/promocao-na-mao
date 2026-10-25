@@ -1,3 +1,4 @@
-- Veja quanto vai gastar em cada mercado da sua lista
-- Toque no sino de uma oferta e receba um aviso quando o produto entrar em oferta de novo
-- Comparação mais completa: muito mais produtos ligados entre os mercados
+- Filtros na busca: escolha vários mercados e esconda as ofertas de atacado
+- Busca por menor preço por kg ou litro, e o "Menor preço" agora mostra as mais baratas primeiro
+- Início com ofertas de todos os mercados, revezando
+- Selo "Preço de atacado" nas ofertas de atacado
