@@ -103,7 +103,7 @@ class _Detalhe extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.cores;
     final clube = Mercado.de(o.redeSlug).clube ?? 'clube';
-    final porKg = porUnidade(o.precoReferencia, o.unidadeReferencia);
+    final porKg = porUnidade(o.precoReferencia, o.unidadeReferencia, preco: o.preco);
     final secundario = TextStyle(fontSize: 13, color: c.onSurfaceVariant);
     return ListView(padding: const EdgeInsets.all(16), children: [
       Row(spacing: 8, children: [

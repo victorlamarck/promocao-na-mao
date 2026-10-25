@@ -23,6 +23,17 @@ void main() {
     expect(await primeiraVez(), isFalse);
   });
 
+  testWidgets('leitor de tela não lê o app escondido atrás', (t) async {
+    final semantica = t.ensureSemantics();
+    SharedPreferences.setMockInitialValues({});
+    await t.pumpWidget(app());
+    expect(find.bySemanticsLabel('Início'), findsNothing);
+    await t.tap(find.text('Pular'));
+    await t.pumpAndSettle();
+    expect(find.bySemanticsLabel('Início'), findsOneWidget);
+    semantica.dispose();
+  });
+
   testWidgets('Pular fecha de qualquer tela', (t) async {
     SharedPreferences.setMockInitialValues({});
     await t.pumpWidget(app());

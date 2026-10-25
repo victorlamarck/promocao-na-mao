@@ -65,7 +65,7 @@ class _BoasVindasState extends State<BoasVindas> {
     final ultima = _pagina == BoasVindas.telas.length - 1;
     return Stack(
       children: [
-        widget.child,
+        ExcludeSemantics(child: widget.child), // o leitor de tela não chega ao app escondido atrás
         Positioned.fill(
           child: Material(
             color: c.surface,

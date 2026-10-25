@@ -82,9 +82,9 @@ class Contador extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.cores;
     return Container(
-      height: largo ? 52 : 40,
+      height: largo ? 52 : 48, // 48: área de toque mínima do Android
       alignment: largo ? Alignment.center : null,
-      decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(largo ? 26 : 20)),
+      decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(largo ? 26 : 24)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         IconButton(
           tooltip: quantidade == 1 ? 'Tirar $nome da lista' : 'Menos um $nome',
@@ -126,7 +126,7 @@ class BotaoAdicionar extends StatelessWidget {
             );
           }
           return FilledButton.icon(
-            style: FilledButton.styleFrom(minimumSize: Size(largo ? double.infinity : 44, largo ? 52 : 40)),
+            style: FilledButton.styleFrom(minimumSize: Size(largo ? double.infinity : 48, largo ? 52 : 48)),
             onPressed: () async {
               try {
                 await Lista.minha.adicionar(oferta);
@@ -152,9 +152,11 @@ class SeloValidade extends StatelessWidget {
     final aviso = fim == null ? null : avisoValidade(fim!, DateTime.now());
     if (aviso == null) return const SizedBox.shrink();
     final venceu = aviso == 'Encarte venceu';
+    const claro = Color(0xFFFFF3C4), escuro = Color(0xFF5C4300);
+    final noEscuro = Theme.of(context).brightness == Brightness.dark; // no escuro, o mesmo par invertido
     return Etiqueta(aviso,
-        cor: venceu ? context.cores.onErrorContainer : const Color(0xFF5C4300),
-        fundo: venceu ? context.cores.errorContainer : const Color(0xFFFFF3C4));
+        cor: venceu ? context.cores.onErrorContainer : (noEscuro ? claro : escuro),
+        fundo: venceu ? context.cores.errorContainer : (noEscuro ? escuro : claro));
   }
 }
 
@@ -172,40 +174,60 @@ class CardOferta extends StatelessWidget {
     final o = oferta;
     final c = context.cores;
     final clube = Mercado.de(o.redeSlug).clube ?? 'clube';
-    final unidade = mostrarPorUnidade ? porUnidade(o.porUnidadeValor, o.porUnidadeTipo) : null;
+    final unidade = mostrarPorUnidade ? porUnidade(o.porUnidadeValor, o.porUnidadeTipo, preco: o.preco) : null;
+    final preco = o.preco == null ? 'preço no mercado' : reais(o.preco!);
+    final aviso = avisoValidade(o.validadeFim, DateTime.now());
+    // Leitor de tela: o card vira uma frase só ("Café 500 g, R$ 12,90 no Atacadão, antes R$ 15,90"); o Adicionar fica à parte.
+    final rotulo = [
+      o.nome,
+      mostrarMercado ? '$preco no ${o.redeNome}' : preco,
+      ?unidade,
+      if (o.precoClube != null) '${reais(o.precoClube!)} com $clube',
+      if (o.precoDe != null) 'antes ${reais(o.precoDe!)}',
+      ?o.condicaoCurta,
+      if (o.atacado) 'preço de atacado',
+      if (maisBarato) 'o mais barato',
+      ?aviso,
+    ].join(', ');
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => context.push('/oferta/${o.id}'),
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 4, children: [
-            if (mostrarMercado)
-              Row(spacing: 6, children: [
-                AvatarMercado(o.redeSlug, tamanho: 10),
-                Flexible(
-                  child: Text('${o.redeNome} · até ${diaMes(o.validadeFim)}',
-                      style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), overflow: TextOverflow.ellipsis),
-                ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Semantics(
+              label: rotulo,
+              excludeSemantics: true,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 4, children: [
+                if (mostrarMercado)
+                  Row(spacing: 6, children: [
+                    AvatarMercado(o.redeSlug, tamanho: 10),
+                    Flexible(
+                      child: Text('${o.redeNome} · até ${diaMes(o.validadeFim)}',
+                          style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), overflow: TextOverflow.ellipsis),
+                    ),
+                  ]),
+                SeloValidade(o.validadeFim),
+                if (maisBarato)
+                  Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
+                      cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
+                if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
+                Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
+                Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, spacing: 8, children: [
+                  Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
+                  if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
+                ]),
+                if (o.precoClube != null) Etiqueta('${reais(o.precoClube!)} com $clube'),
+                if (o.precoDe != null)
+                  Text.rich(TextSpan(style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), children: [
+                    const TextSpan(text: 'Antes '),
+                    TextSpan(text: reais(o.precoDe!), style: const TextStyle(decoration: TextDecoration.lineThrough)),
+                  ])),
+                if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
               ]),
-            SeloValidade(o.validadeFim),
-            if (maisBarato)
-              Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
-                  cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
-            if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
-            Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
-            Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, spacing: 8, children: [
-              Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
-              if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
-            ]),
-            if (o.precoClube != null) Etiqueta('${reais(o.precoClube!)} com $clube'),
-            if (o.precoDe != null)
-              Text.rich(TextSpan(style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), children: [
-                const TextSpan(text: 'Antes '),
-                TextSpan(text: reais(o.precoDe!), style: const TextStyle(decoration: TextDecoration.lineThrough)),
-              ])),
-            if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
-            const SizedBox(height: 4),
+            ),
+            const SizedBox(height: 12),
             BotaoAdicionar(o),
           ]),
         ),
