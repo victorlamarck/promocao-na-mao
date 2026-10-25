@@ -67,10 +67,15 @@ void main() {
     expect(com([{'nome': 'Café', 'produto_codigo': null}]).produtoCodigo, isNull);
 
     // atacado: selo "Preço de atacado" e, no card, a condição sem o que o selo já diz
-    Oferta cond(String? condicao) => Oferta.fromJson({
-          'id': 1, 'texto_original': 'Café', 'preco_por': 'embalagem', 'condicao': condicao,
+    Oferta cond(String? condicao, {double? clube}) => Oferta.fromJson({
+          'id': 1, 'texto_original': 'Café', 'preco_por': 'embalagem', 'condicao': condicao, 'preco_clube': clube,
           'validade_fim': '2026-11-03', 'rede_id': 4, 'rede_nome': 'Mart Minas', 'rede_slug': 'mart-minas', 'itens': [],
         });
+    // clube: o card já mostra "R$ 14,90 com bigmais+"; a parte "preço clube: ..." da condição só repetiria
+    const clube = 'preço clube: exclusivo bigmais+ você';
+    expect(cond(clube, clube: 14.9).condicaoCurta, isNull);
+    expect(cond('preço por quilo na peça; $clube', clube: 14.9).condicaoCurta, 'preço por quilo na peça');
+    expect(cond(clube).condicaoCurta, clube); // sem preço de clube no card, a condição é a única que avisa
     const atac = 'preço de atacado: vale na compra em quantidade (mesma fragrância/sabor)';
     expect(cond(atac).atacado, isTrue);
     expect(cond(atac).condicaoCurta, isNull);

@@ -25,6 +25,9 @@ class BuscaPage extends StatefulWidget {
   const BuscaPage({super.key, this.termoInicial = ''});
   final String termoInicial;
 
+  /// A aba guarda a tela, então o autofocus só vale na primeira vez; a busca da Início foca por aqui.
+  static final foco = FocusNode();
+
   @override
   State<BuscaPage> createState() => _BuscaPageState();
 }
@@ -63,6 +66,15 @@ class _BuscaPageState extends State<BuscaPage> {
     _db.from('rede_com_ofertas').select().order('nome', ascending: true).then(
         (r) => mounted ? setState(() => _redes = r.map(Rede.fromJson).toList()) : null, onError: (_) {});
     if (_campo.text.isNotEmpty) _buscar();
+  }
+
+  /// Termo novo vindo da Início (/buscar?q=) com a aba já aberta.
+  @override
+  void didUpdateWidget(BuscaPage antes) {
+    super.didUpdateWidget(antes);
+    if (widget.termoInicial.isEmpty || widget.termoInicial == antes.termoInicial) return;
+    _campo.text = widget.termoInicial;
+    _buscar();
   }
 
   /// A resposta pode chegar depois de a pessoa sair da tela: setState aí derrubava o app (Crashlytics 0.3.0).
@@ -160,6 +172,7 @@ class _BuscaPageState extends State<BuscaPage> {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
         child: TextField(
           controller: _campo,
+          focusNode: BuscaPage.foco,
           autofocus: true,
           textInputAction: TextInputAction.search,
           onChanged: _digitou,

@@ -23,11 +23,24 @@ class _ListaPageState extends State<ListaPage> {
   void initState() {
     super.initState();
     Lista.minha.carregar();
-    if (widget.abrirCompartilhar) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && Lista.minha.quantidadeTotal > 0) compartilhar(context);
-      });
-    }
+    _compartilharSePediu();
+  }
+
+  // A aba guarda a tela: o "Compartilhar" da Início chega aqui com ela já aberta.
+  @override
+  void didUpdateWidget(ListaPage antes) {
+    super.didUpdateWidget(antes);
+    if (!antes.abrirCompartilhar) _compartilharSePediu();
+  }
+
+  void _compartilharSePediu() {
+    if (!widget.abrirCompartilhar) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // tira o ?compartilhar=1: voltar para a aba não reabre a folha, e o próximo pedido abre de novo
+      context.go('/lista');
+      if (Lista.minha.quantidadeTotal > 0) compartilhar(context);
+    });
   }
 
   @override

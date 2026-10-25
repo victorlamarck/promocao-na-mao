@@ -10,6 +10,7 @@ import '../../core/tema.dart';
 import '../../core/widgets.dart';
 import '../anuncios/anuncios.dart';
 import '../anuncios/espaco_anuncio.dart';
+import '../busca/busca_page.dart';
 import '../lista/lista.dart';
 import '../mercado/mercados_page.dart';
 import '../sugestao/fale_com_a_gente.dart';
@@ -107,7 +108,11 @@ class _InicioPageState extends State<InicioPage> {
               hintText: 'Buscar: arroz, café, cerveja…',
               leading: const Icon(Icons.search),
               elevation: const WidgetStatePropertyAll(0),
-              onTap: () => context.go('/buscar'),
+              onTap: () {
+                context.go('/buscar');
+                // depois do quadro em que a aba Buscar aparece (escondida, ela não aceita foco)
+                WidgetsBinding.instance.addPostFrameCallback((_) => BuscaPage.foco.requestFocus());
+              },
               onSubmitted: (t) => context.go('/buscar?q=${Uri.encodeQueryComponent(t)}'),
             ),
             const SizedBox(height: 16),
