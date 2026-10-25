@@ -70,17 +70,21 @@ Future<bool> tentarNaLista(BuildContext context, Future<void> Function() acao) a
 
 /// "− 2 +" (rótulos para leitor de tela: "Mais um café"). Vai até 999, o limite do banco.
 class Contador extends StatelessWidget {
-  const Contador({super.key, required this.quantidade, required this.nome, required this.onMudar});
+  const Contador({super.key, required this.quantidade, required this.nome, required this.onMudar, this.largo = false});
   final int quantidade;
   final String nome;
   final ValueChanged<int> onMudar;
+
+  /// Ocupa a largura toda (como o "Adicionar à lista" que ele substitui), com o "− 2 +" no meio.
+  final bool largo;
 
   @override
   Widget build(BuildContext context) {
     final c = context.cores;
     return Container(
-      height: 40,
-      decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(20)),
+      height: largo ? 52 : 40,
+      alignment: largo ? Alignment.center : null,
+      decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(largo ? 26 : 20)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         IconButton(
           tooltip: quantidade == 1 ? 'Tirar $nome da lista' : 'Menos um $nome',
@@ -113,6 +117,7 @@ class BotaoAdicionar extends StatelessWidget {
             return Contador(
               quantidade: item.quantidade,
               nome: oferta.nome,
+              largo: largo,
               onMudar: (q) async {
                 if (await tentarNaLista(context, () => Lista.minha.mudarQuantidade(item, q)) && q == 0 && context.mounted) {
                   avisar(context, 'Tirado da lista', verLista: false);
@@ -187,6 +192,7 @@ class CardOferta extends StatelessWidget {
             if (maisBarato)
               Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
                   cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
+            if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
             Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
             Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, spacing: 8, children: [
               Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
@@ -198,7 +204,7 @@ class CardOferta extends StatelessWidget {
                 const TextSpan(text: 'Antes '),
                 TextSpan(text: reais(o.precoDe!), style: const TextStyle(decoration: TextDecoration.lineThrough)),
               ])),
-            if (o.condicao != null) Etiqueta(o.condicao!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
+            if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
             const SizedBox(height: 4),
             BotaoAdicionar(o),
           ]),
