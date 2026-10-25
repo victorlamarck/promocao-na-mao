@@ -81,47 +81,63 @@ class _MercadoPageState extends State<MercadoPage> {
         ]),
         actions: [BotaoAviso.mercado(slug: widget.slug, nome: r?.nome ?? 'mercado')],
       ),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 24), children: [
-        if (_secoes.length > 1)
-          SizedBox(
-            height: 40,
-            child: ListView(scrollDirection: Axis.horizontal, children: [
-              for (final s in [null, ..._secoes])
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(label: Text(s ?? 'Tudo'), selected: _secao == s, onSelected: (_) => _filtrar(s)),
-                ),
-            ]),
-          ),
-        const SizedBox(height: 12),
-        if (clube != null) ...[
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: c.primaryContainer, borderRadius: BorderRadius.circular(16)),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, spacing: 10, children: [
-              Icon(Icons.info_outline, size: 18, color: c.onPrimaryContainer),
-              Expanded(
-                child: Text('O selo mostra o preço para quem tem cadastro no $clube. Sem cadastro, vale o preço grande.',
-                    style: TextStyle(fontSize: 13, height: 1.4, color: c.onPrimaryContainer)),
+      body: CustomScrollView(slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          sliver: SliverList.list(children: [
+            if (_secoes.length > 1)
+              // Row rolável em vez de altura fixa: com fonte grande os chips crescem sem cortar o texto
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(spacing: 8, children: [
+                  for (final s in [null, ..._secoes])
+                    FilterChip(label: Text(s ?? 'Tudo'), selected: _secao == s, onSelected: (_) => _filtrar(s)),
+                ]),
               ),
-            ]),
+            const SizedBox(height: 12),
+            if (clube != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: c.primaryContainer, borderRadius: BorderRadius.circular(16)),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, spacing: 10, children: [
+                  Icon(Icons.info_outline, size: 18, color: c.onPrimaryContainer),
+                  Expanded(
+                    child: Text('O selo mostra o preço para quem tem cadastro no $clube. Sem cadastro, vale o preço grande.',
+                        style: TextStyle(fontSize: 13, height: 1.4, color: c.onPrimaryContainer)),
+                  ),
+                ]),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ]),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverList.builder(
+            itemCount: lista.length,
+            itemBuilder: (_, i) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: switch (lista[i]) {
+                Oferta o => CardOferta(o, mostrarMercado: false),
+                EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio, alturaRede: 90),
+                _ => const SizedBox.shrink(),
+              },
+            ),
           ),
-          const SizedBox(height: 12),
-        ],
-        for (final item in lista) ...[
-          switch (item) {
-            Oferta o => CardOferta(o, mostrarMercado: false),
-            EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio, alturaRede: 90),
-            _ => const SizedBox.shrink(),
-          },
-          const SizedBox(height: 10),
-        ],
-        if (_ofertas.erro)
-          Erro(onTentar: () => _ofertas.proxima(_atualizar))
-        else if (_ofertas.fim && _ofertas.itens.isEmpty)
-          const Padding(padding: EdgeInsets.all(24), child: Text('Nenhuma oferta desta categoria no encarte atual.', textAlign: TextAlign.center))
-        else if (!_ofertas.fim)
-          VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(_atualizar)),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          sliver: SliverToBoxAdapter(
+            child: _ofertas.erro
+                ? Erro(onTentar: () => _ofertas.proxima(_atualizar))
+                : _ofertas.fim && _ofertas.itens.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.all(24), child: Text('Nenhuma oferta desta categoria no encarte atual.', textAlign: TextAlign.center))
+                    : _ofertas.fim
+                        ? const SizedBox.shrink()
+                        : VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(_atualizar)),
+          ),
+        ),
       ]),
     );
   }

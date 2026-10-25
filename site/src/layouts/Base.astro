@@ -106,14 +106,14 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   :focus-visible { outline: 3px solid var(--verde); outline-offset: 2px; }
   .so-leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .verde { color: var(--verde); }
-  .suave { color: var(--suave); font-size: 13px; }
+  .suave { color: var(--suave); font-size: 14px; }
   [hidden] { display: none !important; }
 
-  .faixa-dev { position: fixed; top: 10px; right: -30px; z-index: 10; transform: rotate(45deg); background: #B3261E; color: #fff; font-weight: 800; font-size: 12px; padding: 2px 36px; pointer-events: none; }
+  .faixa-dev { position: fixed; top: 10px; right: -30px; z-index: 10; transform: rotate(45deg); background: #B3261E; color: #fff; font-weight: 800; font-size: 13px; padding: 2px 36px; pointer-events: none; }
 
   .topo { background: var(--branco); border-bottom: 1px solid var(--linha); }
   .topo-dentro { max-width: 1240px; margin: 0 auto; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
-  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--texto); font-size: 24px; }
+  .marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--texto); font-size: 22px; }
   .busca { flex: 1 1 320px; min-width: 0; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; border-radius: 999px; background: var(--cinza); }
   .busca input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; color: var(--texto); outline: none; }
   .busca input::placeholder { color: var(--suave); }
@@ -123,15 +123,15 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   .botao-cheio { border: 0; background: var(--verde); color: var(--branco); }
   .botao-cheio:hover { color: var(--branco); background: var(--verde-escuro); }
   .botao-claro { border: 0; background: var(--verde-claro); color: var(--verde-escuro); }
-  .botao-grande { min-height: 48px; font-size: 15px; font-weight: 800; padding: 0 24px; }
+  .botao-grande { min-height: 48px; font-size: 16px; font-weight: 800; padding: 0 24px; }
 
   .colunas { max-width: 1240px; margin: 0 auto; padding: 24px 16px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
   .colunas > main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
   .estreito { max-width: 600px; margin: 0 auto; padding: 20px 16px 32px; display: flex; flex-direction: column; gap: 16px; }
 
   .destaque { border-radius: 24px; background: var(--verde); color: var(--branco); padding: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; }
-  .destaque h1 { font-size: clamp(28px, 4vw, 36px); line-height: 1.17; text-wrap: balance; }
-  .destaque p { margin: 8px 0 0; color: var(--verde-claro); max-width: 520px; line-height: 1.5; }
+  .destaque h1 { font-size: clamp(28px, 4vw, 32px); line-height: 1.17; text-wrap: balance; }
+  .destaque p { margin: 8px 0 0; color: var(--branco); max-width: 520px; line-height: 1.5; }
 
   .secao { display: flex; flex-direction: column; gap: 12px; }
   .secao-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -142,25 +142,25 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   .mercado-card { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); color: var(--texto); text-decoration: none; }
   .mercado-card:hover { border-color: var(--verde); color: var(--texto); }
   .avatar { width: 44px; height: 44px; flex: none; border-radius: 22px; color: var(--branco); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
-  .mercado-card strong { display: block; font-size: 15px; }
+  .mercado-card strong { display: block; font-size: 16px; }
 
   .grade-ofertas { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; } /* 2 colunas no celular */
   .card { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); }
   .card.na-lista { border: 2px solid var(--verde); padding: 11px; }
   .card-link { color: inherit; text-decoration: none; } .card-link:hover { text-decoration: underline; color: inherit; }
-  .card-mercado { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--suave); }
+  .card-mercado { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--suave); }
   .ponto { width: 8px; height: 8px; flex: none; border-radius: 4px; }
-  .card h3 { font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; font-size: 15px; line-height: 20px; min-height: 40px; }
+  .card h3 { font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; font-size: 16px; line-height: 20px; min-height: 40px; }
   .card .card-titulo { font-size: 20px; line-height: 26px; }
   .card-preco { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
   .preco { font-family: 'Fredoka', 'Nunito', sans-serif; font-weight: 600; font-size: 22px; line-height: 28px; color: var(--verde-escuro); }
-  .etiqueta { align-self: flex-start; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: var(--verde-claro); color: var(--verde-escuro); }
+  .etiqueta { align-self: flex-start; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: var(--verde-claro); color: var(--verde-escuro); }
   .etiqueta-condicao { background: #FFE0B2; color: #4A2800; }
   .etiqueta-vence { background: #FFF3C4; color: #5C4300; }
   .etiqueta-vence.venceu { background: #FDE7E7; color: #8C1D18; }
   .grupo-item .etiqueta { display: inline-block; vertical-align: middle; margin-left: 4px; }
   .card-acao { margin-top: auto; padding-top: 4px; }
-  .add { width: 100%; height: 44px; border: 0; border-radius: 999px; background: var(--verde); color: var(--branco); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .add { width: 100%; height: 44px; border: 0; border-radius: 999px; background: var(--verde-claro); color: var(--verde-escuro); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; }
   .contador { height: 44px; border-radius: 999px; background: var(--verde); color: var(--branco); display: flex; align-items: center; justify-content: space-between; }
   .contador button { width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: var(--branco); display: flex; align-items: center; justify-content: center; }
   .contador .qtd { font-weight: 800; }
@@ -168,7 +168,7 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   .anuncio { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); color: var(--texto); text-decoration: none; }
   .anuncio-faixa { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; }
   .anuncio img { width: 100%; border-radius: 8px; object-fit: cover; }
-  .selo { align-self: flex-start; font-size: 12px; font-weight: 700; color: var(--anuncio-texto); background: var(--anuncio); padding: 2px 8px; border-radius: 8px; }
+  .selo { align-self: flex-start; font-size: 13px; font-weight: 700; color: var(--anuncio-texto); background: var(--anuncio); padding: 2px 8px; border-radius: 8px; }
 
   .lista { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 24px; background: var(--branco); border: 1px solid var(--linha); position: sticky; top: 16px; }
   .lista-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }

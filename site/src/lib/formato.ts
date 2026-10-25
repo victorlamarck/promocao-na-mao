@@ -57,9 +57,9 @@ export function avisoValidade(fim: string, hoje = hojeEmGV()): string | null {
   return n < 0 ? 'Encarte venceu' : n === 0 ? 'Vence hoje' : n === 1 ? 'Vence amanhã' : null;
 }
 
-/** "R$ 4,76 o kg". */
-export function porUnidade(valor: number | null, unidade: string | null): string | null {
-  if (valor == null || !unidade) return null;
+/** "R$ 4,76 o kg" / "R$ 1,50 cada" (pacote). Nada quando repete o preço exibido. */
+export function porUnidade(valor: number | null, unidade: string | null, preco: number | null = null): string | null {
+  if (valor == null || !unidade || (preco != null && reais(valor) === reais(preco))) return null;
   return `${reais(valor)} ${unidade === 'kg' ? 'o kg' : unidade === 'l' ? 'o litro' : 'cada'}`;
 }
 

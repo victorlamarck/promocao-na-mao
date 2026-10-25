@@ -25,7 +25,7 @@ const banner = anuncios.find((a) => a.formato === 'banner' && (a.rede_id == null
     <div style="display: flex; align-items: center; gap: 12px">
       <span class="avatar" style={`background: ${m.cor}`}>{m.sigla}</span>
       <div>
-        <h1 style="font-size: 28px; line-height: 34px">Ofertas {rede.nome}</h1>
+        <h1 style="font-size: 32px; line-height: 38px">Ofertas {rede.nome}</h1>
         <span class="suave">{rede.ofertas} ofertas · {rede.lojas} {rede.lojas === 1 ? 'loja' : 'lojas'} em GV · {valeAte(rede.ate)}</span>
       </div>
     </div>

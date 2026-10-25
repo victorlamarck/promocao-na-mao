@@ -36,10 +36,10 @@ export default function ListaRecebida() {
   return (
     <>
       <section class="destaque" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '8px', padding: '20px' }}>
-        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--verde-claro)' }}>
+        <span style={{ fontSize: '14px', fontWeight: 700 }}>
           {quem ? `${quem} compartilhou esta lista com você` : 'Compartilharam esta lista com você'} · atualizada {ha(l.atualizado_em)}
         </span>
-        <h1 style={{ fontSize: '28px', lineHeight: '34px' }}>{pegos} de {total} itens pegos</h1>
+        <h1 style={{ fontSize: '32px', lineHeight: '38px' }}>{pegos} de {total} itens pegos</h1>
         <div style={{ height: '8px', borderRadius: '4px', background: 'rgba(255,255,255,.25)', overflow: 'hidden' }}
           role="progressbar" aria-label="Itens pegos" aria-valuemin={0} aria-valuemax={total} aria-valuenow={pegos}>
           <div style={{ height: '100%', borderRadius: '4px', background: 'var(--verde-claro)', width: `${total ? Math.round((pegos / total) * 100) : 0}%` }} />
@@ -56,9 +56,9 @@ export default function ListaRecebida() {
         return (
           <section class="grupo" key={p.rede_id ?? 'sem'}>
             <div class="grupo-topo" style={{ padding: '12px 16px', gap: '12px' }}>
-              <span class="avatar" style={{ background: m.cor, width: '32px', height: '32px', fontSize: '12px' }}>{p.rede_id ? m.sigla : '?'}</span>
+              <span class="avatar" style={{ background: m.cor, width: '32px', height: '32px', fontSize: '13px' }}>{p.rede_id ? m.sigla : '?'}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h2 style={{ fontSize: '17px', lineHeight: '22px' }}>{p.rede_nome ?? 'Onde preferir'}</h2>
+                <h2 style={{ fontSize: '20px', lineHeight: '26px' }}>{p.rede_nome ?? 'Onde preferir'}</h2>
                 <span class="suave">{feitos} de {itens.length} pegos</span>
               </div>
               {p.rede_nome && (
@@ -67,7 +67,7 @@ export default function ListaRecebida() {
               )}
             </div>
             {itens.map((i) => (
-              <label class="grupo-item" key={i.id} style={{ minHeight: '56px', padding: '4px 16px', gap: '12px', fontSize: '15px', cursor: lista.podeMarcar ? 'pointer' : 'default' }}>
+              <label class="grupo-item" key={i.id} style={{ minHeight: '56px', padding: '4px 16px', gap: '12px', fontSize: '16px', cursor: lista.podeMarcar ? 'pointer' : 'default' }}>
                 <input type="checkbox" checked={i.pego} disabled={!lista.podeMarcar} onChange={(e) => marcar(i, e.currentTarget.checked)}
                   style={{ width: '22px', height: '22px', margin: 0, flex: 'none', accentColor: 'var(--verde)' }} />
                 <span class={i.pego ? 'pego' : ''} style={{ fontWeight: 600, flex: 1, minWidth: 0 }}>{i.texto} <Vence fim={i.validade_fim} /></span>

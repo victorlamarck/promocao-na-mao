@@ -51,7 +51,9 @@ class _ListaPageState extends State<ListaPage> {
             body: RefreshIndicator(
               onRefresh: l.carregar,
               child: ListView(padding: const EdgeInsets.fromLTRB(16, 0, 16, 24), children: [
-                if (n == 0 && !l.carregando)
+                if (n == 0 && l.carregando)
+                  const Padding(padding: EdgeInsets.symmetric(vertical: 48), child: Center(child: CircularProgressIndicator()))
+                else if (n == 0)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),
                     child: Column(spacing: 16, children: [

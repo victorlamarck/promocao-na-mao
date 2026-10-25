@@ -34,12 +34,20 @@ export default function Busca({ redes }: { redes: Rede[] }) {
   useEffect(() => { if (termo) carregar(0); }, [rede, menorPreco]);
   useEffect(() => { if (termo) rpc<Patrocinado[]>('anuncios_da_busca', { termo }).then(setPatrocinados, () => {}); }, []);
 
-  if (!termo) return <p class="tracejado">Digite o que você procura na busca lá em cima: arroz, café, cerveja…</p>;
+  if (!termo) return (
+    <section class="secao">
+      <h1 style={{ fontSize: '22px' }}>Buscar ofertas</h1>
+      <p class="suave" style={{ margin: 0 }}>Digite o que você procura na busca lá em cima ou comece por um destes:</p>
+      <div class="atalhos">
+        {['arroz', 'café', 'carne', 'leite', 'óleo'].map((t) => <a key={t} class="botao" href={`/buscar?q=${encodeURIComponent(t)}`}>{t}</a>)}
+      </div>
+    </section>
+  );
 
   return (
     <section class="secao" aria-labelledby="titulo-busca">
       <div class="secao-topo">
-        <h1 id="titulo-busca" style={{ fontSize: '24px' }}>
+        <h1 id="titulo-busca" style={{ fontSize: '22px' }}>
           {total == null ? `Buscando “${termo}”…` : `${total} ${total === 1 ? 'oferta' : 'ofertas'} para “${termo}”`}
         </h1>
         <label class="suave" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

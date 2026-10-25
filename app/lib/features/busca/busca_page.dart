@@ -98,7 +98,7 @@ class _BuscaPageState extends State<BuscaPage> {
       showDragHandle: true,
       builder: (context) => StatefulBuilder(
         builder: (context, mudar) => SafeArea(
-          child: Padding(
+          child: SingleChildScrollView( // muitos mercados ou fonte grande: rola em vez de estourar
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, spacing: 8, children: [
               const Text('Filtros', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
@@ -180,44 +180,63 @@ class _BuscaPageState extends State<BuscaPage> {
                 child: Text('Digite o produto que você procura.\nMostramos só ofertas que valem hoje.',
                     textAlign: TextAlign.center, style: TextStyle(height: 1.4)),
               ))
-            : ListView(padding: const EdgeInsets.fromLTRB(16, 14, 16, 24), children: [
-                Row(children: [
-                  Badge(
-                    isLabelVisible: _filtrosLigados > 0,
-                    label: Text('$_filtrosLigados'),
-                    child: OutlinedButton.icon(onPressed: _abrirFiltros, icon: const Icon(Icons.tune, size: 18), label: const Text('Filtros')),
+            : CustomScrollView(slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                  sliver: SliverList.list(children: [
+                    Row(children: [
+                      Badge(
+                        isLabelVisible: _filtrosLigados > 0,
+                        label: Text('$_filtrosLigados'),
+                        child: OutlinedButton.icon(onPressed: _abrirFiltros, icon: const Icon(Icons.tune, size: 18), label: const Text('Filtros')),
+                      ),
+                      const Spacer(),
+                      DropdownButton<_Ordem>(
+                        value: _ordem,
+                        underline: const SizedBox.shrink(),
+                        items: [for (final o in _Ordem.values) DropdownMenuItem(value: o, child: Text(o.rotulo))],
+                        onChanged: (v) {
+                          setState(() => _ordem = v!);
+                          _buscar();
+                        },
+                      ),
+                    ]),
+                    Text(_total == null ? 'Buscando…' : '$_total ${_total == 1 ? 'oferta válida' : 'ofertas válidas'} hoje',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 10),
+                    for (final a in _patrocinados) ...[EspacoAnuncioView(anuncio: a, selo: 'Patrocinado'), const SizedBox(height: 10)],
+                  ]),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList.builder(
+                    itemCount: _resultados.itens.length,
+                    itemBuilder: (_, i) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: CardOferta(_resultados.itens[i], mostrarPorUnidade: true, maisBarato: baratas.contains(_resultados.itens[i].id)),
+                    ),
                   ),
-                  const Spacer(),
-                  DropdownButton<_Ordem>(
-                    value: _ordem,
-                    underline: const SizedBox.shrink(),
-                    items: [for (final o in _Ordem.values) DropdownMenuItem(value: o, child: Text(o.rotulo))],
-                    onChanged: (v) {
-                      setState(() => _ordem = v!);
-                      _buscar();
-                    },
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  sliver: SliverToBoxAdapter(
+                    child: _resultados.erro
+                        ? Erro(onTentar: () => _resultados.proxima(_atualizar))
+                        : _resultados.fim && _resultados.itens.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Text(
+                                    _filtrosLigados > 0
+                                        ? 'Nenhuma oferta encontrada hoje com esses filtros.\nTente tirar algum filtro ou buscar outra palavra.'
+                                        : 'Nenhuma oferta encontrada hoje.\nTente outra palavra, como a marca ou o tipo do produto.',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(height: 1.4)),
+                              )
+                            : _resultados.fim
+                                ? const SizedBox.shrink()
+                                : VerMais(carregando: _resultados.carregando, onPressed: () => _resultados.proxima(_atualizar)),
                   ),
-                ]),
-                Text(_total == null ? 'Buscando…' : '$_total ${_total == 1 ? 'oferta válida' : 'ofertas válidas'} hoje',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 10),
-                for (final a in _patrocinados) ...[EspacoAnuncioView(anuncio: a, selo: 'Patrocinado'), const SizedBox(height: 10)],
-                for (final o in _resultados.itens)
-                  ...[CardOferta(o, mostrarPorUnidade: true, maisBarato: baratas.contains(o.id)), const SizedBox(height: 10)],
-                if (_resultados.erro)
-                  Erro(onTentar: () => _resultados.proxima(_atualizar))
-                else if (_resultados.fim && _resultados.itens.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                        _filtrosLigados > 0
-                            ? 'Nenhuma oferta encontrada hoje com esses filtros.\nTente tirar algum filtro ou buscar outra palavra.'
-                            : 'Nenhuma oferta encontrada hoje.\nTente outra palavra, como a marca ou o tipo do produto.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(height: 1.4)),
-                  )
-                else if (!_resultados.fim)
-                  VerMais(carregando: _resultados.carregando, onPressed: () => _resultados.proxima(_atualizar)),
+                ),
               ]),
       ),
     ]);

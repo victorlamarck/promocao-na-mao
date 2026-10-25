@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/busca/busca_page.dart';
 import '../features/inicio/inicio_page.dart';
+import '../features/lista/lista.dart';
 import '../features/lista/lista_page.dart';
 import '../features/lista/lista_recebida_page.dart';
 import '../features/mercado/mercado_page.dart';
@@ -39,15 +40,23 @@ class _ComAbas extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: child,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: _caminhos.indexOf(caminho).clamp(0, 3),
-          onDestinationSelected: (i) => context.go(_caminhos[i]),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Início'),
-            NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),
-            NavigationDestination(icon: Icon(Icons.storefront_outlined), selectedIcon: Icon(Icons.storefront), label: 'Mercados'),
-            NavigationDestination(icon: Icon(Icons.checklist_outlined), selectedIcon: Icon(Icons.checklist), label: 'Lista'),
-          ],
+        bottomNavigationBar: ListenableBuilder(
+          listenable: Lista.minha,
+          builder: (context, _) {
+            // quantos itens tem na lista, no ícone da aba
+            final n = Lista.minha.quantidadeTotal;
+            Widget icone(IconData i) => Badge.count(count: n, isLabelVisible: n > 0, child: Icon(i));
+            return NavigationBar(
+              selectedIndex: _caminhos.indexOf(caminho).clamp(0, 3),
+              onDestinationSelected: (i) => context.go(_caminhos[i]),
+              destinations: [
+                const NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Início'),
+                const NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),
+                const NavigationDestination(icon: Icon(Icons.storefront_outlined), selectedIcon: Icon(Icons.storefront), label: 'Mercados'),
+                NavigationDestination(icon: icone(Icons.checklist_outlined), selectedIcon: icone(Icons.checklist), label: 'Lista'),
+              ],
+            );
+          },
         ),
       );
 }
