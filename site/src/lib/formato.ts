@@ -21,8 +21,15 @@ export interface Oferta {
 // shortcut: depende do texto da extração; virar coluna na API se outra rede tiver folheto de atacado.
 export const atacado = (o: Oferta) => o.condicao?.startsWith('preço de atacado') ?? false;
 
-/** Condição para o card, sem o "preço de atacado: ..." que o selo já diz; null se não sobrar nada. */
-export const condicaoCurta = (o: Oferta) => (atacado(o) ? o.condicao!.replace(/^preço de atacado[^;]*(; )?/, '') || null : o.condicao);
+/** Condição para o card, sem o que ele já mostra: o "preço de atacado: ..." (selo "Preço de atacado") e o
+ *  "preço clube: ..." quando há preço de clube (etiqueta "R$ X com bigmais+"). O texto todo fica na página da oferta.
+ *  Mesma regra do `condicaoCurta` do app (modelos.dart); null se não sobrar nada. */
+// shortcut: as partes vêm separadas por ";" e com esses começos na extração; se mudar, o card volta a repetir.
+export function condicaoCurta(o: Oferta): string | null {
+  const resto = (o.condicao ?? '').split(';').map((p) => p.trim())
+    .filter((p) => p && !p.startsWith('preço de atacado') && !(o.preco_clube != null && p.startsWith('preço clube')));
+  return resto.join('; ') || null;
+}
 
 /** 4.99 → "R$ 4,99"; 1234.5 → "R$ 1.234,50". */
 export function reais(v: number): string {

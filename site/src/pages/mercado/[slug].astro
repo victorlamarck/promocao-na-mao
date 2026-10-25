@@ -18,6 +18,7 @@ const daRede = ofertas.filter((o) => o.rede_id === rede.id);
 const secoes = [...Map.groupBy(daRede, (o) => o.secao ?? 'Outras ofertas')];
 const m = mercado(rede.slug);
 const banner = anuncios.find((a) => a.formato === 'banner' && (a.rede_id == null || a.rede_id === rede.id));
+const visiveis = 8; // por seção; o resto abre em "Ver todas" (continua no HTML, para o Google)
 ---
 <Base titulo={`Ofertas ${rede.nome}`} descricao={`${rede.ofertas} ofertas do ${rede.nome} em Governador Valadares, válidas até ${diaMes(rede.ate)}.`} comLista>
   <section class="secao">
@@ -30,20 +31,38 @@ const banner = anuncios.find((a) => a.formato === 'banner' && (a.rede_id == null
       </div>
     </div>
     {m.clube && <p class="tracejado" style="margin: 0">O preço com <strong>{m.clube}</strong> vale para quem tem o cadastro do {rede.nome}.</p>}
-    {secoes.length > 1 && (
-      <nav aria-label="Seções do encarte" class="atalhos">
-        {secoes.map(([s], i) => <a class="botao" style="flex: none" href={`#s${i}`}>{s}</a>)}
-      </nav>
-    )}
   </section>
+
+  {secoes.length > 1 && (
+    <nav aria-label="Seções do encarte" class="atalhos fixos">
+      {secoes.map(([s], i) => <a class="botao" style="flex: none" href={`#s${i}`}>{s}</a>)}
+    </nav>
+  )}
 
   {secoes.map(([secao, lista], i) => (
     <section class="secao" id={`s${i}`}>
       <h2>{secao}</h2>
       <div class="grade-ofertas">
-        {lista.map((o) => <CardOferta o={o} mostrarMercado={false} />)}
+        {lista.slice(0, visiveis).map((o) => <CardOferta o={o} mostrarMercado={false} />)}
       </div>
+      {lista.length > visiveis && (
+        <details class="mais">
+          <summary class="botao">Ver todas as {lista.length}</summary>
+          <div class="grade-ofertas">
+            {lista.slice(visiveis).map((o) => <CardOferta o={o} mostrarMercado={false} />)}
+          </div>
+        </details>
+      )}
     </section>
   ))}
   <Anuncio anuncio={banner} faixa />
 </Base>
+
+<style>
+  /* as seções ficam no topo ao rolar; o título da seção não some embaixo delas */
+  .fixos { position: sticky; top: 0; z-index: 5; margin: -8px 0; padding: 8px 0; background: var(--fundo); }
+  .secao[id] { scroll-margin-top: 64px; }
+  .mais summary { list-style: none; }
+  .mais summary::-webkit-details-marker { display: none; }
+  .mais[open] summary { display: none; } /* aberto, as ofertas continuam a grade de cima */
+</style>

@@ -14,6 +14,17 @@ test('atacado: selo e condição curta no card', () => {
   assert.equal(atacado(com(null)), false);
 });
 
+test('condição curta: sem o preço clube que o card já mostra (regra do app)', () => {
+  const com = (condicao: string, preco_clube: number | null = 14.9) => ({ condicao, preco_clube }) as Oferta;
+  assert.equal(condicaoCurta(com('preço clube: exclusivo bigmais+ você')), null);
+  assert.equal(condicaoCurta(com('preço clube: exclusivo bigmais+ você; ganhe +1 selinho extra comprando 1 un.')),
+    'ganhe +1 selinho extra comprando 1 un.');
+  assert.equal(condicaoCurta(com('preço por quilo na peça;preço clube: exclusivo Meu BH')), 'preço por quilo na peça');
+  assert.equal(condicaoCurta(com('preço app: exclusivo no app Meu Atacadão')), 'preço app: exclusivo no app Meu Atacadão'); // só "preço clube" sai
+  // sem preço de clube no card, a condição é a única informação: fica
+  assert.equal(condicaoCurta(com('preço clube: exclusivo bigmais+ você', null)), 'preço clube: exclusivo bigmais+ você');
+});
+
 test('reais', () => {
   assert.equal(reais(4.99), 'R$ 4,99');
   assert.equal(reais(1234.5), 'R$ 1.234,50');
