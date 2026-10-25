@@ -29,7 +29,7 @@ class _InicioPageState extends State<InicioPage> {
   // não repete nem pula.
   // A primeira página fica salva para abrir sem internet (as vencidas mostram "Encarte venceu").
   final _ofertas = Paginador<Oferta>((de, ate) async {
-    Future<List<Map<String, dynamic>>> q() => _db.from('oferta_inicio').select().order('ordem').range(de, ate);
+    Future<List<Map<String, dynamic>>> q() => _db.from('oferta_inicio').select().order('ordem', ascending: true).range(de, ate);
     return (await (de == 0 ? comCache('inicio', q) : q())).map(Oferta.fromJson).toList();
   });
   final _anotar = TextEditingController();
