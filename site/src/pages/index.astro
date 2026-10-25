@@ -6,13 +6,11 @@ import Anuncio from '../components/Anuncio.astro';
 import { dados } from '../lib/dados';
 import { diaMes, mercado, intercalar, atualizadoEm } from '../lib/formato';
 
-const { ofertas, redes, lojas, anuncios } = await dados();
+const { ofertas, redes, lojas, anuncios, inicio } = await dados();
 
-// Ofertas de hoje: revezando as redes (uma de cada por vez), para não ficar só no último encarte importado.
-const porRede = Map.groupBy(ofertas, (o) => o.rede_id);
-const hoje = [];
-for (let i = 0; hoje.length < 24 && i < ofertas.length; i++)
-  for (const lista of porRede.values()) if (lista[i] && hoje.length < 24) hoje.push(lista[i]);
+// Ofertas de hoje: rodízio entre os mercados, feito no banco (oferta_inicio; o site é refeito todo dia às 03:05).
+const porId = new Map(ofertas.map((o) => [o.id, o]));
+const hoje = inicio.flatMap((id) => porId.get(id) ?? []);
 
 const grade = intercalar(hoje, anuncios.filter((a) => a.formato === 'feed'), 8);
 const banner = anuncios.find((a) => a.formato === 'banner');

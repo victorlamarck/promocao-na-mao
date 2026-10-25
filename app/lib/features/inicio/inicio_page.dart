@@ -25,10 +25,11 @@ class InicioPage extends StatefulWidget {
 }
 
 class _InicioPageState extends State<InicioPage> {
-  // Mais recentes primeiro; termina no id (único) para a paginação não repetir nem pular.
+  // Rodízio entre os mercados, feito no banco (oferta_inicio, migration 21); `ordem` é única, então a paginação
+  // não repete nem pula.
   // A primeira página fica salva para abrir sem internet (as vencidas mostram "Encarte venceu").
   final _ofertas = Paginador<Oferta>((de, ate) async {
-    Future<List<Map<String, dynamic>>> q() => _db.from('oferta_lista').select().order('id', ascending: false).range(de, ate);
+    Future<List<Map<String, dynamic>>> q() => _db.from('oferta_inicio').select().order('ordem', ascending: true).range(de, ate);
     return (await (de == 0 ? comCache('inicio', q) : q())).map(Oferta.fromJson).toList();
   });
   final _anotar = TextEditingController();

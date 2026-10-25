@@ -37,7 +37,7 @@ Para testar a lista recebida, use o build com um servidor que faça o rewrite.
 | Política de privacidade `/privacidade/` | build; link no rodapé. **Mudou o que o site coleta? Atualize a página e a data** | `src/pages/privacidade.astro` |
 | Lista recebida `/l/<código>` | navegador; tempo real no canal `lista-<id>` | `src/components/ListaRecebida.tsx` |
 
-- **Banco:** as mesmas views e funções do app (`oferta_lista`, `rede_com_ofertas`, `buscar_ofertas`,
+- **Banco:** as mesmas views e funções do app (`oferta_lista`, `oferta_inicio`, `rede_com_ofertas`, `buscar_ofertas`,
   `lista_*`, `anuncio_vigente`, `anuncios_da_busca`). O site não exigiu nenhuma mudança no banco.
 - **Lista:** sem login, como no app. O código de dono fica no `localStorage` do navegador (a lista
   do site e a do app são listas diferentes). O link de compartilhar usa o código de **marcar**.
