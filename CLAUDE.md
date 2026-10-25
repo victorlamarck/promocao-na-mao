@@ -19,7 +19,7 @@ repositório **privado `promocao-na-mao-dados`** (clonado ao lado: `../promocao-
 
 ## API do banco (o contrato com o repositório privado)
 Só leitura pela chave publishable (RLS) e funções `security definer`; nada escreve direto nas tabelas.
-- Views: `oferta_lista` (uma linha por oferta vigente; `itens[]` com `produto_id` e `produto_codigo`, migration 20), `rede_com_ofertas` (mercados com ofertas hoje; `atualizado_em`
+- Views: `oferta_lista` (uma linha por oferta vigente; `itens[]` com `produto_id` e `produto_codigo`, migration 20), `oferta_inicio` (as mesmas linhas + `ordem`: rodízio entre mercados na Início, migration 21), `rede_com_ofertas` (mercados com ofertas hoje; `atualizado_em`
   = última importação), `anuncio_vigente`; tabela `loja` (lat/lng).
 - Funções: `buscar_ofertas(termo)`, `anuncios_da_busca(termo)`, `secoes_da_rede(slug)`,
   `comparar_oferta(oferta_id)` (`{mesmo, similares}`, linhas da `oferta_lista` + `preco_comparado`/`unidade_comparada`), `lista_criar`, `lista_ler`,

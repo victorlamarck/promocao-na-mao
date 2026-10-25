@@ -9,18 +9,20 @@ export interface Anuncio { id: number; formato: string; titulo: string; texto: s
 
 const colunas = 'id,texto_original,preco,preco_de,preco_clube,condicao,secao,validade_fim,rede_id,rede_nome,rede_slug,itens,preco_referencia,unidade_referencia';
 
-let cache: Promise<{ ofertas: Oferta[]; redes: Rede[]; lojas: Loja[]; anuncios: Anuncio[] }> | undefined;
+let cache: Promise<{ ofertas: Oferta[]; redes: Rede[]; lojas: Loja[]; anuncios: Anuncio[]; inicio: number[] }> | undefined;
 
 export function dados() {
   conferirConfig();
   cache ??= (async () => {
-    const [ofertas, redes, lojas, anuncios] = await Promise.all([
+    const [ofertas, redes, lojas, anuncios, inicio] = await Promise.all([
       lerTudo<Oferta>('oferta_lista', `select=${colunas}&order=id.desc`),
       lerTudo<Rede>('rede_com_ofertas', 'select=*&order=nome'),
       lerTudo<Loja>('loja', 'select=rede_id,nome,lat,lng&lat=not.is.null'),
       lerTudo<Anuncio>('anuncio_vigente', 'select=id,formato,titulo,texto,imagem_url,link_url,rede_id&order=id'),
+      // ids das ofertas da Início, no rodízio entre mercados do banco (a mesma ordem do app)
+      lerTudo<{ id: number }>('oferta_inicio', 'select=id&order=ordem&limit=24'),
     ]);
-    return { ofertas, redes, lojas, anuncios };
+    return { ofertas, redes, lojas, anuncios, inicio: inicio.map((o) => o.id) };
   })();
   return cache;
 }
