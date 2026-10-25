@@ -36,20 +36,21 @@ Future<void> escolherTemaDoApp(ThemeMode tema) async {
   await (await SharedPreferences.getInstance()).setString('tema_do_app', tema.name);
 }
 
-/// Identidade de cada mercado no app: cor, sigla e nome do programa de clube.
-/// Sem logotipos (marca das redes). Mercado novo sem entrada aqui fica cinza.
+/// Identidade de cada mercado no app: cor, sigla, nome do programa de clube e logo (`assets/mercados/<slug>.png`,
+/// 192 px com fundo e margem). Mercado novo sem entrada aqui fica cinza, com a sigla.
 class Mercado {
-  const Mercado(this.cor, this.sigla, [this.clube]);
+  const Mercado(this.cor, this.sigla, [this.clube, this.logo]);
   final Color cor;
   final String sigla;
   final String? clube;
+  final String? logo;
 
   static const _porSlug = {
-    'big-mais': Mercado(Color(0xFF1D4ED8), 'BM', 'bigmais+'),
-    'coelho-diniz': Mercado(Color(0xFFB45309), 'CD'),
-    'atacadao': Mercado(Color(0xFF0F766E), 'AT', 'app Meu Atacadão'),
-    'supermercados-bh': Mercado(Color(0xFF6D28D9), 'BH', 'Meu BH'),
-    'mart-minas': Mercado(Color(0xFFBE123C), 'MM', 'Mart Mais'),
+    'big-mais': Mercado(Color(0xFF1D4ED8), 'BM', 'bigmais+', 'assets/mercados/big-mais.png'),
+    'coelho-diniz': Mercado(Color(0xFFB45309), 'CD', null, 'assets/mercados/coelho-diniz.png'),
+    'atacadao': Mercado(Color(0xFF0F766E), 'AT', 'app Meu Atacadão', 'assets/mercados/atacadao.png'),
+    'supermercados-bh': Mercado(Color(0xFF6D28D9), 'BH', 'Meu BH', 'assets/mercados/supermercados-bh.png'),
+    'mart-minas': Mercado(Color(0xFFBE123C), 'MM', 'Mart Mais', 'assets/mercados/mart-minas.png'),
   };
 
   static Mercado de(String? slug) =>

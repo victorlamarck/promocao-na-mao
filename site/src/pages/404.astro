@@ -11,7 +11,7 @@ const { redes } = await dados();
   <div class="grade-mercados">
     {redes.map((r) => (
       <a class="mercado-card" href={`/mercado/${r.slug}/`}>
-        <span class="avatar" style={`background: ${mercado(r.slug).cor}`}>{mercado(r.slug).sigla}</span>
+        <span class="avatar" style={`background: ${mercado(r.slug).cor}`}>{mercado(r.slug).logo ? <img src={mercado(r.slug).logo} alt="" /> : mercado(r.slug).sigla}</span>
         <span><strong>{r.nome}</strong><span class="suave">{r.ofertas} ofertas · até {diaMes(r.ate)}</span></span>
       </a>
     ))}

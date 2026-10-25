@@ -21,8 +21,15 @@ export interface Oferta {
 // shortcut: depende do texto da extração; virar coluna na API se outra rede tiver folheto de atacado.
 export const atacado = (o: Oferta) => o.condicao?.startsWith('preço de atacado') ?? false;
 
-/** Condição para o card, sem o "preço de atacado: ..." que o selo já diz; null se não sobrar nada. */
-export const condicaoCurta = (o: Oferta) => (atacado(o) ? o.condicao!.replace(/^preço de atacado[^;]*(; )?/, '') || null : o.condicao);
+/** Condição para o card, sem o que ele já mostra: o "preço de atacado: ..." (selo "Preço de atacado") e o
+ *  "preço clube: ..." quando há preço de clube (etiqueta "R$ X com bigmais+"). O texto todo fica na página da oferta.
+ *  Mesma regra do `condicaoCurta` do app (modelos.dart); null se não sobrar nada. */
+// shortcut: as partes vêm separadas por ";" e com esses começos na extração; se mudar, o card volta a repetir.
+export function condicaoCurta(o: Oferta): string | null {
+  const resto = (o.condicao ?? '').split(';').map((p) => p.trim())
+    .filter((p) => p && !p.startsWith('preço de atacado') && !(o.preco_clube != null && p.startsWith('preço clube')));
+  return resto.join('; ') || null;
+}
 
 /** 4.99 → "R$ 4,99"; 1234.5 → "R$ 1.234,50". */
 export function reais(v: number): string {
@@ -74,16 +81,16 @@ export function nomeDaOferta(o: Pick<Oferta, 'itens' | 'texto_original'>): strin
   return unicos(o.itens.map((i) => junta([i.nome, i.marca]))).join(' ou ');
 }
 
-/** Cor, sigla e nome do clube de cada rede (app/lib/core/tema.dart). */
-const mercados: Record<string, { cor: string; sigla: string; clube?: string }> = {
-  'big-mais': { cor: '#1D4ED8', sigla: 'BM', clube: 'bigmais+' },
-  'coelho-diniz': { cor: '#B45309', sigla: 'CD' },
-  atacadao: { cor: '#0F766E', sigla: 'AT', clube: 'app Meu Atacadão' },
-  'supermercados-bh': { cor: '#6D28D9', sigla: 'BH', clube: 'Meu BH' },
-  'mart-minas': { cor: '#BE123C', sigla: 'MM', clube: 'Mart Mais' },
+/** Cor, sigla, nome do clube e logo (`public/mercados/<slug>.png`) de cada rede (app/lib/core/tema.dart). */
+const mercados: Record<string, { cor: string; sigla: string; clube?: string; logo?: string }> = {
+  'big-mais': { cor: '#1D4ED8', sigla: 'BM', clube: 'bigmais+', logo: '/mercados/big-mais.png' },
+  'coelho-diniz': { cor: '#B45309', sigla: 'CD', logo: '/mercados/coelho-diniz.png' },
+  atacadao: { cor: '#0F766E', sigla: 'AT', clube: 'app Meu Atacadão', logo: '/mercados/atacadao.png' },
+  'supermercados-bh': { cor: '#6D28D9', sigla: 'BH', clube: 'Meu BH', logo: '/mercados/supermercados-bh.png' },
+  'mart-minas': { cor: '#BE123C', sigla: 'MM', clube: 'Mart Mais', logo: '/mercados/mart-minas.png' },
 };
 export const mercado = (slug: string | null | undefined) =>
-  (slug && mercados[slug]) || { cor: '#707971', sigla: slug ? slug.slice(0, 2).toUpperCase() : '?', clube: undefined };
+  (slug && mercados[slug]) || { cor: '#707971', sigla: slug ? slug.slice(0, 2).toUpperCase() : '?', clube: undefined, logo: undefined };
 
 /** Distância em km entre dois pontos (haversine). */
 export function distanciaKm(lat1: number, lng1: number, lat2: number, lng2: number): number {

@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/cache.dart';
 import '../../core/formato.dart';
+import '../../core/localizacao.dart';
 import '../../core/modelos.dart';
 import '../../core/paginador.dart';
 import '../../core/tema.dart';
@@ -140,12 +141,16 @@ class _InicioPageState extends State<InicioPage> {
               builder: (context, s) {
                 if (!s.hasData) return const SizedBox(height: 8);
                 final (redes, distancias, destaque) = s.data!;
-                return Column(children: [
-                  for (final r in redes.take(3)) ...[
-                    CardMercado(r, distancia: distancias[r.id], patrocinado: r.id == destaque),
-                    const SizedBox(height: 8),
-                  ],
-                ]);
+                // fileira que rola de lado (Row, não ListView de altura fixa: cresce com a fonte do sistema)
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.none,
+                  child: IntrinsicHeight(
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 8, children: [
+                      for (final r in redes) _ChipMercado(r, distancia: distancias[r.id], patrocinado: r.id == destaque),
+                    ]),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 12),
@@ -273,3 +278,32 @@ void _escolherCor(BuildContext context) => showModalBottomSheet<void>(
         ]),
       ),
     );
+
+/// Mercado na fileira da Início: logo, nome, distância e validade do encarte (o clube fica na aba Mercados).
+class _ChipMercado extends StatelessWidget {
+  const _ChipMercado(this.rede, {this.distancia, this.patrocinado = false});
+  final Rede rede;
+  final double? distancia;
+  final bool patrocinado;
+
+  @override
+  Widget build(BuildContext context) => Card(
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push('/mercado/${rede.slug}'),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
+            child: Row(spacing: 10, children: [
+              AvatarMercado(rede.slug, tamanho: 40),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, spacing: 2, children: [
+                Text(rede.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                Text('${distancia == null ? '' : '${textoDistancia(distancia!)} · '}até ${diaMes(rede.ate)}',
+                    style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
+                if (patrocinado) const SeloAnuncio(texto: 'Patrocinado'),
+              ]),
+            ]),
+          ),
+        ),
+      );
+}

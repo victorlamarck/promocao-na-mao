@@ -15,7 +15,7 @@ export default function CardOferta({ o, mostrarMercado = true, principal = false
   // na página da oferta (principal) a condição vai inteira, com o "vale na compra em quantidade" do atacado
   const condicao = principal ? o.condicao : condicaoCurta(o);
   return (
-    <article class="card" data-oferta={o.id} data-nome={nome}>
+    <article class={principal ? 'card card-principal' : 'card'} data-oferta={o.id} data-nome={nome}>
       {mostrarMercado && (
         <span class="card-mercado">
           <span class="ponto" style={{ background: m.cor }} />

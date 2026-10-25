@@ -42,6 +42,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/mercados/
   # Fredoka e Nunito (licença OFL, assets/fontes/OFL-*.txt), dentro do app: sem download na 1ª abertura.
   fonts:
     - family: Fredoka
