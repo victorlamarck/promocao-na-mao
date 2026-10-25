@@ -16,6 +16,14 @@ const { o } = Astro.props;
 const nome = nomeDaOferta(o);
 const m = mercado(o.rede_slug);
 const preco = o.preco == null ? 'preço no mercado' : reais(o.preco);
+const url = new URL(Astro.url.pathname, Astro.site).href;
+// dados estruturados para o Google (schema.org): sem preço ("preço no mercado") a oferta sai sem price;
+// o texto vem do encarte, por isso o "<" vira \u003c (um "</script>" no nome não fecha a tag)
+const ld = {
+  '@context': 'https://schema.org', '@type': 'Product', name: nome, url,
+  offers: { '@type': 'Offer', price: o.preco ?? undefined, priceCurrency: 'BRL', priceValidUntil: o.validade_fim,
+    availability: 'https://schema.org/InStock', seller: { '@type': 'Organization', name: o.rede_nome }, url },
+};
 ---
 <Base titulo={`${nome} · ${o.rede_nome}`} descricao={`${nome} por ${preco} no ${o.rede_nome} em Governador Valadares. ${valeAte(o.validade_fim)}.`} imagem={`/previa/${o.id}.png`} comLista>
   <section class="secao">
@@ -35,6 +43,7 @@ const preco = o.preco == null ? 'preço no mercado' : reais(o.preco);
   </section>
   <!-- client:idle (não visible): no build o componente não desenha nada, então não haveria o que observar -->
   <Comparacao client:idle id={o.id} />
+  <script type="application/ld+json" set:html={JSON.stringify(ld).replaceAll('<', '\\u003c')} />
 </Base>
 
 <style>

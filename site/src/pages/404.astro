@@ -1,7 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
+import { dados } from '../lib/dados';
+import { diaMes, mercado } from '../lib/formato';
+
+const { redes } = await dados();
 ---
 <Base titulo="Página não encontrada" indexar={false}>
   <h1>Esta página não existe</h1>
-  <p>Talvez o encarte tenha vencido. <a href="/">Ver as ofertas de hoje</a></p>
+  <p style="margin: 0">Essa oferta pode ter vencido: os encartes mudam toda semana. Busque o produto lá em cima ou veja o que cada mercado tem hoje.</p>
+  <div class="grade-mercados">
+    {redes.map((r) => (
+      <a class="mercado-card" href={`/mercado/${r.slug}/`}>
+        <span class="avatar" style={`background: ${mercado(r.slug).cor}`}>{mercado(r.slug).sigla}</span>
+        <span><strong>{r.nome}</strong><span class="suave">{r.ofertas} ofertas · até {diaMes(r.ate)}</span></span>
+      </a>
+    ))}
+  </div>
+  <a href="/" class="botao botao-cheio botao-grande">Ver as ofertas de hoje</a>
 </Base>

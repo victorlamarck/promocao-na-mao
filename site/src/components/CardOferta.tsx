@@ -11,7 +11,7 @@ const menos = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke
 export default function CardOferta({ o, mostrarMercado = true, principal = false }: { o: Oferta; mostrarMercado?: boolean; principal?: boolean }) {
   const nome = nomeDaOferta(o);
   const m = mercado(o.rede_slug);
-  const unidade = porUnidade(o.preco_referencia, o.unidade_referencia);
+  const unidade = porUnidade(o.preco_referencia, o.unidade_referencia, o.preco);
   // na página da oferta (principal) a condição vai inteira, com o "vale na compra em quantidade" do atacado
   const condicao = principal ? o.condicao : condicaoCurta(o);
   return (
