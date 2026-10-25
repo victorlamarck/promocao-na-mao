@@ -87,8 +87,11 @@ jobs:
           printf '%s\n' "$ANDROID_KEY_PROPERTIES" > android/key.properties
           grep -q '^storeFile=upload.jks' android/key.properties || { echo "::error::ANDROID_KEY_PROPERTIES precisa de storeFile=upload.jks"; exit 1; }
       - name: Notas da versão
+        id: notas
         run: |
           v=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)
+          # nome da versão no Play Console, igual ao do app: "0.7.0 (13)" (sem ele, a Play reaproveita o nome do rascunho)
+          echo "nome=$v ($(sed -n 's/^version: *[^+]*+//p' pubspec.yaml))" >> "$GITHUB_OUTPUT"
           head -1 ../versions.txt | tr -d '\r' | grep -qx "v $v" || { echo "::error::o topo do versions.txt não é \"v $v\""; exit 1; }
           n=$(tr -d '\r' < ../release.txt | wc -m)
           [ "$n" -ge 1 ] && [ "$n" -le 300 ] || { echo "::error::release.txt com $n caracteres (1 a 300)"; exit 1; }
@@ -104,6 +107,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: br.com.promocaonamao.app
           releaseFiles: app/build/app/outputs/bundle/prodRelease/app-prod-release.aab
+          releaseName: ${{ steps.notas.outputs.nome }}
           track: internal
           status: draft
           whatsNewDirectory: novidades
