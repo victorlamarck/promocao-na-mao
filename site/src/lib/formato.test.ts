@@ -48,6 +48,10 @@ test('distância', () => {
 test('preço por unidade', () => {
   assert.equal(porUnidade(4.76, 'kg'), 'R$ 4,76 o kg');
   assert.equal(porUnidade(null, 'kg'), null);
+  assert.equal(porUnidade(9.98, 'l', 4.99), 'R$ 9,98 o litro');
+  assert.equal(porUnidade(4.99, 'kg', 4.99), null); // igual ao preço: não repete
+  assert.equal(porUnidade(2.5, 'un', 7.5), null); // "cada" não aparece
+  assert.equal(porUnidade(2.5, null), null);
 });
 
 test('avisoValidade: hoje, amanhã, venceu, e nada quando falta mais', () => {

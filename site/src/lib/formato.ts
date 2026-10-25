@@ -57,10 +57,12 @@ export function avisoValidade(fim: string, hoje = hojeEmGV()): string | null {
   return n < 0 ? 'Encarte venceu' : n === 0 ? 'Vence hoje' : n === 1 ? 'Vence amanhã' : null;
 }
 
-/** "R$ 4,76 o kg". */
-export function porUnidade(valor: number | null, unidade: string | null): string | null {
-  if (valor == null || !unidade) return null;
-  return `${reais(valor)} ${unidade === 'kg' ? 'o kg' : unidade === 'l' ? 'o litro' : 'cada'}`;
+/** "R$ 4,76 o kg". Só kg e litro, e só quando difere do preço exibido (o "cada" repetia o preço;
+ *  diferente do app, que ainda mostra). */
+export function porUnidade(valor: number | null, unidade: string | null, preco: number | null = null): string | null {
+  if (valor == null || (unidade !== 'kg' && unidade !== 'l')) return null;
+  if (preco != null && reais(valor) === reais(preco)) return null;
+  return `${reais(valor)} ${unidade === 'kg' ? 'o kg' : 'o litro'}`;
 }
 
 /** Nome para o card, montado dos itens (o texto do encarte às vezes traz preço e regras):
