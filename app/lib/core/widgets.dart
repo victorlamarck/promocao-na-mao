@@ -29,15 +29,19 @@ class AvatarMercado extends StatelessWidget {
 
 /// Etiqueta pequena: preço de clube, condição ("Leve 12, pague 10"), selo.
 class Etiqueta extends StatelessWidget {
-  const Etiqueta(this.texto, {super.key, this.cor, this.fundo});
+  const Etiqueta(this.texto, {super.key, this.cor, this.fundo, this.linhas});
   final String texto;
   final Color? cor, fundo;
+  final int? linhas; // null = o texto todo
 
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(color: fundo ?? context.cores.primaryContainer, borderRadius: BorderRadius.circular(8)),
-        child: Text(texto, style: TextStyle(fontSize: 12, height: 1.35, fontWeight: FontWeight.w600, color: cor ?? context.cores.onPrimaryContainer)),
+        child: Text(texto,
+            maxLines: linhas,
+            overflow: linhas == null ? null : TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 12, height: 1.35, fontWeight: FontWeight.w600, color: cor ?? context.cores.onPrimaryContainer)),
       );
 }
 
@@ -192,7 +196,7 @@ class CardOferta extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/oferta/${o.id}'),
+        onTap: () => context.push('/oferta/${o.id}', extra: o),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -224,7 +228,8 @@ class CardOferta extends StatelessWidget {
                     const TextSpan(text: 'Antes '),
                     TextSpan(text: reais(o.precoDe!), style: const TextStyle(decoration: TextDecoration.lineThrough)),
                   ])),
-                if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
+                // até 2 linhas no card; o texto todo na tela da oferta
+                if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer, linhas: 2),
               ]),
             ),
             const SizedBox(height: 12),

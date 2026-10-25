@@ -67,11 +67,16 @@ class Oferta {
   // shortcut: depende do texto da extração; virar coluna na API se outra rede tiver folheto de atacado.
   bool get atacado => condicao?.startsWith('preço de atacado') ?? false;
 
-  /// Condição para o card, sem o "preço de atacado: ..." que o selo "Preço de atacado" já diz.
+  /// Condição para o card, sem o que ele já mostra: o "preço de atacado: ..." (selo "Preço de atacado") e o
+  /// "preço clube: ..." quando há preço de clube (etiqueta "R$ X com bigmais+"). O texto todo fica na tela da oferta.
+  // shortcut: as partes vêm separadas por ";" e com esses começos na extração; se mudar, o card volta a repetir.
   String? get condicaoCurta {
-    if (!atacado) return condicao;
-    final resto = condicao!.replaceFirst(RegExp(r'^preço de atacado[^;]*(; )?'), '');
-    return resto.isEmpty ? null : resto;
+    final resto = condicao
+        ?.split(';')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty && !p.startsWith('preço de atacado') && !(precoClube != null && p.startsWith('preço clube')))
+        .join('; ');
+    return resto == null || resto.isEmpty ? null : resto;
   }
 }
 
