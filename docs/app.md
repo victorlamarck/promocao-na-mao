@@ -132,6 +132,11 @@ lib/
 `/` Início · `/buscar?q=` · `/mercados` · `/lista` (abas) · `/mercado/<slug>` · `/oferta/<id>` ·
 `/l/<código>` (lista recebida).
 
+As abas são um `StatefulShellRoute` (uma pilha por aba): trocar de aba e voltar mantém a tela como estava
+(rolagem, busca, filtros; a Início não busca de novo). Os detalhes (`/oferta`, `/mercado`, `/l`) ficam fora das abas:
+abrem por cima com `push`, sem a barra, e o voltar do Android devolve a aba de onde saíram. A oferta tocada num card
+vai como `extra` e aparece na hora; lojas, banner e comparação chegam em paralelo.
+
 ## Lista de compras
 
 - Sem login: a lista nasce no primeiro "Adicionar"; o código de dono fica no aparelho

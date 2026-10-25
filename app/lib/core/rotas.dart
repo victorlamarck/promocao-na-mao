@@ -9,37 +9,47 @@ import '../features/lista/lista_recebida_page.dart';
 import '../features/mercado/mercado_page.dart';
 import '../features/mercado/mercados_page.dart';
 import '../features/oferta/oferta_page.dart';
+import 'modelos.dart';
 
 // Cada tela tem endereço próprio no web: /oferta/123 e /l/<código> podem ser compartilhados no WhatsApp.
 final rotas = GoRouter(
     // Links do site vêm com barra no fim (/mercado/big-mais/); as rotas do app não têm.
     redirect: (_, s) => s.uri.path.length > 1 && s.uri.path.endsWith('/') ? s.uri.path.substring(0, s.uri.path.length - 1) : null,
     routes: [
-  ShellRoute(
-    builder: (context, state, filho) => _ComAbas(caminho: state.uri.path, child: filho),
-    routes: [
-      GoRoute(path: '/', builder: (_, _) => const SafeArea(child: InicioPage())),
-      GoRoute(path: '/buscar', builder: (_, s) => SafeArea(child: BuscaPage(termoInicial: s.uri.queryParameters['q'] ?? ''))),
-      GoRoute(path: '/mercados', builder: (_, _) => const MercadosPage()),
-      GoRoute(path: '/lista', builder: (_, s) => ListaPage(abrirCompartilhar: s.uri.queryParameters['compartilhar'] == '1')),
+  // Uma pilha por aba: trocar de aba e voltar mantém a tela como estava (rolagem, busca, filtros).
+  StatefulShellRoute(
+    builder: (_, _, abas) => _ComAbas(abas),
+    // O mesmo do StatefulShellRoute.indexedStack, mais o ExcludeFocus: a aba escondida solta o teclado.
+    navigatorContainerBuilder: (_, abas, telas) => IndexedStack(index: abas.currentIndex, children: [
+      for (final (i, tela) in telas.indexed)
+        ExcludeFocus(excluding: i != abas.currentIndex, child: TickerMode(enabled: i == abas.currentIndex, child: tela)),
+    ]),
+    branches: [
+      StatefulShellBranch(routes: [GoRoute(path: '/', builder: (_, _) => const SafeArea(child: InicioPage()))]),
+      StatefulShellBranch(routes: [
+        GoRoute(path: '/buscar', builder: (_, s) => SafeArea(child: BuscaPage(termoInicial: s.uri.queryParameters['q'] ?? ''))),
+      ]),
+      StatefulShellBranch(routes: [GoRoute(path: '/mercados', builder: (_, _) => const MercadosPage())]),
+      StatefulShellBranch(routes: [
+        GoRoute(path: '/lista', builder: (_, s) => ListaPage(abrirCompartilhar: s.uri.queryParameters['compartilhar'] == '1')),
+      ]),
     ],
   ),
+  // Detalhes ficam fora das abas (tela cheia, sem a barra): abrem por cima com push e o voltar do Android
+  // volta à aba de onde saíram, do jeito que ela estava. Por link abrem sozinhos, com o botão Início.
   GoRoute(path: '/mercado/:slug', builder: (_, s) => MercadoPage(slug: s.pathParameters['slug']!)),
-  GoRoute(path: '/oferta/:id', builder: (_, s) => OfertaPage(id: int.tryParse(s.pathParameters['id']!) ?? 0)),
+  GoRoute(path: '/oferta/:id', builder: (_, s) => OfertaPage(id: int.tryParse(s.pathParameters['id']!) ?? 0, oferta: s.extra as Oferta?)),
   GoRoute(path: '/l/:codigo', builder: (_, s) => ListaRecebidaPage(codigo: s.pathParameters['codigo']!)),
 ]);
 
 /// As 4 abas do protótipo: Início, Buscar, Mercados, Lista.
 class _ComAbas extends StatelessWidget {
-  const _ComAbas({required this.caminho, required this.child});
-  final String caminho;
-  final Widget child;
-
-  static const _caminhos = ['/', '/buscar', '/mercados', '/lista'];
+  const _ComAbas(this.abas);
+  final StatefulNavigationShell abas;
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: child,
+        body: abas,
         bottomNavigationBar: ListenableBuilder(
           listenable: Lista.minha,
           builder: (context, _) {
@@ -47,8 +57,12 @@ class _ComAbas extends StatelessWidget {
             final n = Lista.minha.quantidadeTotal;
             Widget icone(IconData i) => Badge.count(count: n, isLabelVisible: n > 0, child: Icon(i));
             return NavigationBar(
-              selectedIndex: _caminhos.indexOf(caminho).clamp(0, 3),
-              onDestinationSelected: (i) => context.go(_caminhos[i]),
+              selectedIndex: abas.currentIndex,
+              onDestinationSelected: (i) {
+                // a aba guarda a tela, então a Lista recarrega ao voltar (sem internet, mostra o que já tinha)
+                if (i == 3) Lista.minha.carregar();
+                abas.goBranch(i, initialLocation: i == abas.currentIndex);
+              },
               destinations: [
                 const NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Início'),
                 const NavigationDestination(icon: Icon(Icons.search), label: 'Buscar'),

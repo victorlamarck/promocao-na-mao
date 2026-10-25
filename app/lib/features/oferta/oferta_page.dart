@@ -17,28 +17,60 @@ final _db = Supabase.instance.client;
 /// Tela 5 do protótipo: a oferta explicada em português simples, com "Adicionar à lista" fixo embaixo,
 /// e a comparação com os outros mercados (comparar_oferta): o mesmo produto e, embaixo, os parecidos.
 class OfertaPage extends StatefulWidget {
-  const OfertaPage({super.key, required this.id});
+  const OfertaPage({super.key, required this.id, this.oferta});
   final int id;
+
+  /// A oferta do card que foi tocado (extra da rota): aparece na hora, enquanto o banco confirma.
+  final Oferta? oferta;
 
   @override
   State<OfertaPage> createState() => _OfertaPageState();
 }
 
 class _OfertaPageState extends State<OfertaPage> {
-  late var _dados = _carregar();
+  late Oferta? _o = widget.oferta;
+  var _venceu = false, _erro = false, _bannerPronto = false;
+  List<String>? _lojas; // null = ainda chegando
+  Anuncio? _banner;
+  var _comparacao = const Comparacao.vazia();
 
-  Future<(Oferta?, List<String>, Anuncio?, Comparacao)> _carregar() async {
-    final j = await _db.from('oferta_lista').select().eq('id', widget.id).maybeSingle();
-    if (j == null) return (null, <String>[], null, const Comparacao.vazia()); // venceu ou não existe
-    final o = Oferta.fromJson(j);
-    final lojas = await _db.from('loja').select('id, nome').eq('rede_id', o.redeId).order('nome');
-    final banners = await anunciosDoFormato('banner');
-    // A comparação é um extra: se falhar, a oferta aparece mesmo assim.
-    final comparacao = await _db
-        .rpc('comparar_oferta', params: {'oferta_id': o.id})
-        .then((r) => Comparacao.fromJson(r as Map<String, dynamic>), onError: (_) => const Comparacao.vazia());
-    return (o, _ondeVale(o, lojas), banners.isEmpty ? null : banners[widget.id % banners.length], comparacao);
+  @override
+  void initState() {
+    super.initState();
+    _carregar();
   }
+
+  /// A resposta pode chegar depois de a pessoa voltar: setState aí derrubava o app.
+  void _mudar(VoidCallback f) {
+    if (mounted) setState(f);
+  }
+
+  /// Tudo em paralelo, cada parte aparece quando chega. Só a oferta derruba a tela; lojas, banner e
+  /// comparação, se falharem, ficam de fora.
+  void _carregar() {
+    _db.from('oferta_lista').select().eq('id', widget.id).maybeSingle().then((j) {
+      final o = j == null ? null : Oferta.fromJson(j);
+      _mudar(() {
+        _o = o;
+        _venceu = o == null; // venceu ou não existe
+      });
+      if (o != null && widget.oferta == null) _carregarLojas(o);
+    }, onError: (_) => _mudar(() => _erro = _o == null)); // sem internet: fica a do card, se tiver
+    if (widget.oferta case final o?) _carregarLojas(o);
+    anunciosDoFormato('banner').then((b) => _mudar(() {
+          _banner = b.isEmpty ? null : b[widget.id % b.length];
+          _bannerPronto = true;
+        }), onError: (_) => _mudar(() => _bannerPronto = true));
+    _db.rpc('comparar_oferta', params: {'oferta_id': widget.id}).then(
+        (r) => _mudar(() => _comparacao = Comparacao.fromJson(r as Map<String, dynamic>)), onError: (_) {});
+  }
+
+  void _carregarLojas(Oferta o) => _db
+      .from('loja')
+      .select('id, nome')
+      .eq('rede_id', o.redeId)
+      .order('nome')
+      .then((l) => _mudar(() => _lojas = _ondeVale(o, l)), onError: (_) {});
 
   /// Nomes das lojas onde a oferta vale, aplicando o "exceto"/"somente" do encarte.
   static List<String> _ondeVale(Oferta o, List<Map<String, dynamic>> lojas) => [
@@ -52,51 +84,51 @@ class _OfertaPageState extends State<OfertaPage> {
       ];
 
   @override
-  Widget build(BuildContext context) => FutureBuilder(
-        future: _dados,
-        builder: (context, s) {
-          final o = s.data?.$1;
-          return Scaffold(
-            appBar: AppBar(
-              leading: inicioSeAbriuPorLink(context),
-              title: const Text('Oferta'),
-              centerTitle: true,
-              actions: [
-                if (o?.produtoCodigo case final codigo?) BotaoAviso.produto(codigo: codigo, nome: o!.nome),
-                IconButton(
-                  tooltip: 'Copiar link da oferta',
-                  icon: const Icon(Icons.share_outlined),
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: linkDoSite('/oferta/${widget.id}')));
-                    avisar(context, 'Link copiado. É só colar no WhatsApp.', verLista: false);
-                  },
-                ),
-              ],
-            ),
-            bottomNavigationBar: o == null
-                ? null
-                : SafeArea(child: Padding(padding: const EdgeInsets.all(16), child: BotaoAdicionar(o, largo: true))),
-            body: switch (s) {
-              _ when s.hasError => Erro(onTentar: () => setState(() { _dados = _carregar(); })),
-              _ when !s.hasData => const Center(child: CircularProgressIndicator()),
-              _ when o == null => Center(
-                  child: Column(mainAxisSize: MainAxisSize.min, spacing: 12, children: [
-                    Text('Esta oferta já venceu.', style: fredoka(20)),
-                    FilledButton(onPressed: () => context.go('/'), child: const Text('Ver ofertas de hoje')),
-                  ]),
-                ),
-              _ => _Detalhe(o, s.data!.$2, s.data!.$3, s.data!.$4),
+  Widget build(BuildContext context) {
+    final o = _o;
+    return Scaffold(
+      appBar: AppBar(
+        leading: inicioSeAbriuPorLink(context),
+        title: const Text('Oferta'),
+        centerTitle: true,
+        actions: [
+          if (o?.produtoCodigo case final codigo?) BotaoAviso.produto(codigo: codigo, nome: o!.nome),
+          IconButton(
+            tooltip: 'Copiar link da oferta',
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: linkDoSite('/oferta/${widget.id}')));
+              avisar(context, 'Link copiado. É só colar no WhatsApp.', verLista: false);
             },
-          );
-        },
-      );
+          ),
+        ],
+      ),
+      bottomNavigationBar: o == null
+          ? null
+          : SafeArea(child: Padding(padding: const EdgeInsets.all(16), child: BotaoAdicionar(o, largo: true))),
+      body: switch (o) {
+        _ when _venceu => Center(
+            child: Column(mainAxisSize: MainAxisSize.min, spacing: 12, children: [
+              Text('Esta oferta já venceu.', style: fredoka(20)),
+              FilledButton(onPressed: () => context.go('/'), child: const Text('Ver ofertas de hoje')),
+            ]),
+          ),
+        null when _erro => Erro(onTentar: () {
+            setState(() => _erro = false);
+            _carregar();
+          }),
+        null => const Center(child: CircularProgressIndicator()),
+        final o => _Detalhe(o, _lojas ?? const [], _bannerPronto ? EspacoAnuncioView(anuncio: _banner) : null, _comparacao),
+      },
+    );
+  }
 }
 
 class _Detalhe extends StatelessWidget {
   const _Detalhe(this.o, this.lojas, this.banner, this.comparacao);
   final Oferta o;
   final List<String> lojas;
-  final Anuncio? banner;
+  final Widget? banner; // o banco ainda não disse qual: nada, para não pedir um do AdMob à toa
   final Comparacao comparacao;
 
   @override
@@ -161,7 +193,7 @@ class _Detalhe extends StatelessWidget {
       const SizedBox(height: 8),
       TextButton(onPressed: () => context.push('/mercado/${o.redeSlug}'), child: Text('Ver o encarte completo do ${o.redeNome}')),
       const SizedBox(height: 12),
-      EspacoAnuncioView(anuncio: banner),
+      ?banner,
     ]);
   }
 }

@@ -3,5 +3,6 @@ import { usarLista } from './usarLista';
 
 export default function ContagemLista() {
   const lista = usarLista(Lista.minha());
-  return <span>Minha lista · {lista.itens.length}</span>;
+  // no celular o rótulo some da tela (fica para o leitor de tela) e o botão vira ícone + número
+  return <span><span class="rotulo-lista">Minha lista · </span>{lista.itens.length}</span>;
 }

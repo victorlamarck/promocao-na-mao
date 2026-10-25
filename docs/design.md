@@ -73,7 +73,9 @@ Navegação: **4 abas** — Início, Buscar, Mercados, Lista.
 - **Jeito de falar** (próximo, de vizinho): "Opa! O café que você sempre leva baixou no Atacadão." ·
   "Sua lista tá vazia. Bora dar uma olhada nas ofertas de hoje?" · "Prontinho! Mandamos a lista.
   Você vê na hora o que já foi pro carrinho."
-- Cores dos mercados (bolinha com a sigla, sem logotipo): Big Mais `#1D4ED8`, Coelho Diniz `#B45309`,
+- Avatar do mercado: o **logo** num círculo com borda fina (`app/assets/mercados/` e `site/public/mercados/`, 192 px
+  com fundo e margem, os mesmos arquivos). Mercado sem logo mostra a sigla na cor dele; na bolinha pequena ao lado do
+  nome (10–12dp) fica só a cor. Cores: Big Mais `#1D4ED8`, Coelho Diniz `#B45309`,
   Atacadão `#0F766E`, Supermercados BH `#6D28D9`, Mart Minas `#BE123C`.
 
 ## Regras de clareza

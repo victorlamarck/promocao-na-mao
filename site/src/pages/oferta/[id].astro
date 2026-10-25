@@ -9,10 +9,12 @@ import { mercado, nomeDaOferta, reais, valeAte } from '../../lib/formato';
 
 export async function getStaticPaths() {
   const { ofertas } = await dados();
-  return ofertas.map((o) => ({ params: { id: String(o.id) }, props: { o } }));
+  // "Mais de <seção> no <mercado>": agrupado uma vez aqui, não uma consulta por página
+  const grupos = Map.groupBy(ofertas, (o) => `${o.rede_id}|${o.secao}`);
+  return ofertas.map((o) => ({ params: { id: String(o.id) }, props: { o, outras: grupos.get(`${o.rede_id}|${o.secao}`)!.filter((x) => x.id !== o.id).slice(0, 6) } }));
 }
 
-const { o } = Astro.props;
+const { o, outras } = Astro.props;
 const nome = nomeDaOferta(o);
 const m = mercado(o.rede_slug);
 const preco = o.preco == null ? 'preço no mercado' : reais(o.preco);
@@ -43,10 +45,16 @@ const ld = {
   </section>
   <!-- client:idle (não visible): no build o componente não desenha nada, então não haveria o que observar -->
   <Comparacao client:idle id={o.id} />
+  {outras.length > 0 && (
+    <section class="secao">
+      <h2>{o.secao ? `Mais de ${o.secao} no ${o.rede_nome}` : `Mais ofertas do ${o.rede_nome}`}</h2>
+      <div class="grade-ofertas">{outras.map((x) => <CardOferta o={x} mostrarMercado={false} />)}</div>
+    </section>
+  )}
   <script type="application/ld+json" set:html={JSON.stringify(ld).replaceAll('<', '\\u003c')} />
 </Base>
 
 <style>
-  .detalhe { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .detalhe { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 20px; align-items: start; }
   @media (max-width: 640px) { .detalhe { grid-template-columns: 1fr; } }
 </style>
