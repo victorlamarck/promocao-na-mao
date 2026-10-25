@@ -37,7 +37,7 @@ String? avisoValidade(DateTime fim, DateTime hoje) {
   return n < 0 ? 'Encarte venceu' : switch (n) { 0 => 'Vence hoje', 1 => 'Vence amanhã', _ => null };
 }
 
-/// R$/kg, R$/l ou R$/un: "R$ 4,76 o kg".
-String? porUnidade(double? valor, String? unidade) => valor == null || unidade == null
+/// R$/kg, R$/l ou R$/un: "R$ 4,76 o kg"; null quando repete o [preco] exibido (mesma regra do site).
+String? porUnidade(double? valor, String? unidade, {double? preco}) => valor == null || unidade == null || valor == preco
     ? null
     : '${reais(valor)} ${switch (unidade) { 'kg' => 'o kg', 'l' => 'o litro', _ => 'cada' }}';

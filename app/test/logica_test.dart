@@ -39,6 +39,10 @@ void main() {
     expect(avisoValidade(fim, DateTime(2026, 10, 31)), isNull);
     expect(porUnidade(4.76, 'kg'), 'R\$ 4,76 o kg');
     expect(porUnidade(null, 'kg'), isNull);
+    expect(porUnidade(1.99, 'l'), 'R\$ 1,99 o litro');
+    expect(porUnidade(12.99, 'kg', preco: 12.99), isNull); // repetiria o preço
+    expect(porUnidade(1.5, 'un', preco: 9), 'R\$ 1,50 cada'); // pacote: o "cada" diz algo a mais
+    expect(porUnidade(3.5, 'un', preco: 3.5), isNull);
   });
 
   test('nome do card: montado dos itens, sem o preço do texto do encarte', () {
