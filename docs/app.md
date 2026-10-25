@@ -120,7 +120,7 @@ lib/
     rotas.dart               go_router + 4 abas
   features/
     inicio/                  Sua lista, anotar item, mercados perto, ofertas de hoje (+ anúncio a cada 8)
-    busca/                   buscar_ofertas, filtro por mercado, menor preço, patrocinado no topo
+    busca/                   buscar_ofertas, Filtros (vários mercados, esconder atacado), ordem (menor preço, R$/kg), patrocinado
     mercado/                 Mercados (distância, destaque pago) e Mercado (categorias, banner)
     oferta/                  detalhe + "Adicionar à lista" fixo
     lista/                   Lista (estado + tempo real), Minha lista, compartilhar, lista recebida
