@@ -1,3 +1,11 @@
+v 0.7.0
+
+- Logos dos mercados, agora lado a lado na tela inicial
+- As abas guardam o que você estava vendo: a busca e a rolagem continuam lá
+- A oferta abre na hora, sem esperar carregar tudo
+- Botões maiores e melhor com fonte grande e leitor de tela
+_______________________________________________________________________________________________________________________
+
 v 0.6.0
 
 - Filtros na busca: escolha vários mercados e esconda as ofertas de atacado
