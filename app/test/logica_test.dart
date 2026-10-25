@@ -61,6 +61,19 @@ void main() {
     expect(com([{'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}, {'nome': 'Café', 'produto_codigo': 'cafe-melitta-500g'}]).produtoCodigo,
         isNull);
     expect(com([{'nome': 'Café', 'produto_codigo': null}]).produtoCodigo, isNull);
+
+    // atacado: selo "Preço de atacado" e, no card, a condição sem o que o selo já diz
+    Oferta cond(String? condicao) => Oferta.fromJson({
+          'id': 1, 'texto_original': 'Café', 'preco_por': 'embalagem', 'condicao': condicao,
+          'validade_fim': '2026-11-03', 'rede_id': 4, 'rede_nome': 'Mart Minas', 'rede_slug': 'mart-minas', 'itens': [],
+        });
+    const atac = 'preço de atacado: vale na compra em quantidade (mesma fragrância/sabor)';
+    expect(cond(atac).atacado, isTrue);
+    expect(cond(atac).condicaoCurta, isNull);
+    expect(cond('$atac; leve 12 pague 11').condicaoCurta, 'leve 12 pague 11');
+    expect(cond('leve 12 pague 11').atacado, isFalse);
+    expect(cond('leve 12 pague 11').condicaoCurta, 'leve 12 pague 11');
+    expect(cond(null).atacado, isFalse);
     expect(com([]).produtoCodigo, isNull);
   });
 

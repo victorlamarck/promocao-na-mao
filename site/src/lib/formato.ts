@@ -17,6 +17,13 @@ export interface Oferta {
   unidade_referencia: string | null;
 }
 
+/** Oferta de folheto de atacado: a condição começa com "preço de atacado" (como o `atacado` do app). */
+// shortcut: depende do texto da extração; virar coluna na API se outra rede tiver folheto de atacado.
+export const atacado = (o: Oferta) => o.condicao?.startsWith('preço de atacado') ?? false;
+
+/** Condição para o card, sem o "preço de atacado: ..." que o selo já diz; null se não sobrar nada. */
+export const condicaoCurta = (o: Oferta) => (atacado(o) ? o.condicao!.replace(/^preço de atacado[^;]*(; )?/, '') || null : o.condicao);
+
 /** 4.99 → "R$ 4,99"; 1234.5 → "R$ 1.234,50". */
 export function reais(v: number): string {
   const [inteiro, centavos] = v.toFixed(2).split('.');

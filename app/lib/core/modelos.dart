@@ -61,6 +61,18 @@ class Oferta {
     if (marcas.length == 1) return junta([itens.map((i) => i['nome']).whereType<String>().toSet().join(' ou '), marcas.first]);
     return itens.map((i) => junta([i['nome'], i['marca']])).toSet().join(' ou ');
   }
+
+  /// Oferta de folheto de atacado (a rede pode ter um de varejo e um de atacado, com produtos iguais):
+  /// a condição começa com "preço de atacado".
+  // shortcut: depende do texto da extração; virar coluna na API se outra rede tiver folheto de atacado.
+  bool get atacado => condicao?.startsWith('preço de atacado') ?? false;
+
+  /// Condição para o card, sem o "preço de atacado: ..." que o selo "Preço de atacado" já diz.
+  String? get condicaoCurta {
+    if (!atacado) return condicao;
+    final resto = condicao!.replaceFirst(RegExp(r'^preço de atacado[^;]*(; )?'), '');
+    return resto.isEmpty ? null : resto;
+  }
 }
 
 /// Ids das ofertas com o menor R$/kg, R$/l ou R$/un entre as que têm a mesma unidade (selo "Mais barato").

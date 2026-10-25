@@ -1,7 +1,18 @@
 // node --test (Node 24 roda TypeScript direto). Mesmos casos do app/test/logica_test.dart.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { reais, valeAte, nomeDaOferta, intercalar, distanciaKm, textoDistancia, porUnidade, avisoValidade, hojeEmGV, atualizadoEm } from './formato.ts';
+import { reais, valeAte, nomeDaOferta, intercalar, distanciaKm, textoDistancia, porUnidade, avisoValidade, hojeEmGV, atualizadoEm, atacado, condicaoCurta, type Oferta } from './formato.ts';
+
+test('atacado: selo e condição curta no card', () => {
+  const com = (condicao: string | null) => ({ condicao }) as Oferta;
+  const atac = 'preço de atacado: vale na compra em quantidade (mesma fragrância/sabor)';
+  assert.equal(atacado(com(atac)), true);
+  assert.equal(condicaoCurta(com(atac)), null);
+  assert.equal(condicaoCurta(com(`${atac}; leve 12 pague 11`)), 'leve 12 pague 11');
+  assert.equal(atacado(com('leve 12 pague 11')), false);
+  assert.equal(condicaoCurta(com('leve 12 pague 11')), 'leve 12 pague 11');
+  assert.equal(atacado(com(null)), false);
+});
 
 test('reais', () => {
   assert.equal(reais(4.99), 'R$ 4,99');
