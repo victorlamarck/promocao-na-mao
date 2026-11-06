@@ -272,6 +272,9 @@ build. Nenhum `.p12` nem Mac na nossa mão. A mesma chave faz o papel da conta d
    nome `esteira-github`, acesso **Admin** (com App Manager a Apple não deixa criar certificado). Baixe o
    `AuthKey_XXXX.p8` (só dá para baixar **uma vez**) e anote o **Key ID** e o **Issuer ID** (no topo da tela).
 4. developer.apple.com → Account → Membership details → **Team ID**.
+   Ainda lá: **Devices** → `+` → cadastre um iPhone (nome e UDID). Sem nenhum aparelho no time a Apple não emite o
+   perfil de desenvolvimento que o archive usa, e a esteira falha com "Your team has no devices". O UDID aparece no
+   app **Dispositivos Apple** (ou iTunes) do Windows com o iPhone no cabo: clique no número de série até virar UDID.
 5. `powershell -ExecutionPolicy Bypass -File C:\projetos\promocao\cadastrar-secrets-ios.ps1` (pasta controladora):
    `APPSTORE_KEY_P8` (do Downloads), `GOOGLE_SERVICE_INFO_PROD` (do `ios/config/prod/`), e cola `APPLE_TEAM_ID`,
    `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`. Guarde o `.p8` em lugar seguro e apague do Downloads.
