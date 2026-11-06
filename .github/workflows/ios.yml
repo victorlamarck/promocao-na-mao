@@ -1,11 +1,19 @@
-# Compila o app de iPhone (sem assinatura, sem conta Apple) para saber se o projeto iOS está de pé:
-# flavors, ícones, tela de abertura, pacotes. Não publica nada.
-# macOS gasta 10× os minutos grátis do GitHub (estourou a cota em 20/10/2026): só no botão,
-# depois de mexer no iOS ou nos pacotes.
+# App de iPhone, só no botão (Actions → iOS → Run workflow). Repositório público: o macOS do GitHub é grátis.
+# - "enviar" desligado: compila sem assinatura (simulador dev + aparelho prod) para saber se o projeto está de pé.
+# - "enviar" ligado: build prod assinado e enviado ao App Store Connect (aparece no TestFlight em ~15 min).
+#   Assinatura automática pela chave da API do App Store Connect: o Xcode cria/baixa certificado e perfil sozinho,
+#   sem Mac e sem .p12. Secrets: APPLE_TEAM_ID, APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8,
+#   GOOGLE_SERVICE_INFO_PROD (docs/app.md#iphone-testflight).
+# O número do build é o +N do pubspec (o mesmo do Android): cada envio precisa de um número maior que o anterior.
 name: iOS
 
 on:
   workflow_dispatch:
+    inputs:
+      enviar:
+        description: Assinar e enviar ao TestFlight
+        type: boolean
+        default: false
 
 defaults:
   run:
@@ -19,7 +27,7 @@ jobs:
   ios:
     # macos-latest (arm64) ficou sem máquina livre 2× em 20/10/2026; Intel tem fila menor
     runs-on: macos-15-intel
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
@@ -32,6 +40,7 @@ jobs:
           FIREBASE_OPTIONS_DEV: ${{ secrets.FIREBASE_OPTIONS_DEV }}
           FIREBASE_OPTIONS_PROD: ${{ secrets.FIREBASE_OPTIONS_PROD }}
           APP_CONFIG_PROD: ${{ secrets.APP_CONFIG_PROD }}
+          GOOGLE_SERVICE_INFO_PROD: ${{ secrets.GOOGLE_SERVICE_INFO_PROD }}
         run: |
           for s in FIREBASE_OPTIONS_DEV FIREBASE_OPTIONS_PROD APP_CONFIG_PROD; do
             [ -n "${!s}" ] || { echo "::error::falta o secret $s"; exit 1; }
@@ -39,12 +48,13 @@ jobs:
           printf '%s\n' "$FIREBASE_OPTIONS_DEV" > lib/firebase_options_dev.dart
           printf '%s\n' "$FIREBASE_OPTIONS_PROD" > lib/firebase_options_prod.dart
           printf '%s\n' "$APP_CONFIG_PROD" > config/prod.json
-          # Só para compilar: o script "Firebase do flavor" exige o arquivo; o app de verdade usa o do Firebase.
+          # Só para compilar: o script "Firebase do flavor" exige o arquivo; o build enviado usa o de verdade.
           for f in dev prod; do
             mkdir -p ios/config/$f
             printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict/></plist>\n' > ios/config/$f/GoogleService-Info.plist
           done
-      - name: Xcode 26 (o Firebase iOS 13+ exige Swift 6.2)
+          [ -z "$GOOGLE_SERVICE_INFO_PROD" ] || printf '%s\n' "$GOOGLE_SERVICE_INFO_PROD" > ios/config/prod/GoogleService-Info.plist
+      - name: Xcode 26 (o Firebase iOS 13+ exige Swift 6.2; a App Store exige o SDK do iOS 26)
         working-directory: .
         run: |
           x=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
@@ -52,7 +62,64 @@ jobs:
           sudo xcode-select -s "$x" && xcodebuild -version
       - run: flutter config --enable-swift-package-manager
       - run: flutter pub get
+
       - name: Simulador (dev, debug)
+        if: ${{ !inputs.enviar }}
         run: flutter build ios --simulator --debug --flavor dev --dart-define-from-file=config/dev.json
       - name: Aparelho (prod, release, sem assinatura)
+        if: ${{ !inputs.enviar }}
         run: flutter build ios --release --no-codesign --flavor prod --dart-define-from-file=config/prod.json
+
+      - name: Chave da API do App Store Connect
+        if: ${{ inputs.enviar }}
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APPSTORE_KEY_P8: ${{ secrets.APPSTORE_KEY_P8 }}
+          GOOGLE_SERVICE_INFO_PROD: ${{ secrets.GOOGLE_SERVICE_INFO_PROD }}
+        run: |
+          for s in APPLE_TEAM_ID APPSTORE_KEY_ID APPSTORE_ISSUER_ID APPSTORE_KEY_P8 GOOGLE_SERVICE_INFO_PROD; do
+            [ -n "${!s}" ] || { echo "::error::falta o secret $s"; exit 1; }
+          done
+          printf '%s\n' "$APPSTORE_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+      - name: Archive (prod, assinado)
+        if: ${{ inputs.enviar }}
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          # --config-only: grava flavor, versão e dart-defines no Generated.xcconfig; quem compila é o xcodebuild
+          flutter build ios --config-only --release --flavor prod --dart-define-from-file=config/prod.json
+          xcodebuild archive -workspace ios/Runner.xcworkspace -scheme prod -configuration Release-prod \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$APPSTORE_KEY_ID" -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
+      - name: Enviar ao App Store Connect
+        if: ${{ inputs.enviar }}
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$APPSTORE_KEY_ID" -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID"
+          echo "Enviado. Confira em App Store Connect → TestFlight (o processamento leva uns 15 min)." >> "$GITHUB_STEP_SUMMARY"
+      - name: Apagar a chave
+        if: ${{ always() && inputs.enviar }}
+        run: rm -f "$RUNNER_TEMP/AuthKey.p8"

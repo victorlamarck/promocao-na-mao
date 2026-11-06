@@ -253,6 +253,41 @@ publicado em nenhuma trilha, use status `draft`.
 O manifest principal declara `INTERNET` (o Flutter só a põe no debug/profile) e `ACCESS_COARSE_LOCATION`;
 o iOS tem o texto `NSLocationWhenInUseUsageDescription`.
 
+## iPhone (TestFlight)
+
+**Como funciona a assinatura.** A Apple só instala app assinado. A assinatura junta duas peças: o **certificado**
+(prova que quem assina é o nosso time) e o **perfil** (autoriza aquele certificado a assinar o app
+`br.com.promocaonamao.app` para a App Store). Normalmente o Xcode, num Mac, cria as duas. Aqui quem faz isso é a
+esteira (`.github/workflows/ios.yml`, Mac do GitHub, grátis porque o repositório é público): com uma **chave da API do
+App Store Connect**, o `xcodebuild -allowProvisioningUpdates` pede à Apple o certificado e o perfil na hora e envia o
+build. Nenhum `.p12` nem Mac na nossa mão. A mesma chave faz o papel da conta de serviço da Play.
+
+**Uma vez (dev, na conta Apple):**
+1. developer.apple.com → Certificates, Identifiers & Profiles → **Identifiers** → `+` → App IDs → App:
+   Bundle ID **explícito** `br.com.promocaonamao.app`, descrição "Promocao na Mao". Sem capabilities por enquanto
+   (Push entra junto com a chave APNs).
+2. appstoreconnect.apple.com → **Apps** → `+` → New App: iOS, nome "Promoção na Mão", Português (Brasil),
+   o bundle ID acima, SKU `promocaonamao`.
+3. App Store Connect → Users and Access → **Integrations** → App Store Connect API → Team Keys → `+`:
+   nome `esteira-github`, acesso **Admin** (com App Manager a Apple não deixa criar certificado). Baixe o
+   `AuthKey_XXXX.p8` (só dá para baixar **uma vez**) e anote o **Key ID** e o **Issuer ID** (no topo da tela).
+4. developer.apple.com → Account → Membership details → **Team ID**.
+5. `powershell -ExecutionPolicy Bypass -File C:\projetos\promocao\cadastrar-secrets-ios.ps1` (pasta controladora):
+   `APPSTORE_KEY_P8` (do Downloads), `GOOGLE_SERVICE_INFO_PROD` (do `ios/config/prod/`), e cola `APPLE_TEAM_ID`,
+   `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`. Guarde o `.p8` em lugar seguro e apague do Downloads.
+
+**Cada build:** Actions → **iOS** → Run workflow (branch `main`) → marcar **"Assinar e enviar ao TestFlight"**.
+Leva ~20 min; depois o App Store Connect processa ~15 min. TestFlight → Teste interno → adicionar quem é do time;
+no iPhone, instalar o app **TestFlight** e aceitar o convite. O número do build é o `+N` do `pubspec.yaml`: cada
+envio precisa de um número maior que o anterior (o `/subir-versao` já sobe).
+
+Já resolvido no projeto: só iPhone (`TARGETED_DEVICE_FAMILY = 1`, sem capturas de iPad) e
+`ITSAppUsesNonExemptEncryption = false` no `Info.plist` (o TestFlight não para perguntando de criptografia).
+Sem botão e sem a marca, a esteira só compila (sem assinatura), como antes.
+
+Se a Apple recusar por excesso de certificados ("maximum number of certificates"): developer.apple.com →
+Certificates → revogar os de desenvolvimento antigos criados pela esteira.
+
 ## Anúncios no app (AdMob)
 
 O AdSense é só para sites; no app, a rede do Google é o **AdMob** (mesmos anunciantes, pagamento junto com o
