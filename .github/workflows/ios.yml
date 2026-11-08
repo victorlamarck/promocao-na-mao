@@ -1,11 +1,21 @@
-# Compila o app de iPhone (sem assinatura, sem conta Apple) para saber se o projeto iOS está de pé:
-# flavors, ícones, tela de abertura, pacotes. Não publica nada.
-# macOS gasta 10× os minutos grátis do GitHub (estourou a cota em 20/10/2026): só no botão,
-# depois de mexer no iOS ou nos pacotes.
+# App de iPhone, só no botão (Actions → iOS → Run workflow). Repositório público: o macOS do GitHub é grátis.
+# - "enviar" desligado: compila sem assinatura (simulador dev + aparelho prod) para saber se o projeto está de pé.
+# - "enviar" ligado: build prod assinado e enviado ao App Store Connect (aparece no TestFlight em ~15 min).
+#   Assinatura manual, como a keystore do Android: certificado Apple Distribution (.p12) e perfil App Store
+#   "Promocao na Mao App Store" ficam nos secrets IOS_DIST_P12, IOS_DIST_P12_SENHA, IOS_PERFIL
+#   (assinatura-ios.ps1 da pasta controladora). A chave da API (APPSTORE_KEY_ID, APPSTORE_ISSUER_ID,
+#   APPSTORE_KEY_P8) só faz o envio. Também: APPLE_TEAM_ID, GOOGLE_SERVICE_INFO_PROD (docs/app.md#iphone-testflight).
+#   AdMob do iPhone: ADMOB_APP_ID_IOS no APP_CONFIG_PROD.
+# O número do build é o +N do pubspec (o mesmo do Android): cada envio precisa de um número maior que o anterior.
 name: iOS
 
 on:
   workflow_dispatch:
+    inputs:
+      enviar:
+        description: Assinar e enviar ao TestFlight
+        type: boolean
+        default: false
 
 defaults:
   run:
@@ -19,7 +29,7 @@ jobs:
   ios:
     # macos-latest (arm64) ficou sem máquina livre 2× em 20/10/2026; Intel tem fila menor
     runs-on: macos-15-intel
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
@@ -32,6 +42,7 @@ jobs:
           FIREBASE_OPTIONS_DEV: ${{ secrets.FIREBASE_OPTIONS_DEV }}
           FIREBASE_OPTIONS_PROD: ${{ secrets.FIREBASE_OPTIONS_PROD }}
           APP_CONFIG_PROD: ${{ secrets.APP_CONFIG_PROD }}
+          GOOGLE_SERVICE_INFO_PROD: ${{ secrets.GOOGLE_SERVICE_INFO_PROD }}
         run: |
           for s in FIREBASE_OPTIONS_DEV FIREBASE_OPTIONS_PROD APP_CONFIG_PROD; do
             [ -n "${!s}" ] || { echo "::error::falta o secret $s"; exit 1; }
@@ -39,12 +50,13 @@ jobs:
           printf '%s\n' "$FIREBASE_OPTIONS_DEV" > lib/firebase_options_dev.dart
           printf '%s\n' "$FIREBASE_OPTIONS_PROD" > lib/firebase_options_prod.dart
           printf '%s\n' "$APP_CONFIG_PROD" > config/prod.json
-          # Só para compilar: o script "Firebase do flavor" exige o arquivo; o app de verdade usa o do Firebase.
+          # Só para compilar: o script "Firebase do flavor" exige o arquivo; o build enviado usa o de verdade.
           for f in dev prod; do
             mkdir -p ios/config/$f
             printf '<?xml version="1.0" encoding="UTF-8"?>\n<plist version="1.0"><dict/></plist>\n' > ios/config/$f/GoogleService-Info.plist
           done
-      - name: Xcode 26 (o Firebase iOS 13+ exige Swift 6.2)
+          [ -z "$GOOGLE_SERVICE_INFO_PROD" ] || printf '%s\n' "$GOOGLE_SERVICE_INFO_PROD" > ios/config/prod/GoogleService-Info.plist
+      - name: Xcode 26 (o Firebase iOS 13+ exige Swift 6.2; a App Store exige o SDK do iOS 26)
         working-directory: .
         run: |
           x=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
@@ -52,7 +64,110 @@ jobs:
           sudo xcode-select -s "$x" && xcodebuild -version
       - run: flutter config --enable-swift-package-manager
       - run: flutter pub get
+
       - name: Simulador (dev, debug)
+        if: ${{ !inputs.enviar }}
         run: flutter build ios --simulator --debug --flavor dev --dart-define-from-file=config/dev.json
       - name: Aparelho (prod, release, sem assinatura)
+        if: ${{ !inputs.enviar }}
         run: flutter build ios --release --no-codesign --flavor prod --dart-define-from-file=config/prod.json
+
+      - name: Certificado, perfil e chave da API
+        if: ${{ inputs.enviar }}
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APPSTORE_KEY_P8: ${{ secrets.APPSTORE_KEY_P8 }}
+          GOOGLE_SERVICE_INFO_PROD: ${{ secrets.GOOGLE_SERVICE_INFO_PROD }}
+          IOS_DIST_P12: ${{ secrets.IOS_DIST_P12 }}
+          IOS_DIST_P12_SENHA: ${{ secrets.IOS_DIST_P12_SENHA }}
+          IOS_PERFIL: ${{ secrets.IOS_PERFIL }}
+        run: |
+          for s in APPLE_TEAM_ID APPSTORE_KEY_ID APPSTORE_ISSUER_ID APPSTORE_KEY_P8 GOOGLE_SERVICE_INFO_PROD \
+                   IOS_DIST_P12 IOS_DIST_P12_SENHA IOS_PERFIL; do
+            [ -n "${!s}" ] || { echo "::error::falta o secret $s"; exit 1; }
+          done
+          printf '%s\n' "$APPSTORE_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+          # Chaveiro só desta execução, com o certificado de distribuição (o Mac do GitHub é apagado no fim).
+          kc="$RUNNER_TEMP/assinatura.keychain-db"; kp=$(uuidgen)
+          security create-keychain -p "$kp" "$kc"
+          security set-keychain-settings -lut 21600 "$kc"
+          security unlock-keychain -p "$kp" "$kc"
+          printf '%s' "$IOS_DIST_P12" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          security import "$RUNNER_TEMP/dist.p12" -P "$IOS_DIST_P12_SENHA" -A -t cert -f pkcs12 -k "$kc"
+          rm -f "$RUNNER_TEMP/dist.p12"
+          security set-key-partition-list -S apple-tool:,apple: -k "$kp" "$kc" > /dev/null
+          security list-keychains -d user -s "$kc" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v -p codesigning "$kc"
+          # Perfil App Store: o Xcode procura pelo UUID nas duas pastas (a nova é do Xcode 16+).
+          perfil="$RUNNER_TEMP/perfil.mobileprovision"
+          printf '%s' "$IOS_PERFIL" | base64 --decode > "$perfil"
+          security cms -D -i "$perfil" > "$RUNNER_TEMP/perfil.plist"
+          uuid=$(plutil -extract UUID raw "$RUNNER_TEMP/perfil.plist")
+          nome=$(plutil -extract Name raw "$RUNNER_TEMP/perfil.plist")
+          [ "$nome" = "Promocao na Mao App Store" ] || { echo "::error::o perfil se chama '$nome'; o projeto espera 'Promocao na Mao App Store'"; exit 1; }
+          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$d" && cp "$perfil" "$d/$uuid.mobileprovision"
+          done
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>provisioningProfiles</key><dict>
+              <key>br.com.promocaonamao.app</key><string>Promocao na Mao App Store</string>
+            </dict>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+      - name: Archive (prod, assinado)
+        if: ${{ inputs.enviar }}
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # --config-only: grava flavor, versão e dart-defines no Generated.xcconfig; quem compila e assina é o
+          # xcodebuild. --no-codesign: senão o Flutter procura certificado no Mac (não há; a Apple dá na hora).
+          flutter build ios --config-only --no-codesign --release --flavor prod --dart-define-from-file=config/prod.json
+          # AdMob: o Info.plist do git tem o ID de teste do Google; o de verdade vem do APP_CONFIG_PROD.
+          admob=$(jq -r '.ADMOB_APP_ID_IOS // empty' config/prod.json)
+          if [ -n "$admob" ]; then /usr/libexec/PlistBuddy -c "Set :GADApplicationIdentifier $admob" ios/Runner/Info.plist
+          else echo "::warning::sem ADMOB_APP_ID_IOS no APP_CONFIG_PROD: o iPhone fica com o ID de teste do AdMob"; fi
+          # Assinatura manual (Release-prod no project.pbxproj): Apple Distribution + perfil App Store do chaveiro.
+          # Por que não a automática pela chave da API: ela cria um certificado de desenvolvimento a cada Mac novo
+          # e a chave privada some com o Mac ("private key is not installed", 08/11/2026).
+          # Archive sem assinar (CODE_SIGNING_ALLOWED=NO) também não serve: os frameworks do Firebase/AdMob ficam
+          # com assinatura inválida e o export recusa (06/11/2026).
+          xcodebuild archive -workspace ios/Runner.xcworkspace -scheme prod -configuration Release-prod \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
+      - name: Enviar ao App Store Connect
+        if: ${{ inputs.enviar }}
+        env:
+          APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+        run: |
+          # A chave da API aqui só autentica o envio (destination upload); o perfil já está instalado.
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$APPSTORE_KEY_ID" -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID"
+          echo "Enviado. Confira em App Store Connect → TestFlight (o processamento leva uns 15 min)." >> "$GITHUB_STEP_SUMMARY"
+      - name: Símbolos para o Crashlytics
+        if: ${{ inputs.enviar }}
+        # Sem os dSYM, o travamento do iPhone aparece no Crashlytics sem o nome das funções. Erro aqui não desfaz o envio.
+        continue-on-error: true
+        run: |
+          up=$(find ~/Library/Developer/Xcode/DerivedData -path '*firebase-ios-sdk/Crashlytics/upload-symbols' -type f | head -1)
+          [ -n "$up" ] || { echo "::warning::não achei o upload-symbols do Crashlytics"; exit 1; }
+          "$up" -gsp ios/config/prod/GoogleService-Info.plist -p ios "$RUNNER_TEMP/Runner.xcarchive/dSYMs"
+      - name: Apagar a chave e o chaveiro
+        if: ${{ always() && inputs.enviar }}
+        run: |
+          rm -f "$RUNNER_TEMP/AuthKey.p8"
+          security delete-keychain "$RUNNER_TEMP/assinatura.keychain-db" 2>/dev/null || true

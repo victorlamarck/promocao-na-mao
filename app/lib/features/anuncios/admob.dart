@@ -5,9 +5,12 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../core/config.dart';
 
 // Celular: o AdSense não roda em app; a rede do Google aqui é o AdMob (mesmos anunciantes e pagamento).
-// shortcut: só Android; o iPhone precisa do GADApplicationIdentifier de verdade no Info.plist e do
-// SKAdNetwork, quando o app de iPhone for para a loja.
-bool get _ativo => !kIsWeb && defaultTargetPlatform == TargetPlatform.android && admobBloco.isNotEmpty;
+// shortcut: no iPhone, sem a pergunta de rastreamento (ATT) o anúncio é só não personalizado (rende menos);
+// pôr o app_tracking_transparency se a receita do iPhone pesar.
+bool get _ativo =>
+    !kIsWeb &&
+    (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) &&
+    admobBloco.isNotEmpty;
 
 void iniciarAdsense() {
   if (_ativo) MobileAds.instance.initialize();

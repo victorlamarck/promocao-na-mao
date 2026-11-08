@@ -253,17 +253,66 @@ publicado em nenhuma trilha, use status `draft`.
 O manifest principal declara `INTERNET` (o Flutter só a põe no debug/profile) e `ACCESS_COARSE_LOCATION`;
 o iOS tem o texto `NSLocationWhenInUseUsageDescription`.
 
+## iPhone (TestFlight)
+
+**Como funciona a assinatura.** A Apple só instala app assinado. A assinatura junta duas peças: o **certificado**
+(prova que quem assina é o nosso time; tem uma chave privada que só nós temos) e o **perfil** (autoriza aquele
+certificado a assinar o app `br.com.promocaonamao.app` para a App Store, com Push). Normalmente o Xcode, num Mac,
+cria as duas. Aqui fazemos uma vez no Windows (`openssl` do Git) e guardamos nos secrets, como a keystore do
+Android; a esteira (`.github/workflows/ios.yml`, Mac do GitHub, grátis porque o repositório é público) põe os dois
+num chaveiro temporário, assina (`Release-prod` com assinatura **manual** no `project.pbxproj`) e envia com a
+**chave da API do App Store Connect**, que faz o papel da conta de serviço da Play.
+Por que não a assinatura automática pela chave da API: ela cria um certificado novo em cada Mac do GitHub e a
+chave privada some junto com o Mac; na rodada seguinte a Apple recusa ("private key is not installed", 08/11/2026).
+
+**Uma vez (dev, na conta Apple):**
+1. developer.apple.com → Certificates, Identifiers & Profiles → **Identifiers** → `+` → App IDs → App:
+   Bundle ID **explícito** `br.com.promocaonamao.app`, descrição "Promocao na Mao", capability **Push Notifications**
+   marcada (o app pede no `Runner.entitlements`; ver "Avisos" abaixo para a chave APNs).
+2. appstoreconnect.apple.com → **Apps** → `+` → New App: iOS, nome "Promoção na Mão", Português (Brasil),
+   o bundle ID acima, SKU `promocaonamao`.
+3. App Store Connect → Users and Access → **Integrations** → App Store Connect API → Team Keys → `+`:
+   nome `esteira-github`, acesso **App Manager** basta para enviar. Baixe o `AuthKey_XXXX.p8` (só dá para baixar
+   **uma vez**) e anote o **Key ID** e o **Issuer ID** (no topo da tela).
+4. developer.apple.com → Account → Membership details → **Team ID**.
+5. `powershell -ExecutionPolicy Bypass -File C:\projetos\promocao\cadastrar-secrets-ios.ps1` (pasta controladora):
+   `APPSTORE_KEY_P8` (do Downloads), `GOOGLE_SERVICE_INFO_PROD` (do `ios/config/prod/`), e cola `APPLE_TEAM_ID`,
+   `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`. Guarde o `.p8` em lugar seguro e apague do Downloads.
+6. Certificado e perfil: `powershell -ExecutionPolicy Bypass -File C:\projetos\promocao\assinatura-ios.ps1`.
+   A 1ª rodada gera a chave e o `pedido.csr` em `%USERPROFILE%\promocao-assinatura-ios` e mostra o que fazer no
+   portal: **Certificates** → `+` → **Apple Distribution** com o `pedido.csr` → baixar; **Profiles** → `+` →
+   **App Store Connect** → o App ID e o certificado novo → nome **exato** `Promocao na Mao App Store` → baixar.
+   A 2ª rodada monta o `.p12` e cadastra `IOS_DIST_P12`, `IOS_DIST_P12_SENHA` e `IOS_PERFIL`. Guarde a pasta em
+   lugar seguro. O certificado vale 1 ano e o perfil também: ao vencer, refazer este passo (apagar a pasta antes).
+   Mudou capability no App ID (ex.: ligar outra): regerar só o perfil no portal e rodar a 2ª parte de novo.
+
+**Cada build:** Actions → **iOS** → Run workflow (branch `main`) → marcar **"Assinar e enviar ao TestFlight"**.
+Leva ~20 min; depois o App Store Connect processa ~15 min. TestFlight → Teste interno → adicionar quem é do time;
+no iPhone, instalar o app **TestFlight** e aceitar o convite. O número do build é o `+N` do `pubspec.yaml`: cada
+envio precisa de um número maior que o anterior (o `/subir-versao` já sobe).
+
+Já resolvido no projeto: só iPhone (`TARGETED_DEVICE_FAMILY = 1`, sem capturas de iPad) e
+`ITSAppUsesNonExemptEncryption = false` no `Info.plist` (o TestFlight não para perguntando de criptografia).
+A esteira também manda os símbolos (dSYM) ao Crashlytics de prod, para o travamento do iPhone vir com o nome das
+funções. Sem botão e sem a marca, a esteira só compila (sem assinatura), como antes.
+
+Não precisa de iPhone em **Devices** (o archive já assina com o perfil da App Store). Os certificados
+**Apple Development** criados pela esteira antiga podem ser revogados em Certificates; a Apple limita a 3 os de
+**Distribution**: se recusar, revogar um antigo que não seja o do `promocao-assinatura-ios`.
+
 ## Anúncios no app (AdMob)
 
 O AdSense é só para sites; no app, a rede do Google é o **AdMob** (mesmos anunciantes, pagamento junto com o
 AdSense). Ordem de cada espaço (`EspacoAnuncioView`): anúncio vendido pelo dev → bloco do AdMob
 (`features/anuncios/admob.dart`, 320×100, com o selo) → "Anuncie aqui" se o Google não tiver anúncio.
-Só Android por enquanto; nunca na Lista.
+Android e iPhone; nunca na Lista.
 
 | Onde | Dev | Prod |
 |---|---|---|
-| ID do app (`ca-app-pub-…~…`) | ID de teste do Google (fixo no `build.gradle.kts`) | `ADMOB_APP_ID` no `config/prod.json` → manifest. Build de release **falha sem ele** |
-| ID do bloco (`ca-app-pub-…/…`) | bloco de teste do Google (`config.dart`) | `ADMOB_BLOCO` no `config/prod.json` (vazio = sem AdMob, só "Anuncie aqui") |
+| ID do app Android (`ca-app-pub-…~…`) | ID de teste do Google (fixo no `build.gradle.kts`) | `ADMOB_APP_ID` no `config/prod.json` → manifest. Build de release **falha sem ele** |
+| ID do bloco Android (`ca-app-pub-…/…`) | bloco de teste do Google (`config.dart`) | `ADMOB_BLOCO` no `config/prod.json` (vazio = sem AdMob, só "Anuncie aqui") |
+| ID do app iPhone | ID de teste do Google (fixo no `Info.plist`) | `ADMOB_APP_ID_IOS` no `config/prod.json`; a esteira `ios.yml` grava no `Info.plist` (sem ele, aviso e fica o de teste) |
+| ID do bloco iPhone | bloco de teste do Google (`config.dart`) | `ADMOB_BLOCO_IOS` no `config/prod.json` (vazio = sem AdMob no iPhone) |
 
 Configurar (dev, uma vez): criar a conta em admob.google.com **com a mesma conta Google do AdSense** (mesmo
 `pub-…`), adicionar o app Android (`br.com.promocaonamao.app`; ligar à ficha da Play quando publicada), criar um
@@ -271,8 +320,10 @@ bloco **Banner**, pôr os dois IDs no `config/prod.json` e no secret `APP_CONFIG
 `/app-ads.txt` (igual ao `ads.txt`), que o AdMob confere no site da ficha da Play. Nunca clicar nos próprios
 anúncios de verdade: testar sempre no flavor dev (anúncios de teste).
 
-iPhone: o `Info.plist` tem o ID de **teste** em `GADApplicationIdentifier` (sem ele o SDK fecha o app);
-trocar pelo do app de iPhone no AdMob e ligar os anúncios lá quando o app for para a App Store.
+iPhone (uma vez): no AdMob, **Apps → Adicionar app → iOS** (ainda não publicado; ligar à App Store depois),
+criar um bloco **Banner**, pôr `ADMOB_APP_ID_IOS` e `ADMOB_BLOCO_IOS` no `config/prod.json` e rodar o
+`cadastrar-secrets.ps1` (atualiza o `APP_CONFIG_PROD`). O `Info.plist` já tem o `SKAdNetworkItems` do Google.
+Sem a pergunta de rastreamento (ATT), o iPhone só mostra anúncio não personalizado.
 
 ## Avisos de ofertas novas (push)
 
@@ -301,7 +352,7 @@ Testar sem enviar: `node extracao/avisar.mjs --teste` (autoteste) e
 `FCM_VALIDAR=1` faz o FCM validar a mensagem de verdade sem entregar a ninguém.
 
 **No app** (`features/avisos/avisos.dart`): o sino na tela do mercado pede a permissão de notificação
-(Android 13+), assina/desassina o tópico e guarda os mercados ligados no aparelho. Tocar na notificação
+(Android 13+ e iPhone), assina/desassina o tópico e guarda os mercados ligados no aparelho. Tocar na notificação
 abre `data.rota`. Ícone: `res/drawable/ic_notificacao.xml` (etiqueta branca), cor da marca.
 
 **Produto em oferta** (migration 20 do privado): o sino na tela da **oferta** assina `produto-<codigo>`, o código do
@@ -309,7 +360,14 @@ produto do catálogo que vem em `itens[].produto_codigo` (`Oferta.produtoCodigo`
 produto ou se as alternativas são produtos diferentes). Depois do catálogo, `avisar.mjs --produtos` manda
 "<produto> em oferta — R$ X no <mercado>, até dd/mm", abrindo `/oferta/<id>`; o mesmo produto no máximo a cada
 7 dias. Os produtos ligados ficam no aparelho (`avisos_produtos`); desligar é pelo sino de uma oferta do produto.
-shortcut: só Android; o iPhone precisa da chave APNs (conta Apple) e da capability "Push Notifications".
+
+**iPhone.** A Apple só entrega notificação pelo serviço dela (APNs); o FCM repassa para lá usando uma **chave
+APNs** do nosso time. No app: `Runner.entitlements` (`aps-environment`) e `UIBackgroundModes` →
+`remote-notification` no `Info.plist`; antes de assinar o tópico, o app espera o token da Apple chegar
+(`_esperarApns`). Uma vez (dev): developer.apple.com → **Keys** → `+` → nome "APNs", marcar **Apple Push
+Notifications service (APNs)** → baixar o `.p8` (uma vez só) e anotar o **Key ID**; Firebase do **prod**
+(promocaonamao-1) → Configurações do projeto → **Cloud Messaging** → app iOS → **Chave de autenticação de APNs**
+→ enviar o `.p8` com o Key ID e o Team ID. Se quiser testar push no app dev, a mesma chave vai no promocaonamao-f08a7.
 
 **Só o dev faz (uma vez por projeto, promocaonamao-f08a7 e promocaonamao-1):**
 1. Google Cloud Console do projeto → **IAM e administrador → IAM** → na linha da service account
