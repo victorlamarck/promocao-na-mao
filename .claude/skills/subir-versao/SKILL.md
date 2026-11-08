@@ -1,6 +1,6 @@
 ---
 name: subir-versao
-description: Sobe uma versão nova do app Android para o teste interno da Play. Atualiza os branches, vê o que mudou desde a última versão, escreve as notas (release.txt e versions.txt), testa o release no celular do dev, abre os PRs e acompanha a esteira Android, que publica sozinha quando a versão nova chega ao main. Use quando o dev disser "subir versão", "nova versão do app", "gerar o .aab" ou rodar /subir-versao.
+description: Sobe uma versão nova do app para o teste interno da Play e o TestFlight. Atualiza os branches, vê o que mudou desde a última versão, escreve as notas (release.txt e versions.txt), testa o release no celular do dev, abre os PRs e acompanha as esteiras Android e iOS, que publicam sozinhas quando a versão nova chega ao main. Use quando o dev disser "subir versão", "nova versão do app", "gerar o .aab" ou rodar /subir-versao.
 argument-hint: "[X.Y.Z]"
 ---
 
@@ -67,7 +67,7 @@ A esteira Android recusa se o topo do `versions.txt` não for `v` + a versão do
 2. PR → `dev`. **(dev)** merge.
 3. PR `dev` → `main` (título "Dev"). **(dev)** merge.
 
-## 6. Mandar para a Play (sozinho)
+## 6. Mandar para a Play e o TestFlight (sozinho)
 
 1. O merge `dev` → `main` com a versão nova **dispara a esteira Android sozinho** (ela publica quando a linha
    `version:` do pubspec muda no `main`). Não rode o botão: sairia um envio repetido.
@@ -76,6 +76,9 @@ A esteira Android recusa se o topo do `versions.txt` não for `v` + a versão do
 3. Falhou → mostre o passo e o erro do log (`gh run view --log-failed`); não tente de novo sem entender. Corrigido
    sem mudar a versão → aí sim o botão: `gh workflow run Android -R victorlamarck/promocao-na-mao --ref main`.
 4. **(dev)** No Play Console: liberar o rascunho do teste interno (e, quando quiser, promover para produção).
+5. O mesmo merge dispara a esteira **iOS** (`-w iOS`): build prod assinado → TestFlight (~20 min + ~15 min de
+   processamento na Apple). Reenvio depois de falha: `gh workflow run iOS -R victorlamarck/promocao-na-mao --ref main
+   -f enviar=true`. **(dev)** Mandar à revisão da App Store é no App Store Connect (escolher o build na versão).
 
 ## 7. Fechar
 
