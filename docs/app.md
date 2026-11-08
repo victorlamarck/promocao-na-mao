@@ -256,11 +256,14 @@ o iOS tem o texto `NSLocationWhenInUseUsageDescription`.
 ## iPhone (TestFlight)
 
 **Como funciona a assinatura.** A Apple só instala app assinado. A assinatura junta duas peças: o **certificado**
-(prova que quem assina é o nosso time) e o **perfil** (autoriza aquele certificado a assinar o app
-`br.com.promocaonamao.app` para a App Store). Normalmente o Xcode, num Mac, cria as duas. Aqui quem faz isso é a
-esteira (`.github/workflows/ios.yml`, Mac do GitHub, grátis porque o repositório é público): com uma **chave da API do
-App Store Connect**, o `xcodebuild -allowProvisioningUpdates` pede à Apple o certificado e o perfil na hora e envia o
-build. Nenhum `.p12` nem Mac na nossa mão. A mesma chave faz o papel da conta de serviço da Play.
+(prova que quem assina é o nosso time; tem uma chave privada que só nós temos) e o **perfil** (autoriza aquele
+certificado a assinar o app `br.com.promocaonamao.app` para a App Store, com Push). Normalmente o Xcode, num Mac,
+cria as duas. Aqui fazemos uma vez no Windows (`openssl` do Git) e guardamos nos secrets, como a keystore do
+Android; a esteira (`.github/workflows/ios.yml`, Mac do GitHub, grátis porque o repositório é público) põe os dois
+num chaveiro temporário, assina (`Release-prod` com assinatura **manual** no `project.pbxproj`) e envia com a
+**chave da API do App Store Connect**, que faz o papel da conta de serviço da Play.
+Por que não a assinatura automática pela chave da API: ela cria um certificado novo em cada Mac do GitHub e a
+chave privada some junto com o Mac; na rodada seguinte a Apple recusa ("private key is not installed", 08/11/2026).
 
 **Uma vez (dev, na conta Apple):**
 1. developer.apple.com → Certificates, Identifiers & Profiles → **Identifiers** → `+` → App IDs → App:
@@ -269,15 +272,19 @@ build. Nenhum `.p12` nem Mac na nossa mão. A mesma chave faz o papel da conta d
 2. appstoreconnect.apple.com → **Apps** → `+` → New App: iOS, nome "Promoção na Mão", Português (Brasil),
    o bundle ID acima, SKU `promocaonamao`.
 3. App Store Connect → Users and Access → **Integrations** → App Store Connect API → Team Keys → `+`:
-   nome `esteira-github`, acesso **Admin** (com App Manager a Apple não deixa criar certificado). Baixe o
-   `AuthKey_XXXX.p8` (só dá para baixar **uma vez**) e anote o **Key ID** e o **Issuer ID** (no topo da tela).
+   nome `esteira-github`, acesso **App Manager** basta para enviar. Baixe o `AuthKey_XXXX.p8` (só dá para baixar
+   **uma vez**) e anote o **Key ID** e o **Issuer ID** (no topo da tela).
 4. developer.apple.com → Account → Membership details → **Team ID**.
-   Ainda lá: **Devices** → `+` → cadastre um iPhone (nome e UDID). Sem nenhum aparelho no time a Apple não emite o
-   perfil de desenvolvimento que o archive usa, e a esteira falha com "Your team has no devices". O UDID aparece no
-   app **Dispositivos Apple** (ou iTunes) do Windows com o iPhone no cabo: clique no número de série até virar UDID.
 5. `powershell -ExecutionPolicy Bypass -File C:\projetos\promocao\cadastrar-secrets-ios.ps1` (pasta controladora):
    `APPSTORE_KEY_P8` (do Downloads), `GOOGLE_SERVICE_INFO_PROD` (do `ios/config/prod/`), e cola `APPLE_TEAM_ID`,
    `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`. Guarde o `.p8` em lugar seguro e apague do Downloads.
+6. Certificado e perfil: `powershell -ExecutionPolicy Bypass -File C:\projetos\promocao\assinatura-ios.ps1`.
+   A 1ª rodada gera a chave e o `pedido.csr` em `%USERPROFILE%\promocao-assinatura-ios` e mostra o que fazer no
+   portal: **Certificates** → `+` → **Apple Distribution** com o `pedido.csr` → baixar; **Profiles** → `+` →
+   **App Store Connect** → o App ID e o certificado novo → nome **exato** `Promocao na Mao App Store` → baixar.
+   A 2ª rodada monta o `.p12` e cadastra `IOS_DIST_P12`, `IOS_DIST_P12_SENHA` e `IOS_PERFIL`. Guarde a pasta em
+   lugar seguro. O certificado vale 1 ano e o perfil também: ao vencer, refazer este passo (apagar a pasta antes).
+   Mudou capability no App ID (ex.: ligar outra): regerar só o perfil no portal e rodar a 2ª parte de novo.
 
 **Cada build:** Actions → **iOS** → Run workflow (branch `main`) → marcar **"Assinar e enviar ao TestFlight"**.
 Leva ~20 min; depois o App Store Connect processa ~15 min. TestFlight → Teste interno → adicionar quem é do time;
@@ -289,8 +296,9 @@ Já resolvido no projeto: só iPhone (`TARGETED_DEVICE_FAMILY = 1`, sem capturas
 A esteira também manda os símbolos (dSYM) ao Crashlytics de prod, para o travamento do iPhone vir com o nome das
 funções. Sem botão e sem a marca, a esteira só compila (sem assinatura), como antes.
 
-Se a Apple recusar por excesso de certificados ("maximum number of certificates"): developer.apple.com →
-Certificates → revogar os de desenvolvimento antigos criados pela esteira.
+Não precisa de iPhone em **Devices** (o archive já assina com o perfil da App Store). Os certificados
+**Apple Development** criados pela esteira antiga podem ser revogados em Certificates; a Apple limita a 3 os de
+**Distribution**: se recusar, revogar um antigo que não seja o do `promocao-assinatura-ios`.
 
 ## Anúncios no app (AdMob)
 

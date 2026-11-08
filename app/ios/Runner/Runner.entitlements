@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Push (avisos de ofertas). "development" aqui; o export para a App Store troca por "production". -->
+	<!-- Push (avisos de ofertas) nas builds de desenvolvimento. O Release-prod usa o Runner-prod.entitlements. -->
 	<key>aps-environment</key>
 	<string>development</string>
 </dict>
