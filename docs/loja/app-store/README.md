@@ -86,7 +86,10 @@ Dúvidas, sugestões ou quer anunciar? Escreva para oi.promocaonamao@gmail.com.
 ```
 <!-- fim da descrição -->
 
-**Screenshots** — iPhone 6,9" (1320×2868, RGB sem transparência), nesta ordem: [capturas/](capturas/)
+**Screenshots** — a tela atual do App Store Connect pede **"iPhone with Dynamic Island (medium display)"**, 6,1"/6,3":
+**1206×2622** (ou 1179×2556), RGB sem transparência → [capturas-6.3/](capturas-6.3/). As de 6,9" (1320×2868, [capturas/](capturas/))
+foram recusadas nessa área em 08/11/2026 ("File dimensions are invalid"); `tools/reduzir.mjs` faz uma a partir da outra.
+Ordem:
 `1-inicio`, `2-busca`, `3-lista`, `4-oferta`, `5-mercados`. A Apple reduz sozinha para os iPhones menores.
 iPad: não precisa (o app é só iPhone).
 
@@ -95,6 +98,11 @@ sem janela em 390×844 ×3, localização negada, e a moldura com legenda em Fre
 Scripts em [tools/](tools/) (`npm i playwright-core` numa pasta temporária; usa o Chrome instalado):
 `node fotos.mjs <app/build/web> <cru> roteiro.json` e `node moldura.mjs <cru> <saida>`.
 Atenção: o roteiro cria uma lista de verdade no banco de prod (some sozinha em 6 meses; rodar com cuidado).
+
+**Header e Search Results** (aba "Header and Search Results", opcionais, só aparecem no iOS 27+; sem transparência):
+[destaques/](destaques/) — `header-3840x1646.png` (21:9, sem texto: a Apple sobrepõe nome e ícone) e
+`busca-3840x2560.png` (3:2, legenda "As ofertas de GV numa lista só"). Geradas por `tools/destaques.mjs` a partir das
+telas cruas. Medidas: [Creative assets specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/creative-assets-specifications/).
 
 ## App Review Information
 
