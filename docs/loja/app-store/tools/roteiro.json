@@ -1,0 +1,9 @@
+[["ir","/buscar"],
+ ["campo","arroz"],["tecla","Enter"],["foto","2-busca"],["tocar","^Adicionar",1],
+ ["campo","café"],["tecla","Enter"],["tocar","^Adicionar",0],
+ ["campo","leite"],["tecla","Enter"],["tocar","^Adicionar",0],
+ ["campo","sabão em pó"],["tecla","Enter"],["tocar","^Adicionar",0],
+ ["campo","arroz"],["tecla","Enter"],["cartao","Arroz Tipo 1 Conquista"],["esperar",3000],["foto","3-oferta"],
+ ["ir","/lista"],["foto","4-lista"],["botoes"],
+ ["ir","/"],["foto","1-inicio"],
+ ["ir","/mercados"],["foto","5-mercados"]]
