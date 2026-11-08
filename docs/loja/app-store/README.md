@@ -99,6 +99,11 @@ Scripts em [tools/](tools/) (`npm i playwright-core` numa pasta temporária; usa
 `node fotos.mjs <app/build/web> <cru> roteiro.json` e `node moldura.mjs <cru> <saida>`.
 Atenção: o roteiro cria uma lista de verdade no banco de prod (some sozinha em 6 meses; rodar com cuidado).
 
+**Header e Search Results** (aba "Header and Search Results", opcionais, só aparecem no iOS 27+; sem transparência):
+[destaques/](destaques/) — `header-3840x1646.png` (21:9, sem texto: a Apple sobrepõe nome e ícone) e
+`busca-3840x2560.png` (3:2, legenda "As ofertas de GV numa lista só"). Geradas por `tools/destaques.mjs` a partir das
+telas cruas. Medidas: [Creative assets specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/creative-assets-specifications/).
+
 ## App Review Information
 
 | Campo | Valor |
