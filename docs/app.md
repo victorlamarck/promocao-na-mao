@@ -65,7 +65,7 @@ a esteira os escreva a partir dos secrets.
 
 No iOS, cada flavor é uma scheme (`dev`, `prod`) com as configurações `Debug-dev`, `Release-prod`
 etc., que o `--flavor` do Flutter exige. As configurações sem flavor (`Debug`, `Release`) valem
-como dev. **O iOS ainda não foi compilado**, porque precisa de um Mac ou da esteira.
+como dev. O iOS é compilado só pela esteira (não há Mac).
 
 No emulador Android, `127.0.0.1` é o próprio emulador. Para usar o Supabase local, rode antes
 `adb reverse tcp:54321 tcp:54321`.
@@ -102,7 +102,7 @@ Secrets (*Settings → Secrets and variables → Actions*):
 | `APP_CONFIG_PROD` | o arquivo `app/config/prod.json` inteiro |
 | `FIREBASE_SA_DEV`, `FIREBASE_SA_PROD` | conta de serviço de cada projeto (*Firebase Hosting Admin*), usada pela esteira do **site** |
 
-Android e iOS ainda não estão na esteira: entram quando houver conta nas lojas e assinatura.
+Os secrets das esteiras Android e iOS estão nas seções [Publicar no Android](#publicar-no-android) e [iPhone](#iphone-testflight).
 
 ## Estrutura
 
@@ -286,7 +286,9 @@ chave privada some junto com o Mac; na rodada seguinte a Apple recusa ("private 
    lugar seguro. O certificado vale 1 ano e o perfil também: ao vencer, refazer este passo (apagar a pasta antes).
    Mudou capability no App ID (ex.: ligar outra): regerar só o perfil no portal e rodar a 2ª parte de novo.
 
-**Cada build:** Actions → **iOS** → Run workflow (branch `main`) → marcar **"Assinar e enviar ao TestFlight"**.
+**Cada build:** sozinho, quando a versão nova do `pubspec.yaml` chega ao `main` (junto com a esteira Android; o
+`/subir-versao` já faz isso). Para reenviar sem mudar a versão: Actions → **iOS** → Run workflow (branch `main`) →
+marcar **"Assinar e enviar ao TestFlight"** (cuidado: o mesmo `+N` a Apple recusa; só serve se o envio anterior falhou).
 Leva ~20 min; depois o App Store Connect processa ~15 min. TestFlight → Teste interno → adicionar quem é do time;
 no iPhone, instalar o app **TestFlight** e aceitar o convite. O número do build é o `+N` do `pubspec.yaml`: cada
 envio precisa de um número maior que o anterior (o `/subir-versao` já sobe).
@@ -294,7 +296,7 @@ envio precisa de um número maior que o anterior (o `/subir-versao` já sobe).
 Já resolvido no projeto: só iPhone (`TARGETED_DEVICE_FAMILY = 1`, sem capturas de iPad) e
 `ITSAppUsesNonExemptEncryption = false` no `Info.plist` (o TestFlight não para perguntando de criptografia).
 A esteira também manda os símbolos (dSYM) ao Crashlytics de prod, para o travamento do iPhone vir com o nome das
-funções. Sem botão e sem a marca, a esteira só compila (sem assinatura), como antes.
+funções. No botão sem a marca, a esteira só compila (sem assinatura), para testar o projeto.
 
 Não precisa de iPhone em **Devices** (o archive já assina com o perfil da App Store). Os certificados
 **Apple Development** criados pela esteira antiga podem ser revogados em Certificates; a Apple limita a 3 os de
@@ -398,4 +400,3 @@ Fredoka 600 e Nunito 400/600/700/800 ficam **dentro do app** (`assets/fontes/`, 
 - Recorte da imagem do encarte (a extração ainda não marca a posição da etiqueta).
 - Comparação na lista: quanto a lista custaria em cada mercado (a tela da oferta e a busca já comparam).
 - AdSense testado de verdade (precisa da conta aprovada); AdMob no celular.
-- Builds Android/iOS publicados (assinatura, lojas). Plataformas e flavors já criados; o iOS nunca foi compilado.

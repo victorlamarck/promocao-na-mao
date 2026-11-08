@@ -1,4 +1,6 @@
-# App de iPhone, só no botão (Actions → iOS → Run workflow). Repositório público: o macOS do GitHub é grátis.
+# App de iPhone. Sozinho quando chega ao main uma VERSÃO NOVA (a linha "version:" do app/pubspec.yaml mudou,
+# como a esteira Android): build prod assinado e enviado ao TestFlight. Também no botão (Actions → iOS →
+# Run workflow). Repositório público: o macOS do GitHub é grátis.
 # - "enviar" desligado: compila sem assinatura (simulador dev + aparelho prod) para saber se o projeto está de pé.
 # - "enviar" ligado: build prod assinado e enviado ao App Store Connect (aparece no TestFlight em ~15 min).
 #   Assinatura manual, como a keystore do Android: certificado Apple Distribution (.p12) e perfil App Store
@@ -10,6 +12,9 @@
 name: iOS
 
 on:
+  push:
+    branches: [main]
+    paths: ['app/pubspec.yaml']
   workflow_dispatch:
     inputs:
       enviar:
@@ -25,8 +30,33 @@ defaults:
 permissions:
   contents: read
 
+concurrency: ios
+
 jobs:
+  # O pubspec também muda quando só se atualiza um pacote: no push, publica só se a linha "version:" mudou.
+  versao:
+    runs-on: ubuntu-latest
+    outputs:
+      publicar: ${{ steps.v.outputs.publicar }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # para ler o pubspec de antes do push
+      - id: v
+        env:
+          ANTES: ${{ github.event.before }}
+        run: |
+          agora=$(grep -m1 '^version:' pubspec.yaml)
+          antes=$(git show "$ANTES:app/pubspec.yaml" 2>/dev/null | grep -m1 '^version:' || true)
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ] || [ "$agora" != "$antes" ]; then
+            echo "publicar=true" >> "$GITHUB_OUTPUT"; echo "publicar: ${antes:-?} → $agora"
+          else
+            echo "publicar=false" >> "$GITHUB_OUTPUT"; echo "::notice::versão não mudou ($agora): nada a publicar"
+          fi
+
   ios:
+    needs: versao
+    if: needs.versao.outputs.publicar == 'true'
     # macos-latest (arm64) ficou sem máquina livre 2× em 20/10/2026; Intel tem fila menor
     runs-on: macos-15-intel
     timeout-minutes: 60
@@ -66,14 +96,14 @@ jobs:
       - run: flutter pub get
 
       - name: Simulador (dev, debug)
-        if: ${{ !inputs.enviar }}
+        if: ${{ !inputs.enviar && github.event_name != 'push' }}
         run: flutter build ios --simulator --debug --flavor dev --dart-define-from-file=config/dev.json
       - name: Aparelho (prod, release, sem assinatura)
-        if: ${{ !inputs.enviar }}
+        if: ${{ !inputs.enviar && github.event_name != 'push' }}
         run: flutter build ios --release --no-codesign --flavor prod --dart-define-from-file=config/prod.json
 
       - name: Certificado, perfil e chave da API
-        if: ${{ inputs.enviar }}
+        if: ${{ inputs.enviar || github.event_name == 'push' }}
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
@@ -127,7 +157,7 @@ jobs:
           </dict></plist>
           EOF
       - name: Archive (prod, assinado)
-        if: ${{ inputs.enviar }}
+        if: ${{ inputs.enviar || github.event_name == 'push' }}
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
@@ -147,7 +177,7 @@ jobs:
             -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Runner.xcarchive" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID"
       - name: Enviar ao App Store Connect
-        if: ${{ inputs.enviar }}
+        if: ${{ inputs.enviar || github.event_name == 'push' }}
         env:
           APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
           APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
@@ -159,7 +189,7 @@ jobs:
             -authenticationKeyID "$APPSTORE_KEY_ID" -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID"
           echo "Enviado. Confira em App Store Connect → TestFlight (o processamento leva uns 15 min)." >> "$GITHUB_STEP_SUMMARY"
       - name: Símbolos para o Crashlytics
-        if: ${{ inputs.enviar }}
+        if: ${{ inputs.enviar || github.event_name == 'push' }}
         # Sem os dSYM, o travamento do iPhone aparece no Crashlytics sem o nome das funções. Erro aqui não desfaz o envio.
         continue-on-error: true
         run: |
@@ -167,7 +197,7 @@ jobs:
           [ -n "$up" ] || { echo "::warning::não achei o upload-symbols do Crashlytics"; exit 1; }
           "$up" -gsp ios/config/prod/GoogleService-Info.plist -p ios "$RUNNER_TEMP/Runner.xcarchive/dSYMs"
       - name: Apagar a chave e o chaveiro
-        if: ${{ always() && inputs.enviar }}
+        if: ${{ always() && (inputs.enviar || github.event_name == 'push') }}
         run: |
           rm -f "$RUNNER_TEMP/AuthKey.p8"
           security delete-keychain "$RUNNER_TEMP/assinatura.keychain-db" 2>/dev/null || true
