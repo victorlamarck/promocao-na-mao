@@ -12,6 +12,9 @@
 	<!-- Só HTTPS do sistema, nenhuma criptografia própria: sem isto cada build para no TestFlight perguntando. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- O app só pede "durante o uso"; a Apple exige este texto porque o geolocator tem o código do "sempre" (ITMS-90683). -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Para mostrar primeiro os mercados mais perto de você. A localização não sai do celular.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Para mostrar primeiro os mercados mais perto de você. A localização não sai do celular.</string>
 	<key>CFBundleDisplayName</key>
