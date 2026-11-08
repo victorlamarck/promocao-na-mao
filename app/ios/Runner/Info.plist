@@ -9,6 +9,9 @@
 	<!-- AdMob: sem isto o SDK fecha o app ao abrir. ID de TESTE do Google; trocar pelo do app de iPhone quando ele for para a loja (docs/app.md). -->
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<!-- Só HTTPS do sistema, nenhuma criptografia própria: sem isto cada build para no TestFlight perguntando. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Para mostrar primeiro os mercados mais perto de você. A localização não sai do celular.</string>
 	<key>CFBundleDisplayName</key>
@@ -64,12 +67,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
+	<key>UIBackgroundModes</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>remote-notification</string>
+	</array>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
 	</array>
 </dict>
 </plist>

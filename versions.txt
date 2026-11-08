@@ -1,3 +1,9 @@
+v 0.7.2
+
+- Preparação para o app de iPhone
+- Pequenos ajustes e melhorias de estabilidade
+_______________________________________________________________________________________________________________________
+
 v 0.7.1
 
 - Pequenos ajustes e melhorias de estabilidade
