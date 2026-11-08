@@ -86,7 +86,10 @@ Dúvidas, sugestões ou quer anunciar? Escreva para oi.promocaonamao@gmail.com.
 ```
 <!-- fim da descrição -->
 
-**Screenshots** — iPhone 6,9" (1320×2868, RGB sem transparência), nesta ordem: [capturas/](capturas/)
+**Screenshots** — a tela atual do App Store Connect pede **"iPhone with Dynamic Island (medium display)"**, 6,1"/6,3":
+**1206×2622** (ou 1179×2556), RGB sem transparência → [capturas-6.3/](capturas-6.3/). As de 6,9" (1320×2868, [capturas/](capturas/))
+foram recusadas nessa área em 08/11/2026 ("File dimensions are invalid"); `tools/reduzir.mjs` faz uma a partir da outra.
+Ordem:
 `1-inicio`, `2-busca`, `3-lista`, `4-oferta`, `5-mercados`. A Apple reduz sozinha para os iPhones menores.
 iPad: não precisa (o app é só iPhone).
 
