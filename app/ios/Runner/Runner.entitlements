@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Push (avisos de ofertas). "development" aqui; o export para a App Store troca por "production". -->
+	<key>aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>

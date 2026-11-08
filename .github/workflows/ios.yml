@@ -3,7 +3,7 @@
 # - "enviar" ligado: build prod assinado e enviado ao App Store Connect (aparece no TestFlight em ~15 min).
 #   Assinatura automática pela chave da API do App Store Connect: o Xcode cria/baixa certificado e perfil sozinho,
 #   sem Mac e sem .p12. Secrets: APPLE_TEAM_ID, APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_KEY_P8,
-#   GOOGLE_SERVICE_INFO_PROD (docs/app.md#iphone-testflight).
+#   GOOGLE_SERVICE_INFO_PROD (docs/app.md#iphone-testflight). AdMob do iPhone: ADMOB_APP_ID_IOS no APP_CONFIG_PROD.
 # O número do build é o +N do pubspec (o mesmo do Android): cada envio precisa de um número maior que o anterior.
 name: iOS
 
@@ -105,6 +105,10 @@ jobs:
           # --config-only: grava flavor, versão e dart-defines no Generated.xcconfig; quem compila e assina é o
           # xcodebuild. --no-codesign: senão o Flutter procura certificado no Mac (não há; a Apple dá na hora).
           flutter build ios --config-only --no-codesign --release --flavor prod --dart-define-from-file=config/prod.json
+          # AdMob: o Info.plist do git tem o ID de teste do Google; o de verdade vem do APP_CONFIG_PROD.
+          admob=$(jq -r '.ADMOB_APP_ID_IOS // empty' config/prod.json)
+          if [ -n "$admob" ]; then /usr/libexec/PlistBuddy -c "Set :GADApplicationIdentifier $admob" ios/Runner/Info.plist
+          else echo "::warning::sem ADMOB_APP_ID_IOS no APP_CONFIG_PROD: o iPhone fica com o ID de teste do AdMob"; fi
           # O archive assina com perfil de desenvolvimento: exige ao menos 1 iPhone em Devices no portal da Apple.
           # Archive sem assinar (CODE_SIGNING_ALLOWED=NO) não serve: os frameworks do Firebase/AdMob ficam com
           # assinatura inválida e o export recusa (06/11/2026). O export reassina tudo com o perfil da App Store.
@@ -124,6 +128,14 @@ jobs:
             -allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
             -authenticationKeyID "$APPSTORE_KEY_ID" -authenticationKeyIssuerID "$APPSTORE_ISSUER_ID"
           echo "Enviado. Confira em App Store Connect → TestFlight (o processamento leva uns 15 min)." >> "$GITHUB_STEP_SUMMARY"
+      - name: Símbolos para o Crashlytics
+        if: ${{ inputs.enviar }}
+        # Sem os dSYM, o travamento do iPhone aparece no Crashlytics sem o nome das funções. Erro aqui não desfaz o envio.
+        continue-on-error: true
+        run: |
+          up=$(find ~/Library/Developer/Xcode/DerivedData -path '*firebase-ios-sdk/Crashlytics/upload-symbols' -type f | head -1)
+          [ -n "$up" ] || { echo "::warning::não achei o upload-symbols do Crashlytics"; exit 1; }
+          "$up" -gsp ios/config/prod/GoogleService-Info.plist -p ios "$RUNNER_TEMP/Runner.xcarchive/dSYMs"
       - name: Apagar a chave
         if: ${{ always() && inputs.enviar }}
         run: rm -f "$RUNNER_TEMP/AuthKey.p8"

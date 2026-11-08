@@ -9,8 +9,9 @@ import '../../core/rotas.dart';
 /// - "Ofertas novas no mercado": sino na tela do mercado, tópico `ofertas-<slug>`;
 /// - "Produto em oferta": sino na tela da oferta, tópico `produto-<codigo do catálogo>` (migration 20 do privado).
 /// A esteira de dados avisa o tópico depois de importar.
-/// shortcut: só Android por enquanto; iPhone precisa da chave APNs (conta Apple) e o web não usa tópicos.
-bool get avisosDisponiveis => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+/// Android e iPhone (este com a chave APNs no Firebase); o web não usa tópicos.
+bool get avisosDisponiveis =>
+    !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
 /// Um tipo de aviso: os valores ligados neste aparelho (slugs ou códigos), guardados em [_chave].
 class TipoAviso {
@@ -29,6 +30,7 @@ class TipoAviso {
     if (ligar) {
       final p = await fcm.requestPermission(); // Android 13+ pergunta; antes já vem liberado
       if (p.authorizationStatus == AuthorizationStatus.denied) return false;
+      await _esperarApns(fcm);
       await fcm.subscribeToTopic(topico(valor));
     } else {
       await fcm.unsubscribeFromTopic(topico(valor));
@@ -44,6 +46,15 @@ class TipoAviso {
 final avisoMercado = TipoAviso._('avisos_mercados', 'ofertas-');
 // shortcut: desligar só pela tela de uma oferta do produto; uma lista "meus avisos" quando alguém pedir.
 final avisoProduto = TipoAviso._('avisos_produtos', 'produto-');
+
+/// iPhone: o FCM recusa assinar tópico ("apns-token-not-set") antes de a Apple entregar o token do aparelho,
+/// que chega alguns segundos depois da permissão. No Android não espera nada.
+Future<void> _esperarApns(FirebaseMessaging fcm) async {
+  if (defaultTargetPlatform != TargetPlatform.iOS) return;
+  for (var i = 0; i < 10 && await fcm.getAPNSToken() == null; i++) {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+  }
+}
 
 Future<void> iniciarAvisos() async {
   if (!avisosDisponiveis) return;

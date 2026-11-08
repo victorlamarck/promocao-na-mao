@@ -29,9 +29,13 @@ String linkDoSite(String caminho) =>
 const adsenseCliente = String.fromEnvironment('ADSENSE_CLIENT'); // ca-pub-...
 const adsenseSlot = String.fromEnvironment('ADSENSE_SLOT');
 
-/// AdMob (o AdSense não roda em app): bloco de anúncio do Android. No dev, o bloco de teste do Google.
-/// O ID do app AdMob (ADMOB_APP_ID) vai no manifest pelo build.gradle.kts, não aqui.
-const admobBloco = String.fromEnvironment('ADMOB_BLOCO', defaultValue: ehProd ? '' : 'ca-app-pub-3940256099942544/6300978111');
+/// AdMob (o AdSense não roda em app): bloco de anúncio, um por plataforma. No dev, os blocos de teste do Google.
+/// O ID do app AdMob vai fora daqui: ADMOB_APP_ID no manifest (build.gradle.kts), ADMOB_APP_ID_IOS no Info.plist (ios.yml).
+const _admobBlocoAndroid =
+    String.fromEnvironment('ADMOB_BLOCO', defaultValue: ehProd ? '' : 'ca-app-pub-3940256099942544/6300978111');
+const _admobBlocoIos =
+    String.fromEnvironment('ADMOB_BLOCO_IOS', defaultValue: ehProd ? '' : 'ca-app-pub-3940256099942544/2934735716');
+String get admobBloco => defaultTargetPlatform == TargetPlatform.iOS ? _admobBlocoIos : _admobBlocoAndroid;
 
 /// Contatos do dev (WhatsApp ou formulário): "Anuncie aqui" e "Sugerir mercado".
 /// No dev, abrem o WhatsApp sem destinatário; no prod são obrigatórios.
