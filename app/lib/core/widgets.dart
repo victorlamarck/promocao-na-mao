@@ -364,15 +364,24 @@ class CardOferta extends StatelessWidget {
     final o = oferta;
     final c = context.cores;
     final clube = Mercado.de(o.redeSlug).clube ?? 'clube';
-    final unidade = mostrarPorUnidade ? porUnidade(o.porUnidadeValor, o.porUnidadeTipo, preco: o.preco) : null;
-    final preco = o.preco == null ? 'preço no mercado' : reais(o.preco!);
+    // preço do clube mais baixo: ele vira o preço grande e a etiqueta mostra o preço sem o clube
+    final clubeMenor = o.precoClube != null && (o.preco == null || o.precoClube! < o.preco!);
+    final valor = clubeMenor ? o.precoClube : o.preco;
+    // o R$/kg do banco já é o do preço mais baixo (o mesmo do preço grande)
+    final unidade = mostrarPorUnidade ? porUnidade(o.porUnidadeValor, o.porUnidadeTipo, preco: valor) : null;
+    final preco = valor == null ? 'preço no mercado' : reais(valor);
+    final etiquetaClube = o.precoClube == null
+        ? null
+        : clubeMenor
+            ? 'com $clube${o.preco == null ? '' : ' · ${reais(o.preco!)} sem'}'
+            : '${reais(o.precoClube!)} com $clube';
     final aviso = avisoValidade(o.validadeFim, DateTime.now());
     // Leitor de tela: o card vira uma frase só ("Café 500 g, R$ 12,90 no Atacadão, antes R$ 15,90"); o Adicionar fica à parte.
     final rotulo = [
       o.nome,
       mostrarMercado ? '$preco no ${o.redeNome}' : preco,
       ?unidade,
-      if (o.precoClube != null) '${reais(o.precoClube!)} com $clube',
+      ?etiquetaClube,
       if (o.precoDe != null) 'antes ${reais(o.precoDe!)}',
       ?o.condicaoCurta,
       if (o.atacado) 'preço de atacado',
@@ -404,13 +413,13 @@ class CardOferta extends StatelessWidget {
                     maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, height: 1.25)),
                 // Wrap: no card estreito, o "antes" e o "R$ X o kg" descem para a linha de baixo
                 Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 6, children: [
-                  Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 15 : 20, cor: context.corPreco)),
+                  Text(valor == null ? 'Preço no mercado' : reais(valor), style: fredoka(valor == null ? 15 : 20, cor: context.corPreco)),
                   if (o.precoDe != null)
                     Text(reais(o.precoDe!),
                         style: TextStyle(fontSize: 12, color: c.onSurfaceVariant, decoration: TextDecoration.lineThrough)),
                   if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
                 ]),
-                if (o.precoClube != null) Etiqueta('${reais(o.precoClube!)} com $clube'),
+                if (etiquetaClube != null) Etiqueta(etiquetaClube),
                 // até 2 linhas no card; o texto todo na tela da oferta
                 if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer, linhas: 2),
                 Text(mostrarMercado ? '${o.redeNome} · até ${diaMes(o.validadeFim)}' : 'até ${diaMes(o.validadeFim)}',
