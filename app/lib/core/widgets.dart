@@ -117,9 +117,12 @@ class Contador extends StatelessWidget {
 
 /// "Adicionar" que vira contador quando a oferta já está na lista.
 class BotaoAdicionar extends StatelessWidget {
-  const BotaoAdicionar(this.oferta, {super.key, this.largo = false});
+  const BotaoAdicionar(this.oferta, {super.key, this.largo = false, this.compacto = false});
   final Oferta oferta;
   final bool largo;
+
+  /// Só o "+" redondo (sobre a foto do card); na lista, o mesmo contador "− 2 +".
+  final bool compacto;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -138,16 +141,26 @@ class BotaoAdicionar extends StatelessWidget {
               },
             );
           }
+          Future<void> adicionar() async {
+            try {
+              await Lista.minha.adicionar(oferta);
+              if (context.mounted) avisar(context, 'Adicionado no ${oferta.redeNome}');
+            } catch (_) {
+              if (context.mounted) avisar(context, 'Não deu para adicionar agora. Tenta de novo?', verLista: false);
+            }
+          }
+
+          if (compacto) {
+            return Material(
+              shape: const CircleBorder(),
+              elevation: 2,
+              color: Colors.transparent,
+              child: IconButton.filled(tooltip: 'Adicionar', onPressed: adicionar, icon: const Icon(Icons.add, semanticLabel: 'Adicionar')),
+            );
+          }
           return FilledButton.icon(
             style: FilledButton.styleFrom(minimumSize: Size(largo ? double.infinity : 48, largo ? 52 : 48)),
-            onPressed: () async {
-              try {
-                await Lista.minha.adicionar(oferta);
-                if (context.mounted) avisar(context, 'Adicionado no ${oferta.redeNome}');
-              } catch (_) {
-                if (context.mounted) avisar(context, 'Não deu para adicionar agora. Tenta de novo?', verLista: false);
-              }
-            },
+            onPressed: adicionar,
             icon: const Icon(Icons.add, size: 20),
             label: Text(largo ? 'Adicionar à lista' : 'Adicionar'),
           );
@@ -173,20 +186,25 @@ class SeloValidade extends StatelessWidget {
   }
 }
 
-/// Ícone da categoria principal do catálogo (catalogo/categorias.json do privado), para a oferta sem foto.
-IconData iconeDaCategoria(String? categoria) => switch (categoria) {
-      'Mercearia' => Icons.local_grocery_store_outlined,
-      'Frios e Laticínios' => Icons.egg_outlined,
-      'Açougue' => Icons.kebab_dining_outlined,
-      'Congelados' => Icons.ac_unit,
-      'Hortifruti' => Icons.eco_outlined,
-      'Padaria' => Icons.bakery_dining_outlined,
-      'Bebidas' => Icons.local_drink_outlined,
-      'Limpeza' => Icons.cleaning_services_outlined,
-      'Higiene' => Icons.soap_outlined,
-      'Pet' => Icons.pets_outlined,
-      'Casa' => Icons.home_outlined,
-      _ => Icons.shopping_basket_outlined,
+/// Categorias principais do catálogo (catalogo/categorias.json do privado), na ordem do filtro da Início.
+const categoriasPrincipais = ['Mercearia', 'Açougue', 'Hortifruti', 'Frios e Laticínios', 'Padaria', 'Congelados', 'Bebidas',
+    'Limpeza', 'Higiene', 'Pet', 'Casa'];
+
+/// Ícone da categoria principal do catálogo, para a oferta sem foto e o filtro da Início.
+// Emoji, como no site (formato.ts): colorido e reconhecível de longe; o mesmo do filtro e do "Sem foto".
+String iconeDaCategoria(String? categoria) => switch (categoria) {
+      'Mercearia' => '🛒',
+      'Frios e Laticínios' => '🧀',
+      'Açougue' => '🥩',
+      'Congelados' => '🧊',
+      'Hortifruti' => '🥬',
+      'Padaria' => '🥖',
+      'Bebidas' => '🥤',
+      'Limpeza' => '🧽',
+      'Higiene' => '🧴',
+      'Pet' => '🐾',
+      'Casa' => '🏠',
+      _ => '🛍️',
     };
 
 /// Foto do produto (recorte do encarte) num quadro branco da largura do card. Sem foto (ou se não carregar), o
@@ -203,7 +221,7 @@ class FotoOferta extends StatelessWidget {
       child: ColoredBox(
         color: c.surfaceContainerHighest,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, spacing: 4, children: [
-          Icon(iconeDaCategoria(oferta.categoria), size: altura * 0.4, color: c.onSurfaceVariant),
+          Text(iconeDaCategoria(oferta.categoria), style: TextStyle(fontSize: altura * 0.3)),
           Text('Sem foto', style: TextStyle(fontSize: 11, color: c.onSurfaceVariant)),
         ]),
       ),
@@ -291,49 +309,117 @@ class CardOferta extends StatelessWidget {
       child: InkWell(
         onTap: () => context.push('/oferta/${o.id}', extra: o),
         child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          padding: const EdgeInsets.all(10),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 6, children: [
+            // foto com o logo do mercado no canto e o "+" (ou o contador) por cima, como num app de mercado
+            Stack(clipBehavior: Clip.none, children: [
+              FotoOferta(o, altura: 120),
+              if (mostrarMercado) Positioned(top: 6, left: 6, child: ExcludeSemantics(child: AvatarMercado(o.redeSlug, tamanho: 26))),
+              Positioned(right: 4, bottom: 4, child: BotaoAdicionar(o, compacto: true)),
+            ]),
             Semantics(
               label: rotulo,
               excludeSemantics: true,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 4, children: [
-                if (mostrarMercado)
-                  Row(spacing: 6, children: [
-                    AvatarMercado(o.redeSlug, tamanho: 10),
-                    Flexible(
-                      child: Text('${o.redeNome} · até ${diaMes(o.validadeFim)}',
-                          style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), overflow: TextOverflow.ellipsis),
-                    ),
-                  ]),
-                FotoOferta(o, altura: 110),
                 SeloValidade(o.validadeFim),
                 if (maisBarato)
                   Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
                       cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
                 if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
-                Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
-                // Wrap: no card estreito da grade, o "R$ X o kg" desce para a linha de baixo
-                Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 8, children: [
-                  Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
+                Text(o.nome,
+                    maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, height: 1.25)),
+                // Wrap: no card estreito, o "antes" e o "R$ X o kg" descem para a linha de baixo
+                Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 6, children: [
+                  Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 15 : 20, cor: context.corPreco)),
+                  if (o.precoDe != null)
+                    Text(reais(o.precoDe!),
+                        style: TextStyle(fontSize: 12, color: c.onSurfaceVariant, decoration: TextDecoration.lineThrough)),
                   if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
                 ]),
                 if (o.precoClube != null) Etiqueta('${reais(o.precoClube!)} com $clube'),
-                if (o.precoDe != null)
-                  Text.rich(TextSpan(style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), children: [
-                    const TextSpan(text: 'Antes '),
-                    TextSpan(text: reais(o.precoDe!), style: const TextStyle(decoration: TextDecoration.lineThrough)),
-                  ])),
                 // até 2 linhas no card; o texto todo na tela da oferta
                 if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer, linhas: 2),
+                Text(mostrarMercado ? '${o.redeNome} · até ${diaMes(o.validadeFim)}' : 'até ${diaMes(o.validadeFim)}',
+                    style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
-            // na grade, os 2 cards da linha têm a mesma altura: o Adicionar fica no pé dos dois
-            const Spacer(),
-            const SizedBox(height: 12),
-            SizedBox(width: double.infinity, child: BotaoAdicionar(o)),
           ]),
         ),
       ),
+    );
+  }
+}
+
+/// Tons de cinza (luminância), para as categorias não escolhidas no filtro.
+const _cinza = ColorFilter.matrix([
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0.2126, 0.7152, 0.0722, 0, 0, //
+  0, 0, 0, 1, 0,
+]);
+
+/// Filtro por categoria (Início e Busca): bolinhas com o ícone (os mesmos do "Sem foto"), "Todas" primeiro.
+class FiltroCategoria extends StatelessWidget {
+  const FiltroCategoria({super.key, required this.marcadas, required this.onMudar});
+
+  /// Categorias marcadas (vazio = todas). Tocar marca ou desmarca; "Todas" limpa.
+  final Set<String> marcadas;
+  final ValueChanged<Set<String>> onMudar;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.cores;
+    Widget bolinha(String? categoria) {
+      final marcada = categoria == null ? marcadas.isEmpty : marcadas.contains(categoria);
+      final colorida = marcadas.isEmpty || marcada;
+      return Semantics(
+        button: true,
+        selected: marcada,
+        label: categoria ?? 'Todas as categorias',
+        excludeSemantics: true,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => onMudar(categoria == null
+              ? {}
+              : marcada
+                  ? ({...marcadas}..remove(categoria))
+                  : {...marcadas, categoria}),
+          child: SizedBox(
+            width: 64,
+            child: Column(spacing: 4, children: [
+              // bolinha branca com o emoji (como no protótipo); a marcada ganha a borda e o fundo da cor do app
+              Container(
+                width: 48,
+                height: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: marcada ? c.primaryContainer : c.surface,
+                  border: Border.all(color: marcada ? c.primary : c.outlineVariant, width: marcada ? 2 : 1),
+                ),
+                // sem filtro, todas coloridas; com alguma marcada, só as marcadas coloridas e as outras em cinza
+                child: ColorFiltered(
+                  colorFilter: colorida ? const ColorFilter.mode(Colors.transparent, BlendMode.dst) : _cinza,
+                  child: Opacity(
+                    opacity: colorida ? 1 : 0.55,
+                    child: Text(categoria == null ? '🏷️' : iconeDaCategoria(categoria), style: const TextStyle(fontSize: 22)),
+                  ),
+                ),
+              ),
+              Text(categoria?.split(' ').first ?? 'Todas',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, fontWeight: marcada ? FontWeight.w800 : FontWeight.w600, color: marcada ? c.primary : null)),
+            ]),
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [bolinha(null), for (final cat in categoriasPrincipais) bolinha(cat)]),
     );
   }
 }

@@ -25,4 +25,26 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.textContaining('0 itens'), findsNothing);
   });
+
+  testWidgets('filtro de categoria: marca duas, desmarca uma, "Todas" limpa', (t) async {
+    var marcadas = <String>{};
+    await t.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: StatefulBuilder(
+          builder: (context, set) => FiltroCategoria(marcadas: marcadas, onMudar: (m) => set(() => marcadas = m)),
+        ),
+      ),
+    ));
+    await t.tap(find.text('Mercearia'));
+    await t.pump();
+    await t.tap(find.text('Açougue'));
+    await t.pump();
+    expect(marcadas, {'Mercearia', 'Açougue'});
+    await t.tap(find.text('Mercearia'));
+    await t.pump();
+    expect(marcadas, {'Açougue'});
+    await t.tap(find.text('Todas'));
+    await t.pump();
+    expect(marcadas, isEmpty);
+  });
 }

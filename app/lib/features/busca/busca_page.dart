@@ -39,19 +39,24 @@ class _BuscaPageState extends State<BuscaPage> {
   bool _semAtacado = false;
   _Ordem _ordem = _Ordem.parecidas;
   int? _total;
+  Set<String> _categorias = {}; // filtro por categorias (coluna categoria, migration 23 do privado); vazio = todas
   List<Rede> _redes = [];
   List<Anuncio> _patrocinados = [];
 
   int get _filtrosLigados => (_mercados.isEmpty ? 0 : 1) + (_semAtacado ? 1 : 0);
 
   late final _resultados = Paginador<Oferta>((de, ate) async {
-    var q = _db.rpc('buscar_ofertas', params: {'termo': _campo.text});
+    // Sem texto (só categoria): as ofertas de hoje na ordem da Início (oferta_inicio); com texto, a busca.
+    final semTermo = _campo.text.trim().isEmpty;
+    PostgrestFilterBuilder<dynamic> q =
+        semTermo ? _db.from('oferta_inicio').select() : _db.rpc('buscar_ofertas', params: {'termo': _campo.text});
     if (_mercados.isNotEmpty) q = q.inFilter('rede_slug', _mercados.toList());
+    if (_categorias.isNotEmpty) q = q.inFilter('categoria', _categorias.toList());
     // o mesmo critério de Oferta.atacado: a condição começa com "preço de atacado"
     if (_semAtacado) q = q.or('condicao.is.null,condicao.not.like."preço de atacado*"');
     // order() do postgrest-dart é decrescente por padrão: ascending explícito
     final ordenada = switch (_ordem) {
-      _Ordem.parecidas => q,
+      _Ordem.parecidas => semTermo ? q.order('ordem', ascending: true) : q,
       _Ordem.menorPreco => q.order('preco', ascending: true).order('id', ascending: true),
       _Ordem.porUnidade => q.order('preco_referencia', ascending: true).order('id', ascending: true),
     };
@@ -93,8 +98,10 @@ class _BuscaPageState extends State<BuscaPage> {
     _resultados.reiniciar();
     _total = null;
     final termo = _campo.text;
-    if (termo.trim().isEmpty) return setState(() => _patrocinados = []);
+    if (termo.trim().isEmpty) setState(() => _patrocinados = []);
+    if (termo.trim().isEmpty && _categorias.isEmpty) return;
     _resultados.proxima(_atualizar);
+    if (termo.trim().isEmpty) return;
     anunciosDaBusca(termo).then((a) {
       if (mounted && termo == _campo.text) setState(() => _patrocinados = a);
     }, onError: (_) {});
@@ -165,7 +172,7 @@ class _BuscaPageState extends State<BuscaPage> {
 
   @override
   Widget build(BuildContext context) {
-    final buscou = _campo.text.trim().isNotEmpty;
+    final buscou = _campo.text.trim().isNotEmpty || _categorias.isNotEmpty;
     final baratas = maisBaratas(_resultados.itens); // entre as já carregadas
     return Column(children: [
       Container(
@@ -185,12 +192,22 @@ class _BuscaPageState extends State<BuscaPage> {
           ),
         ),
       ),
+      // categorias logo abaixo da barra: dá para buscar escolhendo uma (ou mais) em vez de digitar
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+        child: FiltroCategoria(
+            marcadas: _categorias,
+            onMudar: (cats) {
+              setState(() => _categorias = cats);
+              _buscar();
+            }),
+      ),
       Expanded(
         child: !buscou
             ? const Center(
                 child: Padding(
                 padding: EdgeInsets.all(24),
-                child: Text('Digite o produto que você procura.\nMostramos só ofertas que valem hoje.',
+                child: Text('Digite o produto ou escolha uma categoria.\nMostramos só ofertas que valem hoje.',
                     textAlign: TextAlign.center, style: TextStyle(height: 1.4)),
               ))
             : CustomScrollView(slivers: [
