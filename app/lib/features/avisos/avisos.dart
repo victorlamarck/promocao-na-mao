@@ -44,7 +44,6 @@ class TipoAviso {
 }
 
 final avisoMercado = TipoAviso._('avisos_mercados', 'ofertas-');
-// shortcut: desligar só pela tela de uma oferta do produto; uma lista "meus avisos" quando alguém pedir.
 final avisoProduto = TipoAviso._('avisos_produtos', 'produto-');
 
 /// iPhone: o FCM recusa assinar tópico ("apns-token-not-set") antes de a Apple entregar o token do aparelho,

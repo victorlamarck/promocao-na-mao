@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/avisos/meus_avisos_page.dart';
 import '../features/busca/busca_page.dart';
 import '../features/inicio/inicio_page.dart';
 import '../features/lista/lista.dart';
@@ -40,6 +41,7 @@ final rotas = GoRouter(
   // volta à aba de onde saíram, do jeito que ela estava. Por link abrem sozinhos, com o botão Início.
   GoRoute(path: '/mercado/:slug', builder: (_, s) => MercadoPage(slug: s.pathParameters['slug']!)),
   GoRoute(path: '/oferta/:id', builder: (_, s) => OfertaPage(id: int.tryParse(s.pathParameters['id']!) ?? 0, oferta: s.extra as Oferta?)),
+  GoRoute(path: '/avisos', builder: (_, _) => const MeusAvisosPage()),
   GoRoute(path: '/l/:codigo', builder: (_, s) => ListaRecebidaPage(codigo: s.pathParameters['codigo']!)),
 ]);
 

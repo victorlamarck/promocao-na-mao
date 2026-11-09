@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/formato.dart';
 import '../../core/tema.dart';
 import '../../core/widgets.dart';
+import '../avisos/avisos.dart';
 import 'lista.dart';
 
 /// Quanto dá a compra num mercado: preço × quantidade dos itens com preço; com clube usa o preço de clube
@@ -117,6 +118,8 @@ class _Item extends StatelessWidget {
             if (!item.pego) SeloValidade(item.validadeFim),
           ]),
         ),
+        // Sino do produto (o mesmo da tela da oferta); some depois de pego, para não apertar a linha à toa.
+        if (item.produtoCodigo != null && !item.pego) BotaoAviso.produto(codigo: item.produtoCodigo!, nome: item.texto),
         if (lista.podeEditar)
           Contador(quantidade: item.quantidade, nome: item.texto, onMudar: (q) => tentarNaLista(context, () => lista.mudarQuantidade(item, q)))
         else

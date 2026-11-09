@@ -20,10 +20,10 @@ repositório **privado `promocao-na-mao-dados`** (clonado ao lado: `../promocao-
 ## API do banco (o contrato com o repositório privado)
 Só leitura pela chave publishable (RLS) e funções `security definer`; nada escreve direto nas tabelas.
 - Views: `oferta_lista` (uma linha por oferta vigente; `itens[]` com `produto_id`, `produto_codigo` e `produto_foto`, migration 20; `foto` = caminho da foto do produto no R2, `https://fotos.promocaonamao.com.br/<foto>`, migration 22; `categoria` = categoria principal do produto, ícone quando não há foto, migration 23), `oferta_inicio` (as mesmas linhas + `ordem`: rodízio entre mercados na Início, migration 21), `rede_com_ofertas` (mercados com ofertas hoje; `atualizado_em`
-  = última importação), `anuncio_vigente`; tabela `loja` (lat/lng).
+  = última importação), `anuncio_vigente`; tabelas `loja` (lat/lng), `produto` e `rede` (nomes na tela "Meus avisos").
 - Funções: `buscar_ofertas(termo)`, `anuncios_da_busca(termo)`, `secoes_da_rede(slug)`,
   `comparar_oferta(oferta_id)` (`{mesmo, similares}`, linhas da `oferta_lista` + `preco_comparado`/`unidade_comparada`), `lista_criar`, `lista_ler`,
-  `lista_adicionar`, `lista_quantidade`, `lista_marcar`, `lista_nomear`, `lista_esvaziar`, `lista_apagar`, `lista_comparar` (total da lista em cada mercado, migration 24), `enviar_sugestao(tipo, texto, contato, versao, plataforma)`. Tempo real: canal `lista-<id>`.
+  `lista_adicionar`, `lista_quantidade`, `lista_marcar`, `lista_nomear`, `lista_esvaziar`, `lista_apagar`, `lista_comparar` (total da lista em cada mercado, migration 24), `lista_ler` com `produto_codigo` nos itens (migration 25), `enviar_sugestao(tipo, texto, contato, versao, plataforma)`. Tempo real: canal `lista-<id>`.
 - Mudança na API: primeiro o PR com a migration no repositório privado, depois o PR aqui.
 - Regras: "hoje" no fuso America/Sao_Paulo; ofertas vencidas são apagadas do banco todo dia.
 

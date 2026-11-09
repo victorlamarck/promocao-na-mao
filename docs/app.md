@@ -364,7 +364,12 @@ abre `data.rota`. Ícone: `res/drawable/ic_notificacao.xml` (etiqueta branca), c
 produto do catálogo que vem em `itens[].produto_codigo` (`Oferta.produtoCodigo`; sem sino se a oferta não tem
 produto ou se as alternativas são produtos diferentes). Depois do catálogo, `avisar.mjs --produtos` manda
 "<produto> em oferta — R$ X no <mercado>, até dd/mm", abrindo `/oferta/<id>`; o mesmo produto no máximo a cada
-7 dias. Os produtos ligados ficam no aparelho (`avisos_produtos`); desligar é pelo sino de uma oferta do produto.
+7 dias. Os produtos ligados ficam no aparelho (`avisos_produtos`). O mesmo sino aparece em cada item da lista que veio
+de oferta com produto (`ItemLista.produtoCodigo`, `lista_ler` da migration 25; some depois de pego).
+
+**Meus avisos** (`/avisos`, sino no topo da Início; `features/avisos/meus_avisos_page.dart`): os produtos e mercados
+ligados neste aparelho, com os nomes lidos das tabelas `produto` e `rede`; o sino de cada linha desliga (a linha fica
+até sair da tela, para religar). Tocar no produto busca por ele; no mercado, abre o mercado. Só no Android e no iPhone.
 
 **iPhone.** A Apple só entrega notificação pelo serviço dela (APNs); o FCM repassa para lá usando uma **chave
 APNs** do nosso time. No app: `Runner.entitlements` (`aps-environment`) e `UIBackgroundModes` →

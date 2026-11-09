@@ -21,13 +21,17 @@ class ItemLista {
         redeSlug = j['rede_slug'] as String?,
         preco = (j['preco'] as num?)?.toDouble(),
         precoClube = (j['preco_clube'] as num?)?.toDouble(),
-        validadeFim = j['validade_fim'] == null ? null : DateTime.parse(j['validade_fim'] as String);
+        validadeFim = j['validade_fim'] == null ? null : DateTime.parse(j['validade_fim'] as String),
+        produtoCodigo = j['produto_codigo'] as String?;
 
   final int id, quantidade;
   final String texto;
   final bool pego;
   final int? ofertaId, redeId;
   final String? redeNome, redeSlug;
+
+  /// Código do produto do catálogo (migration 25 do privado), para o sino "avisar quando entrar em oferta".
+  final String? produtoCodigo;
   final double? preco, precoClube;
   final DateTime? validadeFim;
 }
