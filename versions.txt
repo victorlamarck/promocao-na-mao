@@ -1,3 +1,10 @@
+v 0.8.1
+
+- Botão Adicionar embaixo do preço, mais fácil de tocar
+- Na oferta, veja quanto dá o item na sua lista
+- App mais leve ao mexer na lista
+_______________________________________________________________________________________________________________________
+
 v 0.8.0
 
 - Fotos dos produtos nas ofertas

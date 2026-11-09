@@ -81,31 +81,87 @@ Future<bool> tentarNaLista(BuildContext context, Future<void> Function() acao) a
   }
 }
 
+/// Redesenha só quando o pedaço da lista que interessa a este widget muda ([ler] devolve um valor comparável com ==,
+/// ex. um record). A lista avisa a cada carga (e duas vezes por mudança): com ListenableBuilder, cada card da tela
+/// se redesenhava a cada "+" em qualquer outro.
+class DaLista<T> extends StatefulWidget {
+  const DaLista({super.key, required this.ler, required this.builder, this.lista});
+  final T Function(Lista lista) ler;
+  final Widget Function(BuildContext context, T valor) builder;
+
+  /// Padrão: [Lista.minha].
+  final Lista? lista;
+
+  @override
+  State<DaLista<T>> createState() => _DaListaState<T>();
+}
+
+class _DaListaState<T> extends State<DaLista<T>> {
+  Lista get _lista => widget.lista ?? Lista.minha;
+  late T _valor = widget.ler(_lista);
+
+  @override
+  void initState() {
+    super.initState();
+    _lista.addListener(_mudou);
+  }
+
+  @override
+  void didUpdateWidget(DaLista<T> antes) {
+    super.didUpdateWidget(antes);
+    final lista = antes.lista ?? Lista.minha;
+    if (lista != _lista) {
+      lista.removeListener(_mudou);
+      _lista.addListener(_mudou);
+    }
+    _valor = widget.ler(_lista);
+  }
+
+  void _mudou() {
+    final v = widget.ler(_lista);
+    if (v != _valor) setState(() => _valor = v);
+  }
+
+  @override
+  void dispose() {
+    _lista.removeListener(_mudou);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _valor);
+}
+
 /// "− 2 +" (rótulos para leitor de tela: "Mais um café"). Vai até 999, o limite do banco.
 class Contador extends StatelessWidget {
-  const Contador({super.key, required this.quantidade, required this.nome, required this.onMudar, this.largo = false});
+  const Contador({super.key, required this.quantidade, required this.nome, required this.onMudar, this.altura = 48, this.largo = false});
   final int quantidade;
   final String nome;
   final ValueChanged<int> onMudar;
+  final double altura;
 
-  /// Ocupa a largura toda (como o "Adicionar à lista" que ele substitui), com o "− 2 +" no meio.
+  /// Ocupa a largura toda (no lugar do "Adicionar"): "−" num canto, a quantidade no meio, "+" no outro.
   final bool largo;
 
   @override
   Widget build(BuildContext context) {
     final c = context.cores;
     return Container(
-      height: largo ? 52 : 48, // 48: área de toque mínima do Android
-      alignment: largo ? Alignment.center : null,
-      decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(largo ? 26 : 24)),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
+      height: altura,
+      decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(altura / 2)),
+      child: Row(mainAxisSize: largo ? MainAxisSize.max : MainAxisSize.min, children: [
         IconButton(
+          constraints: BoxConstraints.tight(Size.square(altura)), // no card estreito, o padrão de 48 estourava
           tooltip: quantidade == 1 ? 'Tirar $nome da lista' : 'Menos um $nome',
           onPressed: () => onMudar(quantidade - 1),
           icon: Icon(quantidade == 1 ? Icons.delete_outline : Icons.remove, color: c.onPrimary, size: 20),
         ),
-        Text('$quantidade', style: TextStyle(color: c.onPrimary, fontWeight: FontWeight.w800, fontSize: 15)),
+        if (largo) const Spacer(),
+        Text('$quantidade',
+            style: TextStyle(color: c.onPrimary, fontWeight: FontWeight.w800, fontSize: 15)),
+        if (largo) const Spacer(),
         IconButton(
+          constraints: BoxConstraints.tight(Size.square(altura)),
           tooltip: 'Mais um $nome',
           onPressed: quantidade >= 999 ? null : () => onMudar(quantidade + 1),
           icon: Icon(Icons.add, color: c.onPrimary, size: 20),
@@ -115,54 +171,73 @@ class Contador extends StatelessWidget {
   }
 }
 
-/// "Adicionar" que vira contador quando a oferta já está na lista.
+/// "Adicionar" da largura toda, que vira o contador quando a oferta já está na lista. Só ele se redesenha quando
+/// a quantidade desta oferta muda ([DaLista]). [altura] 44 no card; 52 fixo embaixo na tela da oferta, onde,
+/// já na lista, vira "Na sua lista" com a conta e o contador compacto.
 class BotaoAdicionar extends StatelessWidget {
-  const BotaoAdicionar(this.oferta, {super.key, this.largo = false, this.compacto = false});
+  const BotaoAdicionar(this.oferta, {super.key, this.altura = 44});
   final Oferta oferta;
-  final bool largo;
-
-  /// Só o "+" redondo (sobre a foto do card); na lista, o mesmo contador "− 2 +".
-  final bool compacto;
+  final double altura;
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: Lista.minha,
-        builder: (context, _) {
-          final item = Lista.minha.itemDaOferta(oferta.id);
-          if (item != null) {
-            return Contador(
-              quantidade: item.quantidade,
+  Widget build(BuildContext context) => DaLista(
+        ler: (l) => l.itemDaOferta(oferta.id)?.quantidade,
+        builder: (context, quantidade) {
+          if (quantidade != null) {
+            final grande = altura > 48;
+            final contador = Contador(
+              quantidade: quantidade,
               nome: oferta.nome,
-              largo: largo,
+              altura: grande ? 48 : altura,
+              largo: !grande,
               onMudar: (q) async {
+                final item = Lista.minha.itemDaOferta(oferta.id);
+                if (item == null) return;
                 if (await tentarNaLista(context, () => Lista.minha.mudarQuantidade(item, q)) && q == 0 && context.mounted) {
                   avisar(context, 'Tirado da lista', verLista: false);
                 }
               },
             );
-          }
-          Future<void> adicionar() async {
-            try {
-              await Lista.minha.adicionar(oferta);
-              if (context.mounted) avisar(context, 'Adicionado no ${oferta.redeNome}');
-            } catch (_) {
-              if (context.mounted) avisar(context, 'Não deu para adicionar agora. Tenta de novo?', verLista: false);
-            }
-          }
-
-          if (compacto) {
-            return Material(
-              shape: const CircleBorder(),
-              elevation: 2,
-              color: Colors.transparent,
-              child: IconButton.filled(tooltip: 'Adicionar', onPressed: adicionar, icon: const Icon(Icons.add, semanticLabel: 'Adicionar')),
+            if (!grande) return contador;
+            // tela da oferta: "Na sua lista" e a conta à esquerda, o contador compacto à direita
+            final c = context.cores;
+            final preco = oferta.preco;
+            return Container(
+              height: altura,
+              padding: const EdgeInsets.only(left: 16, right: 2),
+              decoration: BoxDecoration(
+                  color: c.surfaceContainerHigh, borderRadius: BorderRadius.circular(altura / 2), border: Border.all(color: c.outlineVariant)),
+              child: Row(spacing: 12, children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text('Na sua lista', style: TextStyle(fontSize: 13, color: c.onSurfaceVariant)),
+                    Text(
+                        preco == null
+                            ? '$quantidade ${quantidade == 1 ? 'unidade' : 'unidades'}'
+                            : quantidade == 1
+                                ? reais(preco)
+                                : '$quantidade × ${reais(preco)} = ${reais(preco * quantidade)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: context.corPreco)),
+                  ]),
+                ),
+                contador,
+              ]),
             );
           }
           return FilledButton.icon(
-            style: FilledButton.styleFrom(minimumSize: Size(largo ? double.infinity : 48, largo ? 52 : 48)),
-            onPressed: adicionar,
+            style: FilledButton.styleFrom(minimumSize: Size(double.infinity, altura), padding: const EdgeInsets.symmetric(horizontal: 12)),
+            onPressed: () async {
+              try {
+                await Lista.minha.adicionar(oferta);
+                if (context.mounted) avisar(context, 'Adicionado no ${oferta.redeNome}');
+              } catch (_) {
+                if (context.mounted) avisar(context, 'Não deu para adicionar agora. Tenta de novo?', verLista: false);
+              }
+            },
             icon: const Icon(Icons.add, size: 20),
-            label: Text(largo ? 'Adicionar à lista' : 'Adicionar'),
+            label: Text(altura > 48 ? 'Adicionar à lista' : 'Adicionar'),
           );
         },
       );
@@ -311,11 +386,10 @@ class CardOferta extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 6, children: [
-            // foto com o logo do mercado no canto e o "+" (ou o contador) por cima, como num app de mercado
-            Stack(clipBehavior: Clip.none, children: [
+            // foto com o logo do mercado no canto
+            Stack(children: [
               FotoOferta(o, altura: 120),
               if (mostrarMercado) Positioned(top: 6, left: 6, child: ExcludeSemantics(child: AvatarMercado(o.redeSlug, tamanho: 26))),
-              Positioned(right: 4, bottom: 4, child: BotaoAdicionar(o, compacto: true)),
             ]),
             Semantics(
               label: rotulo,
@@ -343,6 +417,9 @@ class CardOferta extends StatelessWidget {
                     style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
+            // o botão no pé do card: na grade, os dois cards da linha ficam com ele na mesma altura
+            const Spacer(),
+            BotaoAdicionar(o),
           ]),
         ),
       ),

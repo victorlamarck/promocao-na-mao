@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:promocao_na_mao/core/widgets.dart';
 import 'package:promocao_na_mao/features/lista/grupos.dart';
 import 'package:promocao_na_mao/features/lista/lista.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,5 +56,19 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.pumpAndSettle();
     expect(lista.erro, isTrue);
+  });
+
+  testWidgets('DaLista: só redesenha quando o valor escolhido muda', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final lista = Lista.recebida('codigo-de-teste'); // sem Supabase: cai no "sem internet"
+    var quantidade = 0, erro = 0;
+    await tester.pumpWidget(Column(children: [
+      DaLista(lista: lista, ler: (l) => l.quantidadeTotal, builder: (_, _) => SizedBox(height: (++quantidade).toDouble())),
+      DaLista(lista: lista, ler: (l) => l.erro, builder: (_, _) => SizedBox(height: (++erro).toDouble())),
+    ]));
+    lista.carregar(); // avisa duas vezes (carregando, depois o erro); a quantidade continua 0
+    await tester.pumpAndSettle();
+    expect(quantidade, 1);
+    expect(erro, 2);
   });
 }
