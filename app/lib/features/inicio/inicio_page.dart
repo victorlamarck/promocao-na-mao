@@ -9,6 +9,7 @@ import '../../core/modelos.dart';
 import '../../core/paginador.dart';
 import '../../core/tema.dart';
 import '../../core/widgets.dart';
+import '../avisos/avisos.dart';
 import '../anuncios/anuncios.dart';
 import '../anuncios/espaco_anuncio.dart';
 import '../busca/busca_page.dart';
@@ -94,6 +95,8 @@ class _Cabecalho extends StatelessWidget {
           ),
         ]),
       ),
+      if (avisosDisponiveis)
+        IconButton(tooltip: 'Meus avisos', onPressed: () => context.push('/avisos'), icon: const Icon(Icons.notifications_none)),
       IconButton(tooltip: 'Sugestão ou problema no app', onPressed: () => faleComAGente(context), icon: const Icon(Icons.feedback_outlined)),
       IconButton(tooltip: 'Cor e tema do app', onPressed: () => _escolherCor(context), icon: const Icon(Icons.palette_outlined)),
     ]);

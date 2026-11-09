@@ -72,6 +72,7 @@ class _ListaRecebidaPageState extends State<ListaRecebidaPage> {
                             : 'Você pode ver a lista; só quem mandou altera.',
                         style: TextStyle(fontSize: 13, color: c.onSurfaceVariant)),
                     const SizedBox(height: 12),
+                    ComparacaoDaLista(l),
                     GruposDaLista(l, semMercado: 'Onde preferir'),
                   ]),
                 ),

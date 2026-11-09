@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/avisos/meus_avisos_page.dart';
 import '../features/busca/busca_page.dart';
 import '../features/inicio/inicio_page.dart';
 import '../features/lista/lista.dart';
@@ -40,6 +43,7 @@ final rotas = GoRouter(
   // volta à aba de onde saíram, do jeito que ela estava. Por link abrem sozinhos, com o botão Início.
   GoRoute(path: '/mercado/:slug', builder: (_, s) => MercadoPage(slug: s.pathParameters['slug']!)),
   GoRoute(path: '/oferta/:id', builder: (_, s) => OfertaPage(id: int.tryParse(s.pathParameters['id']!) ?? 0, oferta: s.extra as Oferta?)),
+  GoRoute(path: '/avisos', builder: (_, _) => const MeusAvisosPage()),
   GoRoute(path: '/l/:codigo', builder: (_, s) => ListaRecebidaPage(codigo: s.pathParameters['codigo']!)),
 ]);
 
@@ -48,8 +52,32 @@ class _ComAbas extends StatelessWidget {
   const _ComAbas(this.abas);
   final StatefulNavigationShell abas;
 
+  /// Voltar do Android nas abas (pedido do dev, 09/11/2026): fora da Início, vai para a Início; na Início, pergunta
+  /// antes de fechar o app. As telas abertas por cima (oferta, mercado...) voltam normal: estão em outra rota.
+  /// No web o voltar é do navegador e não muda.
+  Future<void> _voltar(BuildContext context) async {
+    if (abas.currentIndex != 0) return abas.goBranch(0);
+    final sair = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Sair do app?'),
+        content: const Text('Você realmente quer sair do app?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('Sair')),
+        ],
+      ),
+    );
+    if (sair == true) await SystemNavigator.pop();
+  }
+
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => PopScope(
+      canPop: kIsWeb,
+      onPopInvokedWithResult: (saiu, _) {
+        if (!saiu) _voltar(context);
+      },
+      child: Scaffold(
         body: abas,
         bottomNavigationBar: DaLista(
           ler: (l) => l.quantidadeTotal,
@@ -72,5 +100,5 @@ class _ComAbas extends StatelessWidget {
             );
           },
         ),
-      );
+      ));
 }

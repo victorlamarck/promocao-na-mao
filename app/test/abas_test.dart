@@ -47,4 +47,24 @@ void main() {
     expect(find.text('arroz'), findsOneWidget);
     expect(BuscaPage.foco.hasFocus, isTrue);
   });
+
+  testWidgets('voltar do Android: outra aba vai para a Início; na Início pergunta antes de sair', (t) async {
+    await t.pumpWidget(MaterialApp.router(routerConfig: rotas));
+    await t.pump();
+    await t.tap(find.text('Mercados'));
+    await t.pumpAndSettle();
+
+    await t.binding.handlePopRoute(); // o botão voltar
+    await t.pumpAndSettle();
+    expect(rotas.state.uri.path, '/');
+    expect(find.text('Você realmente quer sair do app?'), findsNothing);
+
+    await t.binding.handlePopRoute();
+    await t.pumpAndSettle();
+    expect(find.text('Você realmente quer sair do app?'), findsOneWidget);
+    await t.tap(find.text('Cancelar'));
+    await t.pumpAndSettle();
+    expect(find.text('Você realmente quer sair do app?'), findsNothing);
+    expect(rotas.state.uri.path, '/');
+  });
 }
