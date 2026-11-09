@@ -44,24 +44,30 @@ class _ListaPageState extends State<ListaPage> {
   }
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: Lista.minha,
-        builder: (context, _) {
-          final l = Lista.minha;
-          final n = l.quantidadeTotal;
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Minha lista'),
-              actions: [
-                if (n > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilledButton.tonalIcon(
-                        onPressed: () => compartilhar(context), icon: const Icon(Icons.share_outlined), label: const Text('Compartilhar')),
-                  ),
-              ],
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Minha lista'),
+          actions: [
+            DaLista(
+              ler: (l) => l.quantidadeTotal > 0,
+              builder: (context, temItens) => !temItens
+                  ? const SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilledButton.tonalIcon(
+                          onPressed: () => compartilhar(context), icon: const Icon(Icons.share_outlined), label: const Text('Compartilhar')),
+                    ),
             ),
-            body: RefreshIndicator(
+          ],
+        ),
+        // Redesenha quando chega uma lista nova (itens é trocada a cada carga) ou muda o estado da carga; não no
+        // "carregando" que vem antes de cada mudança.
+        body: DaLista(
+          ler: (l) => (l.itens, l.carregando && l.itens.isEmpty, l.erro, l.salva, l.nomeDono),
+          builder: (context, _) {
+            final l = Lista.minha;
+            final n = l.quantidadeTotal;
+            return RefreshIndicator(
               onRefresh: l.carregar,
               child: ListView(padding: const EdgeInsets.fromLTRB(16, 0, 16, 24), children: [
                 if (n == 0 && l.carregando)
@@ -98,9 +104,9 @@ class _ListaPageState extends State<ListaPage> {
                 ],
                 if (l.erro) Erro(onTentar: l.carregar, texto: 'Não conseguimos carregar a lista.'),
               ]),
-            ),
-          );
-        },
+            );
+          },
+        ),
       );
 
   Future<void> _esvaziar(BuildContext context) async {
