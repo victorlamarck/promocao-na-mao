@@ -1,2 +1,4 @@
-- Preparação para o app de iPhone
+- Fotos dos produtos nas ofertas
+- Tela inicial nova, com filtro por categoria
+- Busque escolhendo a categoria, sem digitar
 - Pequenos ajustes e melhorias de estabilidade
