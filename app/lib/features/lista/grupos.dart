@@ -129,6 +129,61 @@ class _Item extends StatelessWidget {
   }
 }
 
+/// "Quanto a lista sai em cada mercado": só com 2 mercados ou mais para comparar. O selo "Mais barato" vai para o
+/// 1º da ordem do banco (mais itens encontrados, depois menor total) só se ele achou todos os itens comparáveis:
+/// mercado que tem menos coisa não ganha selo por ficar mais barato.
+class ComparacaoDaLista extends StatelessWidget {
+  const ComparacaoDaLista(this.lista, {super.key});
+  final Lista lista;
+
+  @override
+  Widget build(BuildContext context) {
+    final m = lista.comparacao;
+    if (m.length < 2) return const SizedBox.shrink();
+    final c = context.cores;
+    final n = m.first.itens;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: Text('Quanto a lista sai em cada mercado', style: fredoka(18)),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
+            child: Text(
+                'Pelo menor preço de hoje de ${n == 1 ? 'cada produto' : 'cada um dos $n produtos'} da lista que achamos em outros encartes.',
+                style: TextStyle(fontSize: 13, color: c.onSurfaceVariant)),
+          ),
+          for (final (i, r) in m.indexed)
+            ListTile(
+              dense: true,
+              leading: AvatarMercado(r.redeSlug, tamanho: 36),
+              title: Row(spacing: 6, children: [
+                Flexible(child: Text(r.redeNome, style: const TextStyle(fontWeight: FontWeight.w700))),
+                if (i == 0 && r.encontrados == r.itens)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(color: c.primaryContainer, borderRadius: BorderRadius.circular(6)),
+                    child: Text('Mais barato',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.onPrimaryContainer)),
+                  ),
+              ]),
+              subtitle: Text(r.encontrados == r.itens ? 'Todos os itens' : '${r.encontrados} de ${r.itens} itens'),
+              trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text(reais(r.total), style: TextStyle(fontWeight: FontWeight.w800, color: context.corPreco)),
+                if (r.totalClube != null && r.totalClube! < r.total)
+                  Text('${reais(r.totalClube!)} com ${Mercado.de(r.redeSlug).clube ?? 'clube'}', style: const TextStyle(fontSize: 12)),
+              ]),
+            ),
+        ]),
+      ),
+    );
+  }
+}
+
 /// "Sem internet": a lista na tela é a última salva no aparelho; marcar volta quando a conexão voltar.
 class AvisoListaSalva extends StatelessWidget {
   const AvisoListaSalva(this.lista, {super.key});

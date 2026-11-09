@@ -169,6 +169,9 @@ build local = "dev") e a plataforma. Está na política de privacidade do site.
   unidade (`maisBaratas` em `core/modelos.dart`; precisa de 2 ou mais).
 - **Lista:** cada mercado mostra o total da compra (preço × quantidade) e, se tiver, o total com o clube
   (`totalDoMercado` em `features/lista/grupos.dart`). Anotados à mão (sem preço) ficam fora.
+  Acima dos grupos, "Quanto a lista sai em cada mercado" (`ComparacaoDaLista`, `lista_comparar` da migration 24 do
+  privado): a oferta mais barata de hoje do mesmo produto em cada mercado × a quantidade, "8 de 10 itens" quando falta
+  algum; selo "Mais barato" só para quem tem todos. Aparece com 2 mercados ou mais; sem internet, não aparece.
 
 ## Sem internet (sinal ruim no mercado)
 
@@ -398,5 +401,4 @@ Fredoka 600 e Nunito 400/600/700/800 ficam **dentro do app** (`assets/fontes/`, 
 - Digital da chave de **publicação** no `ANDROID_SHA256` do prod, quando o app for para a Play Store.
 
 - Recorte da imagem do encarte (a extração ainda não marca a posição da etiqueta).
-- Comparação na lista: quanto a lista custaria em cada mercado (a tela da oferta e a busca já comparam).
 - AdSense testado de verdade (precisa da conta aprovada); AdMob no celular.
