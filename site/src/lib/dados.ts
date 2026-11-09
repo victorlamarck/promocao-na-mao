@@ -7,7 +7,7 @@ export interface Rede { id: number; nome: string; slug: string; ofertas: number;
 export interface Loja { rede_id: number; nome: string | null; lat: number | null; lng: number | null }
 export interface Anuncio { id: number; formato: string; titulo: string; texto: string | null; imagem_url: string | null; link_url: string | null; rede_id: number | null }
 
-const colunas = 'id,texto_original,preco,preco_de,preco_clube,condicao,secao,validade_fim,rede_id,rede_nome,rede_slug,itens,preco_referencia,unidade_referencia';
+const colunas = 'id,texto_original,preco,preco_de,preco_clube,condicao,secao,validade_fim,rede_id,rede_nome,rede_slug,itens,preco_referencia,unidade_referencia,foto';
 
 let cache: Promise<{ ofertas: Oferta[]; redes: Rede[]; lojas: Loja[]; anuncios: Anuncio[]; inicio: number[] }> | undefined;
 

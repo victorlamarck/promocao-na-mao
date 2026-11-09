@@ -142,6 +142,10 @@ class _Detalhe extends StatelessWidget {
         AvatarMercado(o.redeSlug, tamanho: 12),
         Expanded(child: Text('${o.redeNome} · ${valeAte(o.validadeFim).toLowerCase()}', style: secundario)),
       ]),
+      if (o.fotoUrl != null) ...[
+        const SizedBox(height: 12),
+        Center(child: FotoProduto(o.fotoUrl, tamanho: 200)),
+      ],
       const SizedBox(height: 8),
       Text(o.nome, style: fredoka(24)),
       const SizedBox(height: 6),
