@@ -135,7 +135,8 @@ class _Detalhe extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.cores;
     final clube = Mercado.de(o.redeSlug).clube ?? 'clube';
-    final porKg = porUnidade(o.precoReferencia, o.unidadeReferencia, preco: o.preco);
+    // o banco calcula o R$/kg pelo preço mais baixo (o do clube, quando há): ele vai junto desse preço
+    final porKg = porUnidade(o.precoReferencia, o.unidadeReferencia, preco: o.precoClube ?? o.preco);
     final secundario = TextStyle(fontSize: 13, color: c.onSurfaceVariant);
     return ListView(padding: const EdgeInsets.all(16), children: [
       Row(spacing: 8, children: [
@@ -157,7 +158,7 @@ class _Detalhe extends StatelessWidget {
               const Expanded(child: Text('Preço para todos')),
               Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 18 : 32, cor: context.corPreco)),
             ]),
-            if (porKg != null) Align(alignment: Alignment.centerRight, child: Text(porKg, style: secundario)),
+            if (porKg != null && o.precoClube == null) Align(alignment: Alignment.centerRight, child: Text(porKg, style: secundario)),
             if (o.precoDe != null)
               Text.rich(TextSpan(style: secundario, children: [
                 const TextSpan(text: 'Antes '),
@@ -169,6 +170,7 @@ class _Detalhe extends StatelessWidget {
                 Expanded(child: Text('Com cadastro no $clube', style: const TextStyle(fontWeight: FontWeight.w700))),
                 Etiqueta(reais(o.precoClube!)),
               ]),
+              if (porKg != null) Align(alignment: Alignment.centerRight, child: Text(porKg, style: secundario)),
             ],
             if (o.condicao != null) ...[
               const SizedBox(height: 8),
