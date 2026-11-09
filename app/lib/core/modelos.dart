@@ -26,7 +26,8 @@ class Oferta {
         unidadeReferencia = j['unidade_referencia'] as String?,
         precoComparado = _num(j['preco_comparado']),
         unidadeComparada = j['unidade_comparada'] as String?,
-        foto = j['foto'] as String?;
+        foto = j['foto'] as String?,
+        categoria = j['categoria'] as String?;
 
   final int id;
   final String textoOriginal;
@@ -51,6 +52,9 @@ class Oferta {
   /// Caminho da foto do produto no R2 (a do 1º item que tem foto; migration 22 do privado); nulo sem foto.
   final String? foto;
   String? get fotoUrl => foto == null ? null : '$fotosUrl/$foto';
+
+  /// Categoria principal do produto ("Mercearia", "Bebidas"...; migration 23 do privado): ícone quando não há foto.
+  final String? categoria;
 
   /// Código do produto do catálogo (migration 20), para o aviso "produto em oferta"; nulo se a oferta não tem
   /// produto ou se as alternativas ("A ou B") são produtos diferentes.
