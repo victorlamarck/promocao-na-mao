@@ -1,4 +1,3 @@
-- Fotos dos produtos nas ofertas
-- Tela inicial nova, com filtro por categoria
-- Busque escolhendo a categoria, sem digitar
-- Pequenos ajustes e melhorias de estabilidade
+- Botão Adicionar embaixo do preço, mais fácil de tocar
+- Na oferta, veja quanto dá o item na sua lista
+- App mais leve ao mexer na lista

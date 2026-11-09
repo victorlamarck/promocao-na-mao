@@ -18,7 +18,8 @@ import '../sugestao/fale_com_a_gente.dart';
 
 final _db = Supabase.instance.client;
 
-/// Tela 1 do protótipo: busca, Sua lista, anotar item, mercados perto, ofertas de hoje.
+/// Tela 1 do protótipo: busca, Sua lista, mercados perto, ofertas de hoje. Cada parte é um widget que se redesenha
+/// sozinho: a página só guarda os mercados (cabeçalho e fileira) e o puxar para atualizar.
 class InicioPage extends StatefulWidget {
   const InicioPage({super.key});
 
@@ -27,9 +28,116 @@ class InicioPage extends StatefulWidget {
 }
 
 class _InicioPageState extends State<InicioPage> {
+  late var _mercados = mercadosOrdenados();
+  final _ofertas = GlobalKey<_OfertasDeHojeState>();
+
+  Future<void> _recarregar() async {
+    setState(() => _mercados = mercadosOrdenados());
+    await _ofertas.currentState?.recarregar();
+  }
+
+  @override
+  Widget build(BuildContext context) => RefreshIndicator(
+        onRefresh: _recarregar,
+        child: CustomScrollView(slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            sliver: SliverList.list(children: [
+              _Cabecalho(_mercados),
+              const SizedBox(height: 12),
+              SearchBar(
+                hintText: 'Buscar: arroz, café, cerveja…',
+                leading: const Icon(Icons.search),
+                elevation: const WidgetStatePropertyAll(0),
+                onTap: () {
+                  context.go('/buscar');
+                  // depois do quadro em que a aba Buscar aparece (escondida, ela não aceita foco)
+                  WidgetsBinding.instance.addPostFrameCallback((_) => BuscaPage.foco.requestFocus());
+                },
+                onSubmitted: (t) => context.go('/buscar?q=${Uri.encodeQueryComponent(t)}'),
+              ),
+              const SizedBox(height: 12),
+              const _SuaLista(),
+              const SizedBox(height: 12),
+              _FileiraMercados(_mercados),
+              const SizedBox(height: 16),
+            ]),
+          ),
+          _OfertasDeHoje(key: _ofertas),
+        ]),
+      );
+}
+
+typedef _Mercados = Future<(List<Rede>, Map<int, double>, int?)>;
+
+/// Nome do app, "atualizado há…" (o encarte mais novo) e os botões de sugestão e de cor.
+class _Cabecalho extends StatelessWidget {
+  const _Cabecalho(this.mercados);
+  final _Mercados mercados;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.cores;
+    return Row(children: [
+      Expanded(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Promoção na Mão', style: fredoka(24, cor: c.primary)),
+          Text('Governador Valadares · ofertas que valem hoje', style: TextStyle(fontSize: 13, color: c.onSurfaceVariant)),
+          FutureBuilder(
+            future: mercados,
+            builder: (context, s) {
+              final datas = s.data?.$1.map((r) => r.atualizadoEm).whereType<DateTime>() ?? const <DateTime>[];
+              if (datas.isEmpty) return const SizedBox.shrink();
+              return Text(atualizado(datas.reduce((a, b) => a.isAfter(b) ? a : b), DateTime.now()),
+                  style: TextStyle(fontSize: 12, color: c.onSurfaceVariant));
+            },
+          ),
+        ]),
+      ),
+      IconButton(tooltip: 'Sugestão ou problema no app', onPressed: () => faleComAGente(context), icon: const Icon(Icons.feedback_outlined)),
+      IconButton(tooltip: 'Cor e tema do app', onPressed: () => _escolherCor(context), icon: const Icon(Icons.palette_outlined)),
+    ]);
+  }
+}
+
+/// Mercados perto, numa fileira que rola de lado, e "Ver todos".
+class _FileiraMercados extends StatelessWidget {
+  const _FileiraMercados(this.mercados);
+  final _Mercados mercados;
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder(
+        future: mercados,
+        builder: (context, s) {
+          if (!s.hasData) return const SizedBox(height: 8);
+          final (redes, distancias, destaque) = s.data!;
+          // Row, não ListView de altura fixa: cresce com a fonte do sistema
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: IntrinsicHeight(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 8, children: [
+                for (final r in redes) _ChipMercado(r, distancia: distancias[r.id], patrocinado: r.id == destaque),
+                ActionChip(label: const Text('Ver todos'), onPressed: () => context.go('/mercados')),
+              ]),
+            ),
+          );
+        },
+      );
+}
+
+/// "Ofertas de hoje": título, filtro por categoria, a grade com anúncios e o "Ver mais". Paginar e filtrar
+/// redesenham só esta parte.
+class _OfertasDeHoje extends StatefulWidget {
+  const _OfertasDeHoje({super.key});
+
+  @override
+  State<_OfertasDeHoje> createState() => _OfertasDeHojeState();
+}
+
+class _OfertasDeHojeState extends State<_OfertasDeHoje> {
   // Rodízio entre os mercados, feito no banco (oferta_inicio, migration 21); `ordem` é única, então a paginação
-  // não repete nem pula.
-  // A primeira página fica salva para abrir sem internet (as vencidas mostram "Encarte venceu").
+  // não repete nem pula. A primeira página fica salva para abrir sem internet (as vencidas mostram "Encarte venceu").
   // Filtro por categorias (coluna categoria, migration 23 do privado); vazio = todas. Só "todas" fica no cache.
   Set<String> _categorias = {};
   late final _ofertas = Paginador<Oferta>((de, ate) async {
@@ -40,20 +148,12 @@ class _InicioPageState extends State<InicioPage> {
     }
     return (await (de == 0 && _categorias.isEmpty ? comCache('inicio', q) : q())).map(Oferta.fromJson).toList();
   });
-  final _anotar = TextEditingController();
-  late var _mercados = mercadosOrdenados();
   List<Anuncio> _anuncios = [];
 
   @override
   void initState() {
     super.initState();
-    _carregar();
-  }
-
-  @override
-  void dispose() {
-    _anotar.dispose();
-    super.dispose();
+    recarregar();
   }
 
   /// A resposta pode chegar depois de a pessoa trocar de aba: setState aí derrubava o app (Crashlytics 0.3.0).
@@ -61,9 +161,8 @@ class _InicioPageState extends State<InicioPage> {
     if (mounted) setState(() {});
   }
 
-  Future<void> _carregar() async {
+  Future<void> recarregar() async {
     _ofertas.reiniciar();
-    setState(() { _mercados = mercadosOrdenados(); });
     await _ofertas.proxima(_atualizar);
     anunciosDoFormato('feed').then((a) => mounted ? setState(() => _anuncios = a) : null, onError: (_) {});
   }
@@ -74,133 +173,30 @@ class _InicioPageState extends State<InicioPage> {
     await _ofertas.proxima(_atualizar);
   }
 
-  /// "Anotar" da faixa da lista: folha com o campo (a Início ficou sem o campo fixo).
-  void _abrirAnotar() {
-    void anotar(BuildContext folha) {
-      Navigator.pop(folha);
-      _anotarItem();
-    }
-
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (folha) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.viewInsetsOf(folha).bottom),
-        child: TextField(
-          controller: _anotar,
-          autofocus: true,
-          maxLength: 120, // limite do banco (lista_item.texto)
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => anotar(folha),
-          decoration: InputDecoration(
-            labelText: 'Anotar item na lista',
-            hintText: 'Ex.: pão francês',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-            suffixIcon: IconButton(tooltip: 'Anotar', onPressed: () => anotar(folha), icon: const Icon(Icons.add)),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _anotarItem() async {
-    final texto = _anotar.text;
-    if (texto.trim().isEmpty) return;
-    _anotar.clear();
-    try {
-      await Lista.minha.anotar(texto);
-      if (mounted) avisar(context, 'Anotado na lista');
-    } catch (_) {
-      if (mounted) avisar(context, 'Não deu para anotar agora. Tenta de novo?', verLista: false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final linhas = emPares(intercalar(_ofertas.itens, _anuncios));
-    final c = context.cores;
-    return RefreshIndicator(
-      onRefresh: _carregar,
-      child: CustomScrollView(slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-          sliver: SliverList.list(children: [
-            Row(children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Promoção na Mão', style: fredoka(24, cor: c.primary)),
-                  Text('Governador Valadares · ofertas que valem hoje', style: TextStyle(fontSize: 13, color: c.onSurfaceVariant)),
-                  FutureBuilder(
-                    future: _mercados,
-                    builder: (context, s) {
-                      final datas = s.data?.$1.map((r) => r.atualizadoEm).whereType<DateTime>() ?? const <DateTime>[];
-                      if (datas.isEmpty) return const SizedBox.shrink();
-                      return Text(atualizado(datas.reduce((a, b) => a.isAfter(b) ? a : b), DateTime.now()),
-                          style: TextStyle(fontSize: 12, color: c.onSurfaceVariant));
-                    },
-                  ),
-                ]),
-              ),
-              IconButton(
-                  tooltip: 'Sugestão ou problema no app', onPressed: () => faleComAGente(context), icon: const Icon(Icons.feedback_outlined)),
-              IconButton(tooltip: 'Cor e tema do app', onPressed: () => _escolherCor(context), icon: const Icon(Icons.palette_outlined)),
-            ]),
-            const SizedBox(height: 12),
-            SearchBar(
-              hintText: 'Buscar: arroz, café, cerveja…',
-              leading: const Icon(Icons.search),
-              elevation: const WidgetStatePropertyAll(0),
-              onTap: () {
-                context.go('/buscar');
-                // depois do quadro em que a aba Buscar aparece (escondida, ela não aceita foco)
-                WidgetsBinding.instance.addPostFrameCallback((_) => BuscaPage.foco.requestFocus());
-              },
-              onSubmitted: (t) => context.go('/buscar?q=${Uri.encodeQueryComponent(t)}'),
-            ),
-            const SizedBox(height: 12),
-            _SuaLista(onAnotar: _abrirAnotar),
-            const SizedBox(height: 12),
-            FutureBuilder(
-              future: _mercados,
-              builder: (context, s) {
-                if (!s.hasData) return const SizedBox(height: 8);
-                final (redes, distancias, destaque) = s.data!;
-                // fileira que rola de lado (Row, não ListView de altura fixa: cresce com a fonte do sistema)
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  clipBehavior: Clip.none,
-                  child: IntrinsicHeight(
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 8, children: [
-                      for (final r in redes) _ChipMercado(r, distancia: distancias[r.id], patrocinado: r.id == destaque),
-                      ActionChip(label: const Text('Ver todos'), onPressed: () => context.go('/mercados')),
-                    ]),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            Text('Ofertas de hoje', style: fredoka(20)),
-            const SizedBox(height: 8),
-            FiltroCategoria(marcadas: _categorias, onMudar: _filtrar),
-            const SizedBox(height: 10),
-          ]),
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverMainAxisGroup(slivers: [
+        SliverList.list(children: [
+          Text('Ofertas de hoje', style: fredoka(20)),
+          const SizedBox(height: 8),
+          FiltroCategoria(marcadas: _categorias, onMudar: _filtrar),
+          const SizedBox(height: 10),
+        ]),
+        SliverList.separated(
+          itemCount: linhas.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
+          itemBuilder: (_, i) => switch (linhas[i]) {
+            List<Oferta> par => ParDeCards([for (final o in par) CardOferta(o)]),
+            EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio),
+            _ => const SizedBox.shrink(),
+          },
         ),
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverList.separated(
-            itemCount: linhas.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => switch (linhas[i]) {
-              List<Oferta> par => ParDeCards([for (final o in par) CardOferta(o)]),
-              EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio),
-              _ => const SizedBox.shrink(),
-            },
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          padding: const EdgeInsets.fromLTRB(0, 8, 0, 24),
+          sliver: SliverToBoxAdapter(
             child: _ofertas.erro
                 ? Erro(onTentar: () => _ofertas.proxima(_atualizar))
                 : _ofertas.fim
@@ -209,7 +205,7 @@ class _InicioPageState extends State<InicioPage> {
                             ? 'Nenhuma oferta de ${_categorias.join(' ou ')} hoje.'
                             : 'Mostramos só ofertas que valem hoje.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: c.onSurfaceVariant))
+                        style: TextStyle(color: context.cores.onSurfaceVariant))
                     : VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(_atualizar)),
           ),
         ),
@@ -219,20 +215,31 @@ class _InicioPageState extends State<InicioPage> {
 }
 
 /// Faixa "Sua lista" de uma linha: quantos itens e em quantos mercados, Compartilhar e Anotar; tocar abre a lista.
+/// Redesenha só quando o número de itens ou de mercados muda.
 class _SuaLista extends StatelessWidget {
-  const _SuaLista({required this.onAnotar});
-  final VoidCallback onAnotar;
+  const _SuaLista();
+
+  Future<void> _anotar(BuildContext context) async {
+    final texto = await showModalBottomSheet<String>(
+        context: context, isScrollControlled: true, showDragHandle: true, builder: (_) => const _FolhaAnotar());
+    if (texto == null || texto.trim().isEmpty || !context.mounted) return;
+    try {
+      await Lista.minha.anotar(texto);
+      if (context.mounted) avisar(context, 'Anotado na lista');
+    } catch (_) {
+      if (context.mounted) avisar(context, 'Não deu para anotar agora. Tenta de novo?', verLista: false);
+    }
+  }
 
   @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: Lista.minha,
-        builder: (context, _) {
-          final l = Lista.minha;
+  Widget build(BuildContext context) => DaLista(
+        ler: (l) => (l.quantidadeTotal, l.mercados),
+        builder: (context, v) {
+          final (n, mercados) = v;
           final c = context.cores;
-          final n = l.quantidadeTotal;
           final resumo = n == 0
               ? 'Sua lista está vazia'
-              : '$n ${n == 1 ? 'item' : 'itens'}${l.mercados > 0 ? ' em ${l.mercados} ${l.mercados == 1 ? 'mercado' : 'mercados'}' : ''}';
+              : '$n ${n == 1 ? 'item' : 'itens'}${mercados > 0 ? ' em $mercados ${mercados == 1 ? 'mercado' : 'mercados'}' : ''}';
           return Material(
             color: c.primary,
             borderRadius: BorderRadius.circular(16),
@@ -252,7 +259,7 @@ class _SuaLista extends StatelessWidget {
                         icon: Icon(Icons.share_outlined, color: c.onPrimary, size: 20)),
                   TextButton.icon(
                       style: TextButton.styleFrom(foregroundColor: c.onPrimary, padding: const EdgeInsets.symmetric(horizontal: 10)),
-                      onPressed: onAnotar,
+                      onPressed: () => _anotar(context),
                       icon: const Icon(Icons.edit_note, size: 20),
                       label: const Text('Anotar')),
                 ]),
@@ -260,6 +267,42 @@ class _SuaLista extends StatelessWidget {
             ),
           );
         },
+      );
+}
+
+/// Folha do "Anotar" (item à mão, sem mercado): devolve o texto ao fechar. Dona do próprio campo.
+class _FolhaAnotar extends StatefulWidget {
+  const _FolhaAnotar();
+
+  @override
+  State<_FolhaAnotar> createState() => _FolhaAnotarState();
+}
+
+class _FolhaAnotarState extends State<_FolhaAnotar> {
+  final _texto = TextEditingController();
+
+  @override
+  void dispose() {
+    _texto.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.viewInsetsOf(context).bottom),
+        child: TextField(
+          controller: _texto,
+          autofocus: true,
+          maxLength: 120, // limite do banco (lista_item.texto)
+          textInputAction: TextInputAction.done,
+          onSubmitted: (t) => Navigator.pop(context, t),
+          decoration: InputDecoration(
+            labelText: 'Anotar item na lista',
+            hintText: 'Ex.: pão francês',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+            suffixIcon: IconButton(tooltip: 'Anotar', onPressed: () => Navigator.pop(context, _texto.text), icon: const Icon(Icons.add)),
+          ),
+        ),
       );
 }
 

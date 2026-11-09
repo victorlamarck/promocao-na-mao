@@ -105,7 +105,7 @@ class _OfertaPageState extends State<OfertaPage> {
       ),
       bottomNavigationBar: o == null
           ? null
-          : SafeArea(child: Padding(padding: const EdgeInsets.all(16), child: BotaoAdicionar(o, largo: true))),
+          : SafeArea(child: Padding(padding: const EdgeInsets.all(16), child: BotaoAdicionar(o, altura: 52))),
       body: switch (o) {
         _ when _venceu => Center(
             child: Column(mainAxisSize: MainAxisSize.min, spacing: 12, children: [

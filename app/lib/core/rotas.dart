@@ -10,6 +10,7 @@ import '../features/mercado/mercado_page.dart';
 import '../features/mercado/mercados_page.dart';
 import '../features/oferta/oferta_page.dart';
 import 'modelos.dart';
+import 'widgets.dart';
 
 // Cada tela tem endereço próprio no web: /oferta/123 e /l/<código> podem ser compartilhados no WhatsApp.
 final rotas = GoRouter(
@@ -50,11 +51,10 @@ class _ComAbas extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: abas,
-        bottomNavigationBar: ListenableBuilder(
-          listenable: Lista.minha,
-          builder: (context, _) {
+        bottomNavigationBar: DaLista(
+          ler: (l) => l.quantidadeTotal,
+          builder: (context, n) {
             // quantos itens tem na lista, no ícone da aba
-            final n = Lista.minha.quantidadeTotal;
             Widget icone(IconData i) => Badge.count(count: n, isLabelVisible: n > 0, child: Icon(i));
             return NavigationBar(
               selectedIndex: abas.currentIndex,
