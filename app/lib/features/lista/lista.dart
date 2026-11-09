@@ -21,15 +21,37 @@ class ItemLista {
         redeSlug = j['rede_slug'] as String?,
         preco = (j['preco'] as num?)?.toDouble(),
         precoClube = (j['preco_clube'] as num?)?.toDouble(),
-        validadeFim = j['validade_fim'] == null ? null : DateTime.parse(j['validade_fim'] as String);
+        validadeFim = j['validade_fim'] == null ? null : DateTime.parse(j['validade_fim'] as String),
+        produtoCodigo = j['produto_codigo'] as String?;
 
   final int id, quantidade;
   final String texto;
   final bool pego;
   final int? ofertaId, redeId;
   final String? redeNome, redeSlug;
+
+  /// Código do produto do catálogo (migration 25 do privado), para o sino "avisar quando entrar em oferta".
+  final String? produtoCodigo;
   final double? preco, precoClube;
   final DateTime? validadeFim;
+}
+
+/// Quanto a lista sai num mercado (`lista_comparar`, migration 24 do privado): a oferta mais barata do mesmo produto
+/// do catálogo, × a quantidade. [encontrados] de [itens]: o mercado pode não ter todos os produtos da lista.
+class ComparacaoMercado {
+  ComparacaoMercado.fromJson(Map<String, dynamic> j)
+      : redeNome = j['rede_nome'] as String,
+        redeSlug = j['rede_slug'] as String?,
+        total = (j['total'] as num).toDouble(),
+        totalClube = (j['total_clube'] as num?)?.toDouble(),
+        encontrados = j['encontrados'] as int,
+        itens = j['itens'] as int;
+
+  final String redeNome;
+  final String? redeSlug;
+  final double total;
+  final double? totalClube;
+  final int encontrados, itens;
 }
 
 /// Lista de compras sem login (migration 9): quem tem o código tem acesso.
@@ -48,6 +70,9 @@ class Lista extends ChangeNotifier {
   Map<String, dynamic>? codigos; // só o dono recebe: {marcar, ver}
   DateTime? atualizadaEm;
   List<ItemLista> itens = [];
+
+  /// Um total por mercado, mais itens e mais barato primeiro; vazia sem internet ou se a comparação falhar.
+  List<ComparacaoMercado> comparacao = [];
   bool carregando = false, erro = false;
 
   /// Sem internet: mostrando a última versão salva no aparelho (marcar e editar ficam para depois).
@@ -79,6 +104,7 @@ class Lista extends ChangeNotifier {
     try {
       final j = await _db.rpc('lista_ler', params: {'codigo': _codigo}) as Map<String, dynamic>;
       _aplicar(j);
+      comparacao = await _comparar();
       erro = salva = false;
       _ouvir();
       await (await SharedPreferences.getInstance()).setString(_chaveSalva, jsonEncode({...j, '_codigo': _codigo}));
@@ -95,6 +121,7 @@ class Lista extends ChangeNotifier {
       final salvo = s == null ? null : jsonDecode(s) as Map<String, dynamic>;
       if (salvo != null && salvo['_codigo'] == _codigo && id == null) {
         _aplicar(salvo);
+        comparacao = [];
         salva = true;
       } else {
         erro = true;
@@ -102,6 +129,16 @@ class Lista extends ChangeNotifier {
     }
     carregando = false;
     notifyListeners();
+  }
+
+  // Como a comparação na tela da oferta: se falhar, a lista aparece sem ela.
+  Future<List<ComparacaoMercado>> _comparar() async {
+    try {
+      final r = await _db.rpc('lista_comparar', params: {'codigo': _codigo}) as List;
+      return r.map((m) => ComparacaoMercado.fromJson(m as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   // Uma vaga para a minha e uma para a última recebida: listas de outras pessoas não se acumulam no aparelho.

@@ -92,6 +92,7 @@ class _ListaPageState extends State<ListaPage> {
                     ),
                   const SizedBox(height: 12),
                   AvisoListaSalva(l),
+                  ComparacaoDaLista(l),
                   GruposDaLista(l),
                   TextButton.icon(
                       onPressed: () => context.go('/'), icon: const Icon(Icons.add), label: const Text('Adicionar mais ofertas')),

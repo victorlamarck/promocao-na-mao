@@ -129,6 +129,9 @@ lib/
 
 ## Rotas (endereços compartilháveis no web)
 
+- **Voltar do Android** nas abas (`_ComAbas` em `core/rotas.dart`): fora da Início vai para a Início; na Início, o diálogo
+  "Você realmente quer sair do app?" antes de fechar. Telas abertas por cima (oferta, mercado, avisos) voltam normal; o web não muda.
+
 `/` Início · `/buscar?q=` · `/mercados` · `/lista` (abas) · `/mercado/<slug>` · `/oferta/<id>` ·
 `/l/<código>` (lista recebida).
 
@@ -169,6 +172,9 @@ build local = "dev") e a plataforma. Está na política de privacidade do site.
   unidade (`maisBaratas` em `core/modelos.dart`; precisa de 2 ou mais).
 - **Lista:** cada mercado mostra o total da compra (preço × quantidade) e, se tiver, o total com o clube
   (`totalDoMercado` em `features/lista/grupos.dart`). Anotados à mão (sem preço) ficam fora.
+  Acima dos grupos, "Quanto a lista sai em cada mercado" (`ComparacaoDaLista`, `lista_comparar` da migration 24 do
+  privado): a oferta mais barata de hoje do mesmo produto em cada mercado × a quantidade, "8 de 10 itens" quando falta
+  algum; selo "Mais barato" só para quem tem todos. Aparece com 2 mercados ou mais; sem internet, não aparece.
 
 ## Sem internet (sinal ruim no mercado)
 
@@ -361,7 +367,12 @@ abre `data.rota`. Ícone: `res/drawable/ic_notificacao.xml` (etiqueta branca), c
 produto do catálogo que vem em `itens[].produto_codigo` (`Oferta.produtoCodigo`; sem sino se a oferta não tem
 produto ou se as alternativas são produtos diferentes). Depois do catálogo, `avisar.mjs --produtos` manda
 "<produto> em oferta — R$ X no <mercado>, até dd/mm", abrindo `/oferta/<id>`; o mesmo produto no máximo a cada
-7 dias. Os produtos ligados ficam no aparelho (`avisos_produtos`); desligar é pelo sino de uma oferta do produto.
+7 dias. Os produtos ligados ficam no aparelho (`avisos_produtos`). O mesmo sino aparece em cada item da lista que veio
+de oferta com produto (`ItemLista.produtoCodigo`, `lista_ler` da migration 25; some depois de pego).
+
+**Meus avisos** (`/avisos`, sino no topo da Início; `features/avisos/meus_avisos_page.dart`): os produtos e mercados
+ligados neste aparelho, com os nomes lidos das tabelas `produto` e `rede`; o sino de cada linha desliga (a linha fica
+até sair da tela, para religar). Tocar no produto busca por ele; no mercado, abre o mercado. Só no Android e no iPhone.
 
 **iPhone.** A Apple só entrega notificação pelo serviço dela (APNs); o FCM repassa para lá usando uma **chave
 APNs** do nosso time. No app: `Runner.entitlements` (`aps-environment`) e `UIBackgroundModes` →
@@ -398,5 +409,4 @@ Fredoka 600 e Nunito 400/600/700/800 ficam **dentro do app** (`assets/fontes/`, 
 - Digital da chave de **publicação** no `ANDROID_SHA256` do prod, quando o app for para a Play Store.
 
 - Recorte da imagem do encarte (a extração ainda não marca a posição da etiqueta).
-- Comparação na lista: quanto a lista custaria em cada mercado (a tela da oferta e a busca já comparam).
 - AdSense testado de verdade (precisa da conta aprovada); AdMob no celular.

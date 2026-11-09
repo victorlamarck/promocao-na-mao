@@ -33,6 +33,23 @@ void main() {
     expect(totalDoMercado([_item(2, 4.5, 4.0), _item(1, 3.0)]), (12.0, 11.0));
   });
 
+  testWidgets('comparação: selo só para quem achou todos os itens; some com 1 mercado', (t) async {
+    ComparacaoMercado m(String nome, double total, int achou) => ComparacaoMercado.fromJson(
+        {'rede_nome': nome, 'rede_slug': null, 'total': total, 'total_clube': null, 'encontrados': achou, 'itens': 3});
+    final lista = Lista.recebida('x')..comparacao = [m('Atacadão', 50, 3), m('Big Mais', 40, 2)];
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: ComparacaoDaLista(lista))));
+    expect(find.text('Mais barato'), findsOneWidget);
+    expect(find.text('Todos os itens'), findsOneWidget);
+    expect(find.text('2 de 3 itens'), findsOneWidget);
+
+    lista.comparacao = [m('Big Mais', 40, 2), m('Atacadão', 50, 1)];
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: ComparacaoDaLista(lista, key: UniqueKey()))));
+    expect(find.text('Mais barato'), findsNothing, reason: 'o 1º não tem todos os itens');
+
+    lista.comparacao = [m('Big Mais', 40, 3)];
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: ComparacaoDaLista(lista, key: UniqueKey()))));
+    expect(find.byType(ListTile), findsNothing);
+  });
 
   // Crashlytics (0.1.0): "setState() or markNeedsBuild() called during build ... dispatching notifications for Lista".
   testWidgets('carregar no initState não avisa no meio do build', (tester) async {
