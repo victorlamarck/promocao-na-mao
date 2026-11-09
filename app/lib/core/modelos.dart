@@ -1,6 +1,8 @@
 // Modelos das views da API (docs/banco.md, "API para o app"). fromJson à mão.
 // Dinheiro chega como número do Postgres (numeric); no app só é exibido, nunca somado.
 
+import 'config.dart';
+
 double? _num(Object? v) => (v as num?)?.toDouble();
 
 class Oferta {
@@ -23,7 +25,8 @@ class Oferta {
         precoReferencia = _num(j['preco_referencia']),
         unidadeReferencia = j['unidade_referencia'] as String?,
         precoComparado = _num(j['preco_comparado']),
-        unidadeComparada = j['unidade_comparada'] as String?;
+        unidadeComparada = j['unidade_comparada'] as String?,
+        foto = j['foto'] as String?;
 
   final int id;
   final String textoOriginal;
@@ -44,6 +47,10 @@ class Oferta {
   final int redeId;
   final String redeNome, redeSlug;
   final List<Map<String, dynamic>> itens;
+
+  /// Caminho da foto do produto no R2 (a do 1º item que tem foto; migration 22 do privado); nulo sem foto.
+  final String? foto;
+  String? get fotoUrl => foto == null ? null : '$fotosUrl/$foto';
 
   /// Código do produto do catálogo (migration 20), para o aviso "produto em oferta"; nulo se a oferta não tem
   /// produto ou se as alternativas ("A ou B") são produtos diferentes.

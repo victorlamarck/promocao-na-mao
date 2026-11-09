@@ -25,6 +25,9 @@ const appUrl = String.fromEnvironment('APP_URL');
 String linkDoSite(String caminho) =>
     '${appUrl.isNotEmpty ? appUrl : kIsWeb ? Uri.base.origin : 'https://promocaonamao-f08a7.web.app'}$caminho';
 
+/// Fotos dos produtos (Cloudflare R2): a API dá só o caminho (`produtos/<codigo>-<hash>.jpg`). Igual no dev e no prod.
+const fotosUrl = String.fromEnvironment('FOTOS_URL', defaultValue: 'https://fotos.promocaonamao.com.br');
+
 /// AdSense: sem estas duas, espaço sem anúncio vendido mostra "Anuncie aqui".
 const adsenseCliente = String.fromEnvironment('ADSENSE_CLIENT'); // ca-pub-...
 const adsenseSlot = String.fromEnvironment('ADSENSE_SLOT');
