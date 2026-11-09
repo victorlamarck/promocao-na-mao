@@ -152,6 +152,8 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   .card-mercado { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--suave); }
   .ponto { width: 8px; height: 8px; flex: none; border-radius: 4px; }
   .card h3 { font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; font-size: 16px; line-height: 20px; min-height: 40px; }
+  .card-foto { align-self: center; width: 100%; height: 96px; object-fit: contain; } /* recorte do encarte, fundo branco como o card */
+  .card-principal .card-foto { height: 200px; }
   .card-principal .card-titulo { font-size: 32px; line-height: 38px; text-wrap: balance; }
   .card-principal .preco { font-size: 32px; line-height: 38px; }
   .card-preco { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }

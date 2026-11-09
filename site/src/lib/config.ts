@@ -12,6 +12,8 @@ export const lojaAndroid: string = env.PUBLIC_PLAY_STORE_URL || '';
 export const lojaIos: string = env.PUBLIC_APP_STORE_URL || '';
 /** Pacote Android do flavor (app/android/app/build.gradle.kts): o link de intent abre este app. */
 export const pacoteAndroid = ehProd ? 'br.com.promocaonamao.app' : 'br.com.promocaonamao.app.dev';
+/** Fotos dos produtos (Cloudflare R2); a API dá só o caminho. Igual no dev e no prod. */
+export const fotosUrl: string = env.PUBLIC_FOTOS_URL || 'https://fotos.promocaonamao.com.br';
 export const contatoAnuncie: string =
   env.PUBLIC_CONTATO_ANUNCIE || (ehProd ? '' : 'https://wa.me/?text=Quero%20anunciar%20no%20Promo%C3%A7%C3%A3o%20na%20M%C3%A3o');
 

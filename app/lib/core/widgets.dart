@@ -173,6 +173,32 @@ class SeloValidade extends StatelessWidget {
   }
 }
 
+/// Foto do produto (recorte do encarte), num quadro claro: as fotos vêm com fundo branco ou do folheto.
+/// Sem foto ou se não carregar, não ocupa espaço. É decorativa: o nome já está no texto do card.
+class FotoProduto extends StatelessWidget {
+  const FotoProduto(this.url, {super.key, required this.tamanho});
+  final String? url;
+  final double tamanho;
+
+  @override
+  Widget build(BuildContext context) {
+    if (url == null) return const SizedBox.shrink();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: ColoredBox(
+        color: Colors.white,
+        child: Image.network(url!,
+            width: tamanho,
+            height: tamanho,
+            fit: BoxFit.contain,
+            excludeFromSemantics: true,
+            cacheWidth: (tamanho * MediaQuery.devicePixelRatioOf(context)).round(),
+            errorBuilder: (_, _, _) => const SizedBox.shrink()),
+      ),
+    );
+  }
+}
+
 /// Card de uma oferta: mercado e validade, nome, preço (o elemento mais forte), clube, "antes", condição, Adicionar.
 class CardOferta extends StatelessWidget {
   const CardOferta(this.oferta, {super.key, this.mostrarPorUnidade = false, this.mostrarMercado = true, this.maisBarato = false});
@@ -226,7 +252,10 @@ class CardOferta extends StatelessWidget {
                   Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
                       cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
                 if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
-                Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, spacing: 10, children: [
+                  FotoProduto(o.fotoUrl, tamanho: 64),
+                  Expanded(child: Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25))),
+                ]),
                 Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, spacing: 8, children: [
                   Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
                   if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),

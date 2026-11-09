@@ -3,6 +3,7 @@
 // pelo data-oferta, assim o card não precisa virar componente interativo.
 import { reais, diaMes, porUnidade, nomeDaOferta, mercado, atacado, condicaoCurta, type Oferta } from '../lib/formato';
 import Vence from './Vence';
+import { fotosUrl } from '../lib/config';
 
 const mais = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>;
 const menos = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg>;
@@ -25,6 +26,8 @@ export default function CardOferta({ o, mostrarMercado = true, principal = false
       {/* nas páginas estáticas, "hoje" é o dia do build (refeito todo dia às 03:05) */}
       <Vence fim={o.validade_fim} />
       {atacado(o) && <span class="etiqueta etiqueta-condicao">Preço de atacado</span>}
+      {/* foto decorativa (alt vazio): o nome vem logo abaixo */}
+      {o.foto && <img class="card-foto" src={`${fotosUrl}/${o.foto}`} alt="" loading="lazy" decoding="async" />}
       {principal ? <h1 class="card-titulo">{nome}</h1> : <h3><a class="card-link" href={`/oferta/${o.id}/`}>{nome}</a></h3>}
       <span class="card-preco">
         <span class="preco" style={o.preco == null ? { fontSize: '16px' } : undefined}>{o.preco == null ? 'Preço no mercado' : reais(o.preco)}</span>

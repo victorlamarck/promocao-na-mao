@@ -15,6 +15,7 @@ export interface Oferta {
   itens: { nome?: string | null; marca?: string | null }[];
   preco_referencia: number | null;
   unidade_referencia: string | null;
+  foto?: string | null; // caminho no R2 (migration 22 do privado): `${fotosUrl}/${foto}`
 }
 
 /** Oferta de folheto de atacado: a condição começa com "preço de atacado" (como o `atacado` do app). */
