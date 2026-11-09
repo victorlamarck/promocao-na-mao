@@ -1,3 +1,10 @@
+v 0.9.0
+
+- Veja quanto sua lista sai em cada mercado
+- Meus avisos: veja e desligue os produtos e mercados que você acompanha
+- Toque no sino de um item da lista para saber quando ele entrar em oferta
+_______________________________________________________________________________________________________________________
+
 v 0.8.1
 
 - Botão Adicionar embaixo do preço, mais fácil de tocar
