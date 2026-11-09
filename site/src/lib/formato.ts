@@ -16,6 +16,7 @@ export interface Oferta {
   preco_referencia: number | null;
   unidade_referencia: string | null;
   foto?: string | null; // caminho no R2 (migration 22 do privado): `${fotosUrl}/${foto}`
+  categoria?: string | null; // categoria principal do produto (migration 23): ícone quando não há foto
 }
 
 /** Oferta de folheto de atacado: a condição começa com "preço de atacado" (como o `atacado` do app). */
@@ -113,3 +114,8 @@ export function intercalar<T, A>(itens: T[], anuncios: A[], n: number): ({ ofert
   });
   return saida;
 }
+
+/** Ícone (emoji) da categoria principal do catálogo, para a oferta sem foto (como o iconeDaCategoria do app). */
+export const iconeDaCategoria = (c?: string | null) =>
+  ({ Mercearia: '🛒', 'Frios e Laticínios': '🧀', Açougue: '🥩', Congelados: '🧊', Hortifruti: '🥬', Padaria: '🥖',
+     Bebidas: '🥤', Limpeza: '🧽', Higiene: '🧴', Pet: '🐾', Casa: '🏠' } as Record<string, string>)[c ?? ''] ?? '🛍️';

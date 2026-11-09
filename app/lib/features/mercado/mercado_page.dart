@@ -62,7 +62,7 @@ class _MercadoPageState extends State<MercadoPage> {
   Widget build(BuildContext context) {
     final r = _rede;
     final clube = Mercado.de(widget.slug).clube;
-    final lista = intercalar(_ofertas.itens, _banners);
+    final linhas = emPares(intercalar(_ofertas.itens, _banners));
     final c = context.cores;
     return Scaffold(
       appBar: AppBar(
@@ -114,11 +114,11 @@ class _MercadoPageState extends State<MercadoPage> {
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverList.builder(
-            itemCount: lista.length,
+            itemCount: linhas.length,
             itemBuilder: (_, i) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: switch (lista[i]) {
-                Oferta o => CardOferta(o, mostrarMercado: false),
+              child: switch (linhas[i]) {
+                List<Oferta> par => ParDeCards([for (final o in par) CardOferta(o, mostrarMercado: false)]),
                 EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio, alturaRede: 90),
                 _ => const SizedBox.shrink(),
               },
