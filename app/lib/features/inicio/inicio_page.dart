@@ -30,9 +30,15 @@ class _InicioPageState extends State<InicioPage> {
   // Rodízio entre os mercados, feito no banco (oferta_inicio, migration 21); `ordem` é única, então a paginação
   // não repete nem pula.
   // A primeira página fica salva para abrir sem internet (as vencidas mostram "Encarte venceu").
-  final _ofertas = Paginador<Oferta>((de, ate) async {
-    Future<List<Map<String, dynamic>>> q() => _db.from('oferta_inicio').select().order('ordem', ascending: true).range(de, ate);
-    return (await (de == 0 ? comCache('inicio', q) : q())).map(Oferta.fromJson).toList();
+  // Filtro por categorias (coluna categoria, migration 23 do privado); vazio = todas. Só "todas" fica no cache.
+  Set<String> _categorias = {};
+  late final _ofertas = Paginador<Oferta>((de, ate) async {
+    Future<List<Map<String, dynamic>>> q() {
+      var f = _db.from('oferta_inicio').select();
+      if (_categorias.isNotEmpty) f = f.inFilter('categoria', _categorias.toList());
+      return f.order('ordem', ascending: true).range(de, ate);
+    }
+    return (await (de == 0 && _categorias.isEmpty ? comCache('inicio', q) : q())).map(Oferta.fromJson).toList();
   });
   final _anotar = TextEditingController();
   late var _mercados = mercadosOrdenados();
@@ -60,6 +66,42 @@ class _InicioPageState extends State<InicioPage> {
     setState(() { _mercados = mercadosOrdenados(); });
     await _ofertas.proxima(_atualizar);
     anunciosDoFormato('feed').then((a) => mounted ? setState(() => _anuncios = a) : null, onError: (_) {});
+  }
+
+  Future<void> _filtrar(Set<String> categorias) async {
+    setState(() => _categorias = categorias);
+    _ofertas.reiniciar();
+    await _ofertas.proxima(_atualizar);
+  }
+
+  /// "Anotar" da faixa da lista: folha com o campo (a Início ficou sem o campo fixo).
+  void _abrirAnotar() {
+    void anotar(BuildContext folha) {
+      Navigator.pop(folha);
+      _anotarItem();
+    }
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (folha) => Padding(
+        padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.viewInsetsOf(folha).bottom),
+        child: TextField(
+          controller: _anotar,
+          autofocus: true,
+          maxLength: 120, // limite do banco (lista_item.texto)
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => anotar(folha),
+          decoration: InputDecoration(
+            labelText: 'Anotar item na lista',
+            hintText: 'Ex.: pão francês',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+            suffixIcon: IconButton(tooltip: 'Anotar', onPressed: () => anotar(folha), icon: const Icon(Icons.add)),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _anotarItem() async {
@@ -116,26 +158,9 @@ class _InicioPageState extends State<InicioPage> {
               },
               onSubmitted: (t) => context.go('/buscar?q=${Uri.encodeQueryComponent(t)}'),
             ),
-            const SizedBox(height: 16),
-            const _SuaLista(),
             const SizedBox(height: 12),
-            TextField(
-              controller: _anotar,
-              maxLength: 120, // limite do banco (lista_item.texto)
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _anotarItem(),
-              decoration: InputDecoration(
-                labelText: 'Anotar item na lista',
-                hintText: 'Ex.: pão francês',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                suffixIcon: IconButton(tooltip: 'Anotar', onPressed: _anotarItem, icon: const Icon(Icons.add)),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(children: [
-              Expanded(child: Text('Mercados perto de você', style: fredoka(20))),
-              TextButton(onPressed: () => context.go('/mercados'), child: const Text('Ver todos')),
-            ]),
+            _SuaLista(onAnotar: _abrirAnotar),
+            const SizedBox(height: 12),
             FutureBuilder(
               future: _mercados,
               builder: (context, s) {
@@ -148,13 +173,16 @@ class _InicioPageState extends State<InicioPage> {
                   child: IntrinsicHeight(
                     child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 8, children: [
                       for (final r in redes) _ChipMercado(r, distancia: distancias[r.id], patrocinado: r.id == destaque),
+                      ActionChip(label: const Text('Ver todos'), onPressed: () => context.go('/mercados')),
                     ]),
                   ),
                 );
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text('Ofertas de hoje', style: fredoka(20)),
+            const SizedBox(height: 8),
+            FiltroCategoria(marcadas: _categorias, onMudar: _filtrar),
             const SizedBox(height: 10),
           ]),
         ),
@@ -176,7 +204,12 @@ class _InicioPageState extends State<InicioPage> {
             child: _ofertas.erro
                 ? Erro(onTentar: () => _ofertas.proxima(_atualizar))
                 : _ofertas.fim
-                    ? Text('Mostramos só ofertas que valem hoje.', textAlign: TextAlign.center, style: TextStyle(color: c.onSurfaceVariant))
+                    ? Text(
+                        _ofertas.itens.isEmpty && _categorias.isNotEmpty
+                            ? 'Nenhuma oferta de ${_categorias.join(' ou ')} hoje.'
+                            : 'Mostramos só ofertas que valem hoje.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: c.onSurfaceVariant))
                     : VerMais(carregando: _ofertas.carregando, onPressed: () => _ofertas.proxima(_atualizar)),
           ),
         ),
@@ -185,9 +218,10 @@ class _InicioPageState extends State<InicioPage> {
   }
 }
 
-/// Card "Sua lista": quantos itens, em quantos mercados, Ver lista e Compartilhar.
+/// Faixa "Sua lista" de uma linha: quantos itens e em quantos mercados, Compartilhar e Anotar; tocar abre a lista.
 class _SuaLista extends StatelessWidget {
-  const _SuaLista();
+  const _SuaLista({required this.onAnotar});
+  final VoidCallback onAnotar;
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -197,27 +231,33 @@ class _SuaLista extends StatelessWidget {
           final c = context.cores;
           final n = l.quantidadeTotal;
           final resumo = n == 0
-              ? 'Sua lista tá vazia. Bora dar uma olhada nas ofertas de hoje?'
+              ? 'Sua lista está vazia'
               : '$n ${n == 1 ? 'item' : 'itens'}${l.mercados > 0 ? ' em ${l.mercados} ${l.mercados == 1 ? 'mercado' : 'mercados'}' : ''}';
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: c.primary, borderRadius: BorderRadius.circular(22)),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 4, children: [
-              Text('Sua lista', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: c.onPrimary.withValues(alpha: 0.85))),
-              Text(resumo, style: n == 0 ? TextStyle(fontSize: 15, color: c.onPrimary) : fredoka(24, cor: c.onPrimary)),
-              if (n > 0) ...[
-                const SizedBox(height: 8),
-                Row(spacing: 8, children: [
-                  FilledButton.tonal(onPressed: () => context.go('/lista'), child: const Text('Ver lista')),
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(foregroundColor: c.onPrimary, side: BorderSide(color: c.onPrimary)),
-                    onPressed: () => context.go('/lista?compartilhar=1'),
-                    icon: const Icon(Icons.share_outlined, size: 18),
-                    label: const Text('Compartilhar'),
-                  ),
+          return Material(
+            color: c.primary,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => context.go('/lista'),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+                child: Row(children: [
+                  Icon(Icons.checklist, color: c.onPrimary, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(child: Text(resumo, style: TextStyle(color: c.onPrimary, fontWeight: FontWeight.w700))),
+                  if (n > 0)
+                    IconButton(
+                        tooltip: 'Compartilhar a lista',
+                        onPressed: () => context.go('/lista?compartilhar=1'),
+                        icon: Icon(Icons.share_outlined, color: c.onPrimary, size: 20)),
+                  TextButton.icon(
+                      style: TextButton.styleFrom(foregroundColor: c.onPrimary, padding: const EdgeInsets.symmetric(horizontal: 10)),
+                      onPressed: onAnotar,
+                      icon: const Icon(Icons.edit_note, size: 20),
+                      label: const Text('Anotar')),
                 ]),
-              ],
-            ]),
+              ),
+            ),
           );
         },
       );
@@ -279,7 +319,7 @@ void _escolherCor(BuildContext context) => showModalBottomSheet<void>(
       ),
     );
 
-/// Mercado na fileira da Início: logo, nome, distância e validade do encarte (o clube fica na aba Mercados).
+/// Mercado na fileira da Início, compacto: logo, nome e distância (o encarte e o clube ficam na aba Mercados).
 class _ChipMercado extends StatelessWidget {
   const _ChipMercado(this.rede, {this.distancia, this.patrocinado = false});
   final Rede rede;
@@ -287,23 +327,28 @@ class _ChipMercado extends StatelessWidget {
   final bool patrocinado;
 
   @override
-  Widget build(BuildContext context) => Card(
-        margin: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => context.push('/mercado/${rede.slug}'),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
-            child: Row(spacing: 10, children: [
-              AvatarMercado(rede.slug, tamanho: 40),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, spacing: 2, children: [
-                Text(rede.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-                Text('${distancia == null ? '' : '${textoDistancia(distancia!)} · '}até ${diaMes(rede.ate)}',
-                    style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
-                if (patrocinado) const SeloAnuncio(texto: 'Patrocinado'),
-              ]),
+  Widget build(BuildContext context) {
+    final c = context.cores;
+    return Material(
+      color: c.surface,
+      shape: StadiumBorder(side: BorderSide(color: c.outlineVariant)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/mercado/${rede.slug}'),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 6, 14, 6),
+          child: Row(spacing: 8, children: [
+            AvatarMercado(rede.slug, tamanho: 28),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(rede.nome, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+              if (patrocinado)
+                Text('Patrocinado', style: TextStyle(fontSize: 11, color: c.onSurfaceVariant))
+              else if (distancia != null)
+                Text(textoDistancia(distancia!), style: TextStyle(fontSize: 11, color: c.onSurfaceVariant)),
             ]),
-          ),
+          ]),
         ),
-      );
+      ),
+    );
+  }
 }
