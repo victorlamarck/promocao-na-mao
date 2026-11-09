@@ -129,6 +129,9 @@ lib/
 
 ## Rotas (endereços compartilháveis no web)
 
+- **Voltar do Android** nas abas (`_ComAbas` em `core/rotas.dart`): fora da Início vai para a Início; na Início, o diálogo
+  "Você realmente quer sair do app?" antes de fechar. Telas abertas por cima (oferta, mercado, avisos) voltam normal; o web não muda.
+
 `/` Início · `/buscar?q=` · `/mercados` · `/lista` (abas) · `/mercado/<slug>` · `/oferta/<id>` ·
 `/l/<código>` (lista recebida).
 
