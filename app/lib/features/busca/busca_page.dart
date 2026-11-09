@@ -223,10 +223,13 @@ class _BuscaPageState extends State<BuscaPage> {
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverList.builder(
-                    itemCount: _resultados.itens.length,
+                    itemCount: (_resultados.itens.length + 1) ~/ 2,
                     itemBuilder: (_, i) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: CardOferta(_resultados.itens[i], mostrarPorUnidade: true, maisBarato: baratas.contains(_resultados.itens[i].id)),
+                      child: ParDeCards([
+                        for (final o in _resultados.itens.skip(i * 2).take(2))
+                          CardOferta(o, mostrarPorUnidade: true, maisBarato: baratas.contains(o.id)),
+                      ]),
                     ),
                   ),
                 ),

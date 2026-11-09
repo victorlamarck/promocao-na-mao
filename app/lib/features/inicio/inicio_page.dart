@@ -76,7 +76,7 @@ class _InicioPageState extends State<InicioPage> {
 
   @override
   Widget build(BuildContext context) {
-    final lista = intercalar(_ofertas.itens, _anuncios);
+    final linhas = emPares(intercalar(_ofertas.itens, _anuncios));
     final c = context.cores;
     return RefreshIndicator(
       onRefresh: _carregar,
@@ -161,10 +161,10 @@ class _InicioPageState extends State<InicioPage> {
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverList.separated(
-            itemCount: lista.length,
+            itemCount: linhas.length,
             separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => switch (lista[i]) {
-              Oferta o => CardOferta(o),
+            itemBuilder: (_, i) => switch (linhas[i]) {
+              List<Oferta> par => ParDeCards([for (final o in par) CardOferta(o)]),
               EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio),
               _ => const SizedBox.shrink(),
             },

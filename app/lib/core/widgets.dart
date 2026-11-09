@@ -173,30 +173,88 @@ class SeloValidade extends StatelessWidget {
   }
 }
 
-/// Foto do produto (recorte do encarte), num quadro claro: as fotos vêm com fundo branco ou do folheto.
-/// Sem foto ou se não carregar, não ocupa espaço. É decorativa: o nome já está no texto do card.
-class FotoProduto extends StatelessWidget {
-  const FotoProduto(this.url, {super.key, required this.tamanho});
-  final String? url;
-  final double tamanho;
+/// Ícone da categoria principal do catálogo (catalogo/categorias.json do privado), para a oferta sem foto.
+IconData iconeDaCategoria(String? categoria) => switch (categoria) {
+      'Mercearia' => Icons.local_grocery_store_outlined,
+      'Frios e Laticínios' => Icons.egg_outlined,
+      'Açougue' => Icons.kebab_dining_outlined,
+      'Congelados' => Icons.ac_unit,
+      'Hortifruti' => Icons.eco_outlined,
+      'Padaria' => Icons.bakery_dining_outlined,
+      'Bebidas' => Icons.local_drink_outlined,
+      'Limpeza' => Icons.cleaning_services_outlined,
+      'Higiene' => Icons.soap_outlined,
+      'Pet' => Icons.pets_outlined,
+      'Casa' => Icons.home_outlined,
+      _ => Icons.shopping_basket_outlined,
+    };
+
+/// Foto do produto (recorte do encarte) num quadro branco da largura do card. Sem foto (ou se não carregar), o
+/// ícone da categoria com "Sem foto", para ninguém achar que é a foto do produto. Decorativa: o nome está no card.
+class FotoOferta extends StatelessWidget {
+  const FotoOferta(this.oferta, {super.key, required this.altura});
+  final Oferta oferta;
+  final double altura;
 
   @override
   Widget build(BuildContext context) {
-    if (url == null) return const SizedBox.shrink();
+    final c = context.cores;
+    final semFoto = ExcludeSemantics(
+      child: ColoredBox(
+        color: c.surfaceContainerHighest,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, spacing: 4, children: [
+          Icon(iconeDaCategoria(oferta.categoria), size: altura * 0.4, color: c.onSurfaceVariant),
+          Text('Sem foto', style: TextStyle(fontSize: 11, color: c.onSurfaceVariant)),
+        ]),
+      ),
+    );
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: ColoredBox(
-        color: Colors.white,
-        child: Image.network(url!,
-            width: tamanho,
-            height: tamanho,
-            fit: BoxFit.contain,
-            excludeFromSemantics: true,
-            cacheWidth: (tamanho * MediaQuery.devicePixelRatioOf(context)).round(),
-            errorBuilder: (_, _, _) => const SizedBox.shrink()),
+      child: SizedBox(
+        height: altura,
+        width: double.infinity,
+        child: oferta.fotoUrl == null
+            ? semFoto
+            : ColoredBox(
+                color: Colors.white,
+                child: Image.network(oferta.fotoUrl!,
+                    fit: BoxFit.contain,
+                    excludeFromSemantics: true,
+                    cacheHeight: (altura * MediaQuery.devicePixelRatioOf(context)).round(),
+                    errorBuilder: (_, _, _) => semFoto),
+              ),
       ),
     );
   }
+}
+
+/// Ofertas em 2 colunas: junta ofertas seguidas em pares (`List<Oferta>`); outro item (anúncio) ocupa a linha toda.
+List<Object> emPares(Iterable<Object> itens) {
+  final linhas = <Object>[];
+  for (final x in itens) {
+    final ultima = linhas.lastOrNull;
+    if (x is Oferta && ultima is List<Oferta> && ultima.length == 1) {
+      ultima.add(x);
+    } else {
+      linhas.add(x is Oferta ? <Oferta>[x] : x);
+    }
+  }
+  return linhas;
+}
+
+/// Uma linha da grade de ofertas: 2 cards da mesma altura (o da direita vazio se a lista for ímpar).
+// shortcut: 2 colunas em qualquer largura; em tablet/web largo, calcular as colunas pela largura.
+class ParDeCards extends StatelessWidget {
+  const ParDeCards(this.cards, {super.key});
+  final List<Widget> cards;
+
+  @override
+  Widget build(BuildContext context) => IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, spacing: 10, children: [
+          Expanded(child: cards[0]),
+          Expanded(child: cards.length > 1 ? cards[1] : const SizedBox.shrink()),
+        ]),
+      );
 }
 
 /// Card de uma oferta: mercado e validade, nome, preço (o elemento mais forte), clube, "antes", condição, Adicionar.
@@ -247,16 +305,15 @@ class CardOferta extends StatelessWidget {
                           style: TextStyle(fontSize: 12, color: c.onSurfaceVariant), overflow: TextOverflow.ellipsis),
                     ),
                   ]),
+                FotoOferta(o, altura: 110),
                 SeloValidade(o.validadeFim),
                 if (maisBarato)
                   Etiqueta('Mais barato ${switch (o.porUnidadeTipo) { 'kg' => 'por kg', 'l' => 'por litro', _ => 'por unidade' }}',
                       cor: c.onSecondaryContainer, fundo: c.secondaryContainer),
                 if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
-                Row(crossAxisAlignment: CrossAxisAlignment.start, spacing: 10, children: [
-                  FotoProduto(o.fotoUrl, tamanho: 64),
-                  Expanded(child: Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25))),
-                ]),
-                Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, spacing: 8, children: [
+                Text(o.nome, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25)),
+                // Wrap: no card estreito da grade, o "R$ X o kg" desce para a linha de baixo
+                Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 8, children: [
                   Text(o.preco == null ? 'Preço no mercado' : reais(o.preco!), style: fredoka(o.preco == null ? 16 : 22, cor: context.corPreco)),
                   if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
                 ]),
@@ -270,8 +327,10 @@ class CardOferta extends StatelessWidget {
                 if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer, linhas: 2),
               ]),
             ),
+            // na grade, os 2 cards da linha têm a mesma altura: o Adicionar fica no pé dos dois
+            const Spacer(),
             const SizedBox(height: 12),
-            BotaoAdicionar(o),
+            SizedBox(width: double.infinity, child: BotaoAdicionar(o)),
           ]),
         ),
       ),

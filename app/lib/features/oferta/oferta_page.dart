@@ -142,10 +142,8 @@ class _Detalhe extends StatelessWidget {
         AvatarMercado(o.redeSlug, tamanho: 12),
         Expanded(child: Text('${o.redeNome} · ${valeAte(o.validadeFim).toLowerCase()}', style: secundario)),
       ]),
-      if (o.fotoUrl != null) ...[
-        const SizedBox(height: 12),
-        Center(child: FotoProduto(o.fotoUrl, tamanho: 200)),
-      ],
+      const SizedBox(height: 12),
+      FotoOferta(o, altura: 200),
       const SizedBox(height: 8),
       Text(o.nome, style: fredoka(24)),
       const SizedBox(height: 6),
@@ -233,13 +231,14 @@ class _EmOutrosMercadosState extends State<_EmOutrosMercados> {
             if (sub != null) Text(sub, style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
           ]),
         );
-    Widget card(Oferta x) => Padding(
-        padding: const EdgeInsets.only(bottom: 10), child: CardOferta(x, mostrarPorUnidade: true, maisBarato: _maisBarato(x)));
+    Iterable<Widget> grade(Iterable<Oferta> ofertas) => emPares(ofertas).cast<List<Oferta>>().map((par) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: ParDeCards([for (final x in par) CardOferta(x, mostrarPorUnidade: true, maisBarato: _maisBarato(x))])));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (mesmo.isNotEmpty) ...[titulo('O mesmo produto em outros encartes'), ...mesmo.map(card)],
+      if (mesmo.isNotEmpty) ...[titulo('O mesmo produto em outros encartes'), ...grade(mesmo)],
       if (similares.isNotEmpty) ...[
         titulo('Parecidos', 'Outra marca ou tamanho. Compare pelo preço do kg ou do litro.'),
-        ...(_todos ? similares : similares.take(_visiveis)).map(card),
+        ...grade(_todos ? similares : similares.take(_visiveis)),
         if (!_todos && similares.length > _visiveis)
           TextButton(
               onPressed: () => setState(() => _todos = true),
