@@ -19,6 +19,8 @@ const guardar = (c: string | null) => { try { c ? localStorage.setItem(CHAVE, c)
 export class Lista {
   lida: Lida | null = null;
   erro = false;
+  /** O último erro foi falta de rede (não "lista não encontrada"). */
+  semInternet = false;
   private ouvintes = new Set<() => void>();
   private canal: { unsubscribe(): unknown } | null = null;
 
@@ -44,6 +46,7 @@ export class Lista {
       this.tempoReal();
     } catch (e) {
       this.erro = true;
+      this.semInternet = e instanceof TypeError; // fetch sem rede; o resto é resposta do banco
       // Lista apagada no servidor: some da tela; a deste navegador recomeça no próximo "Adicionar".
       if (String(e).includes('não encontrada')) {
         this.lida = null;
@@ -70,9 +73,13 @@ export class Lista {
     this.espera = setTimeout(() => { this.espera = null; this.carregar(); }, 1000);
   }
 
+  // Dois "Adicionar" antes de a lista existir esperam a MESMA criação (antes: duas listas, e um item se perdia).
+  private criando: Promise<{ dono: string }> | null = null;
+
   private async chamar(funcao: string, args: Record<string, unknown>) {
     if (!this.codigo) {
-      const c = await rpc<{ dono: string }>('lista_criar');
+      this.criando ??= rpc<{ dono: string }>('lista_criar').finally(() => { this.criando = null; });
+      const c = await this.criando;
       this.codigo = c.dono;
       if (this.doNavegador) guardar(c.dono);
     }

@@ -19,7 +19,9 @@ export default function ListaRecebida() {
 
   const l = lista.lida;
   if (!l) {
-    return lista.erro
+    return lista.erro && lista.semInternet
+      ? <p class="tracejado">Sem internet agora. <button type="button" class="botao" onClick={() => lista.carregar()}>Tentar de novo</button></p>
+      : lista.erro || !codigo
       ? <p class="tracejado">Não achamos esta lista. Confira o link com quem mandou. <a href="/">Ver ofertas de hoje</a></p>
       : <p class="suave" role="status">Abrindo a lista…</p>;
   }

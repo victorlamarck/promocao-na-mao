@@ -27,15 +27,19 @@ document.addEventListener('click', async (e) => {
   const card = botao?.closest<HTMLElement>('[data-oferta]');
   if (!botao || !card) return;
   const item = lista.itemDaOferta(Number(card.dataset.oferta));
-  botao.disabled = true;
+  // todos os botões do card: "+" e "−" seguidos mandavam quantidades calculadas da mesma leitura
+  const botoes = card.querySelectorAll<HTMLButtonElement>('.add, .mais, .menos');
+  botoes.forEach((b) => (b.disabled = true));
   try {
     if (botao.classList.contains('menos')) { if (item) await lista.quantidade(item, item.quantidade - 1); }
     else if (item) await lista.quantidade(item, item.quantidade + 1);
-    else { await lista.adicionar(Number(card.dataset.oferta), card.dataset.nome!); avisar('Adicionado à sua lista'); }
-  } catch {
-    avisar('Não deu para salvar na lista. Confira a internet e tente de novo.');
+    // 120 letras: limite do banco (o app corta igual, lista.dart)
+    else { await lista.adicionar(Number(card.dataset.oferta), card.dataset.nome!.slice(0, 120)); avisar('Adicionado à sua lista'); }
+  } catch (e) {
+    // fetch sem rede dá TypeError; o resto é a recusa do banco ("a lista chegou ao limite de 300 itens"...)
+    avisar(e instanceof TypeError ? 'Não deu para salvar na lista. Confira a internet e tente de novo.' : `Não deu para salvar: ${(e as Error).message}`);
   } finally {
-    botao.disabled = false;
+    botoes.forEach((b) => (b.disabled = false));
   }
 });
 

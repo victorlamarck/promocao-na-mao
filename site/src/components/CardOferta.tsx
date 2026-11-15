@@ -22,13 +22,12 @@ export default function CardOferta({ o, mostrarMercado = true, principal = false
   const unidade = porUnidade(o.preco_referencia, o.unidade_referencia, valor);
   return (
     <article class={principal ? 'card card-principal' : 'card'} data-oferta={o.id} data-nome={nome}>
-      {mostrarMercado && (
-        <span class="card-mercado">
-          <span class="ponto" style={{ background: m.cor }} />
-          {o.rede_nome} · até {diaMes(o.validade_fim)}
-        </span>
-      )}
-      {/* nas páginas estáticas, "hoje" é o dia do build (refeito todo dia às 03:05) */}
+      {/* a data vai sempre: na página do mercado, os encartes da mesma rede vencem em dias diferentes */}
+      <span class="card-mercado">
+        {mostrarMercado && <><span class="ponto" style={{ background: m.cor }} />{o.rede_nome} · </>}
+        até {diaMes(o.validade_fim)}
+      </span>
+      {/* nas páginas estáticas, "hoje" é o dia do build (refeito todo dia às 00:05) */}
       <Vence fim={o.validade_fim} />
       {atacado(o) && <span class="etiqueta etiqueta-condicao">Preço de atacado</span>}
       {/* foto decorativa (alt vazio): o nome vem logo abaixo. Sem foto, o ícone da categoria com "Sem foto" */}
