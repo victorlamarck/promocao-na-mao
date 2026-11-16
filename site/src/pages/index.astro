@@ -8,7 +8,7 @@ import { diaMes, mercado, intercalar, atualizadoEm } from '../lib/formato';
 
 const { ofertas, redes, lojas, anuncios, inicio } = await dados();
 
-// Ofertas de hoje: rodízio entre os mercados, feito no banco (oferta_inicio; o site é refeito todo dia às 03:05).
+// Ofertas de hoje: rodízio entre os mercados, feito no banco (oferta_inicio; o site é refeito todo dia às 00:05).
 const porId = new Map(ofertas.map((o) => [o.id, o]));
 const hoje = inicio.flatMap((id) => porId.get(id) ?? []);
 

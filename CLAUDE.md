@@ -36,7 +36,7 @@ Só leitura pela chave publishable (RLS) e funções `security definer`; nada es
 - O app mostra o texto original e a imagem do próprio encarte; "Atualizado hoje às 08:12" na Início.
 
 ## Site — detalhes em `docs/site.md`
-- Páginas de ofertas geradas no build (refeito depois de cada importação, por aviso do repositório privado, e às 03:05);
+- Páginas de ofertas geradas no build (refeito depois de cada importação, por aviso do repositório privado, e às 00:05);
   busca e lista no navegador com as mesmas funções do banco. www.promocaonamao.com.br.
 - `cd site && npm run dev`; `npm test`; `npx astro check`.
 - Páginas exigidas pela Play: `/privacidade` (AdSense e AdMob), `/apagar-dados`, `ads.txt` e `app-ads.txt`.
@@ -60,7 +60,7 @@ Só leitura pela chave publishable (RLS) e funções `security definer`; nada es
 - `.github/workflows/`: `app.yml` (análise/testes), `android.yml` (só no botão, do `main`: `.aab` prod assinado → teste
   interno do Play como rascunho; **toda versão nova do app atualiza `release.txt` (≤300 caracteres) e o topo do
   `versions.txt`**, formato em `docs/app.md#publicar-no-android`), `ios.yml` (só no botão; roda em Mac) e `site.yml`
-  (dev → site dev, `main` → prod; também no aviso `repository_dispatch: dados`, às 03:05 e no botão).
+  (dev → site dev, `main` → prod; também no aviso `repository_dispatch: dados`, às 00:05 e no botão).
 - Repositório público: minutos das esteiras grátis (inclusive Mac).
 - MCP (`.mcp.json`, só leitura): `firebase` (Crashlytics; projetos `promocaonamao-f08a7` dev, `promocaonamao-1` prod).
   O 1º start frio é lento: `MCP_TIMEOUT` alto no `.claude/settings.local.json`.

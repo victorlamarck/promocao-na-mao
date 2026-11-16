@@ -75,7 +75,7 @@ no Play Console). O iPhone (Universal Links e `APP_STORE_URL`) depende da conta 
 
 `components/Vence.tsx` (`avisoValidade` em `lib/formato.ts`): "Vence hoje" / "Vence amanhã" no card e nos
 itens da lista; "Encarte venceu" nos itens da lista. "Hoje" é o dia em GV (`hojeEmGV`), não o fuso de quem
-roda: nas páginas estáticas vale o dia do build, que é refeito todo dia às 03:05.
+roda: nas páginas estáticas vale o dia do build, que é refeito todo dia às 00:05.
 
 ## Segurança
 
@@ -116,7 +116,7 @@ Por isso a esteira refaz o site também depois de cada importação (o `dados.ym
 | PR em `site/` (para `dev` ou `main`) | só build | — |
 | push no branch `dev` em `site/` | publica | — |
 | push na `main` em `site/` (merge do PR `dev` → `main`) | — | publica |
-| "Dados" terminou, 03:05 todo dia, botão | publica o branch `dev` | publica a `main` |
+| "Dados" terminou, 00:05 todo dia, botão | publica o branch `dev` | publica a `main` |
 
 Cada site usa o seu banco: o dev usa o Supabase de dev (secret `APP_CONFIG_DEV`) e o prod usa o
 de produção (`APP_CONFIG_PROD`), ver `docs/banco.md` do repositório privado `promocao-na-mao-dados`. O build roda

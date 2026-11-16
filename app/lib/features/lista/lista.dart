@@ -166,8 +166,15 @@ class Lista extends ChangeNotifier {
     _espera = Timer(const Duration(seconds: 1), carregar);
   }
 
+  // Dois "Adicionar" antes de a lista existir esperam a MESMA criação (antes: duas listas, e um item se perdia).
+  Future<void>? _criando;
+
   Future<void> _garantirLista() async {
     if (_codigo != null) return;
+    await (_criando ??= _criar().whenComplete(() => _criando = null));
+  }
+
+  Future<void> _criar() async {
     final c = await _db.rpc('lista_criar') as Map<String, dynamic>;
     _codigo = c['dono'] as String;
     await (await SharedPreferences.getInstance()).setString(_chave, _codigo!);
