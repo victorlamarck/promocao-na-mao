@@ -70,10 +70,12 @@ class EspacoAnuncioView extends StatelessWidget {
                 ],
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(a?.titulo ?? 'Anuncie aqui', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                    // limites do Guia do Anunciante (privado: docs/guia-do-anunciante.md): título até 40, texto até 80 caracteres
+                    Text(a?.titulo ?? 'Anuncie aqui',
+                        maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
                     Text(a?.texto ?? 'Seu comércio para quem está fazendo as compras em Governador Valadares.',
-                        style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
+                        maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
                   ]),
                 ),
               ]),

@@ -213,7 +213,10 @@ const idIos = idAppStore(lojaIos);
 
   .anuncio { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); color: var(--texto); text-decoration: none; }
   .anuncio-faixa { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; }
-  .anuncio img { width: 100%; border-radius: 8px; object-fit: cover; }
+  /* imagem quadrada do Guia do Anunciante: no meio das ofertas ocupa o card, na faixa vira miniatura (como no app) */
+  .anuncio img { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; }
+  .anuncio-faixa img { width: 64px; height: 64px; }
+  .anuncio-linhas { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--linhas); line-clamp: var(--linhas); overflow: hidden; }
   .selo { align-self: flex-start; font-size: 13px; font-weight: 700; color: var(--anuncio-texto); background: var(--anuncio); padding: 2px 8px; border-radius: 8px; }
 
   .lista { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 24px; background: var(--branco); border: 1px solid var(--linha); position: sticky; top: 16px; }
