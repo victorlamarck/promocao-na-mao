@@ -58,6 +58,19 @@ void main() {
     expect(com([{'nome': 'Leite', 'marca': null}, {'nome': 'Leite', 'marca': null}]).nome, 'Leite');
     expect(com([]).nome, 'Mac Espag ou Cortado Don Sapore 400g R\$ 1,99');
 
+    // tamanho da embalagem: selo na foto do card (o nome fica sem ele)
+    expect(com([{'nome': 'Filé de Salmão Pedaço', 'marca': 'Bem Fresco', 'quantidade': 430, 'unidade': 'g'}]).tamanho, '430g');
+    expect(com([{'nome': 'Refrigerante', 'marca': 'Sukita', 'quantidade': 1.5, 'unidade': 'l'}]).tamanho, '1,5l');
+    expect(com([{'nome': 'Papel Higiênico', 'marca': 'Mili', 'quantidade': 32, 'unidade': 'un'}]).tamanho, 'c/32');
+    expect(com([{'nome': 'Panela', 'marca': 'Tramontina', 'quantidade': 1, 'unidade': 'un'}]).tamanho, isNull);
+    expect(com([{'nome': 'Arroz Japonês', 'marca': 'Rei Arthur', 'quantidade': 1, 'unidade': 'kg'},
+      {'nome': 'Arroz Parboilizado', 'marca': 'Rei Arthur', 'quantidade': 2, 'unidade': 'kg'}]).tamanho, '1kg ou 2kg');
+    expect(com([{'nome': 'Amaciante', 'marca': 'Downy', 'quantidade': 500, 'unidade': 'ml'},
+      {'nome': 'Amaciante', 'marca': 'Comfort', 'quantidade': null, 'unidade': 'ml'}]).tamanho, isNull); // "A/B" não distribuído
+    Oferta aPeso(Map<String, dynamic> j) => Oferta.fromJson({...j, 'preco_por': 'kg'});
+    expect(aPeso({'id': 1, 'texto_original': 'x', 'validade_fim': '2026-11-03', 'rede_id': 4, 'rede_nome': 'M', 'rede_slug': 'm',
+      'itens': [{'nome': 'Melancia', 'marca': null, 'quantidade': 1, 'unidade': 'kg'}]}).tamanho, isNull);
+
     // aviso de produto: só quando a oferta é de um produto só do catálogo
     expect(com([{'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}]).produtoCodigo, 'cafe-pilao-500g');
     expect(com([{'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}, {'nome': 'Café', 'produto_codigo': 'cafe-pilao-500g'}]).produtoCodigo,

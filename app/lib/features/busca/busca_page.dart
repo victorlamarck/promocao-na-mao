@@ -288,7 +288,7 @@ class _ResultadosState extends State<_Resultados> {
             padding: const EdgeInsets.only(bottom: 10),
             child: ParDeCards([
               for (final o in _resultados.itens.skip(i * 2).take(2))
-                CardOferta(o, mostrarPorUnidade: true, maisBarato: baratas.contains(o.id)),
+                CardOferta(o, maisBarato: baratas.contains(o.id)),
             ]),
           ),
         ),

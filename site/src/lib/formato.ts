@@ -12,7 +12,8 @@ export interface Oferta {
   rede_id: number;
   rede_nome: string;
   rede_slug: string;
-  itens: { nome?: string | null; marca?: string | null }[];
+  preco_por?: string; // embalagem | kg | 100g
+  itens: { nome?: string | null; marca?: string | null; quantidade?: number | null; unidade?: string | null }[];
   preco_referencia: number | null;
   unidade_referencia: string | null;
   foto?: string | null; // caminho no R2 (migration 22 do privado): `${fotosUrl}/${foto}`
@@ -81,6 +82,20 @@ export function nomeDaOferta(o: Pick<Oferta, 'itens' | 'texto_original'>): strin
   const marcas = unicos(o.itens.map((i) => i.marca ?? ''));
   if (marcas.length === 1) return junta([unicos(o.itens.map((i) => i.nome ?? '').filter(Boolean)).join(' ou '), marcas[0]]);
   return unicos(o.itens.map((i) => junta([i.nome, i.marca]))).join(' ou ');
+}
+
+/** Tamanho da embalagem para o selo na foto do card ("430g", "1,5l", "c/12"; "1kg ou 2kg" se as alternativas
+ *  diferem). Null no vendido a peso (o preço já é do kg), quando algum item não tem tamanho e no "1 un". Igual ao app. */
+export function tamanho(o: Pick<Oferta, 'itens' | 'preco_por'>): string | null {
+  if (o.preco_por !== 'embalagem') return null;
+  const numero = (n: number) => String(n).replace('.', ',');
+  const tamanhos = new Set<string>();
+  for (const i of o.itens) {
+    if (i.quantidade == null || !i.unidade) return null;
+    if (i.unidade === 'un' && i.quantidade === 1) continue;
+    tamanhos.add(i.unidade === 'un' ? `c/${numero(i.quantidade)}` : `${numero(i.quantidade)}${i.unidade}`);
+  }
+  return tamanhos.size === 0 ? null : [...tamanhos].join(' ou ');
 }
 
 /** Cor, sigla, nome do clube e logo (`public/mercados/<slug>.png`) de cada rede (app/lib/core/tema.dart). */

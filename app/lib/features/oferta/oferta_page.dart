@@ -235,7 +235,7 @@ class _EmOutrosMercadosState extends State<_EmOutrosMercados> {
         );
     Iterable<Widget> grade(Iterable<Oferta> ofertas) => emPares(ofertas).cast<List<Oferta>>().map((par) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: ParDeCards([for (final x in par) CardOferta(x, mostrarPorUnidade: true, maisBarato: _maisBarato(x))])));
+        child: ParDeCards([for (final x in par) CardOferta(x, maisBarato: _maisBarato(x))])));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (mesmo.isNotEmpty) ...[titulo('O mesmo produto em outros encartes'), ...grade(mesmo)],
       if (similares.isNotEmpty) ...[
