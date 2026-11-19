@@ -1,7 +1,7 @@
 ---
 // Prévia do gráfico de preço (decisão do dev, 19/11/2026): o gráfico completo é só do app; aqui um desenho
 // ILUSTRATIVO e borrado (não são os dados do produto) com o convite para baixar.
-// shortcut: botões direto para as lojas; com o rastreio de público/criativo (t45) passam pelo /baixar.
+// Os botões levam a origem do anúncio até a loja e contam o toque (src/scripts/medir.ts, data-loja).
 import { lojaAndroid, lojaIos } from '../lib/config';
 ---
 <section class="previa-grafico" aria-labelledby="previa-grafico-titulo">
@@ -14,8 +14,8 @@ import { lojaAndroid, lojaIos } from '../lib/config';
     <p>No app Promoção na Mão você vê o preço deste produto nos últimos dias em cada mercado e o menor preço em 30 dias.</p>
     {(lojaAndroid || lojaIos) && (
       <div class="previa-botoes">
-        {lojaAndroid && <a class="botao botao-cheio" href={lojaAndroid} target="_blank" rel="noopener">Baixar na Google Play</a>}
-        {lojaIos && <a class="botao botao-cheio" href={lojaIos} target="_blank" rel="noopener">Baixar na App Store</a>}
+        {lojaAndroid && <a class="botao botao-cheio" href={lojaAndroid} data-loja="android" data-onde="grafico" target="_blank" rel="noopener">Baixar na Google Play</a>}
+        {lojaIos && <a class="botao botao-cheio" href={lojaIos} data-loja="ios" data-onde="grafico" target="_blank" rel="noopener">Baixar na App Store</a>}
       </div>
     )}
   </div>

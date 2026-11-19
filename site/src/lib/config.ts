@@ -10,6 +10,11 @@ export const adsenseCliente: string = env.PUBLIC_ADSENSE_CLIENT || '';
 /** Lojas do app: sem o link, a folha "Abrir no app" não aparece naquela plataforma. */
 export const lojaAndroid: string = env.PUBLIC_PLAY_STORE_URL || '';
 export const lojaIos: string = env.PUBLIC_APP_STORE_URL || '';
+/** Google Analytics 4 do site: o app Web do Firebase de prod, na mesma propriedade do app (tudo num lugar só).
+ *  Só no prod: o site de dev não mistura visitas de teste. Não é segredo. */
+export const gaId: string = env.PUBLIC_GA_ID ?? (ehProd ? 'G-W4DJ7PTC1N' : '');
+/** Pixel da Meta (anúncios): só carrega depois de a pessoa aceitar os cookies. Vazio = sem Pixel. */
+export const metaPixelId: string = env.PUBLIC_META_PIXEL_ID ?? '';
 /** Pacote Android do flavor (app/android/app/build.gradle.kts): o link de intent abre este app. */
 export const pacoteAndroid = ehProd ? 'br.com.promocaonamao.app' : 'br.com.promocaonamao.app.dev';
 /** Fotos dos produtos (Cloudflare R2); a API dá só o caminho. Igual no dev e no prod. */
