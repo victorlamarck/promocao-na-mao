@@ -63,6 +63,10 @@ class Oferta {
     return codigos.length == 1 ? codigos.first : null;
   }
 
+  /// Produto do catálogo para o gráfico de preço: o do 1º item que tem um.
+  // shortcut: numa oferta "A ou B" de produtos diferentes, mostra só o histórico do 1º.
+  int? get produtoId => itens.map((i) => i['produto_id'] as int?).nonNulls.firstOrNull;
+
   /// Nome para o card, montado dos itens (o texto do encarte às vezes traz preço e regras):
   /// "Macarrão Espaguete ou Macarrão Cortado Don Sapore". Sem itens, o texto do encarte.
   String get nome {

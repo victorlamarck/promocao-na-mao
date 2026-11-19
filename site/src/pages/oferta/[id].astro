@@ -4,6 +4,7 @@
 import Base from '../../layouts/Base.astro';
 import CardOferta from '../../components/CardOferta.tsx';
 import Comparacao from '../../components/Comparacao.tsx';
+import PreviaGrafico from '../../components/PreviaGrafico.astro';
 import { dados } from '../../lib/dados';
 import { mercado, nomeDaOferta, reais, valeAte } from '../../lib/formato';
 
@@ -43,6 +44,7 @@ const ld = {
       </div>
     </div>
   </section>
+  {o.itens.some((i) => i.produto_id != null) && <PreviaGrafico />}  <!-- só onde o app tem gráfico: produto do catálogo -->
   <!-- client:idle (não visible): no build o componente não desenha nada, então não haveria o que observar -->
   <Comparacao client:idle id={o.id} />
   {outras.length > 0 && (

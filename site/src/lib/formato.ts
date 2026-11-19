@@ -13,7 +13,7 @@ export interface Oferta {
   rede_nome: string;
   rede_slug: string;
   preco_por?: string; // embalagem | kg | 100g
-  itens: { nome?: string | null; marca?: string | null; quantidade?: number | null; unidade?: string | null }[];
+  itens: { nome?: string | null; marca?: string | null; produto_id?: number | null; quantidade?: number | null; unidade?: string | null }[];
   preco_referencia: number | null;
   unidade_referencia: string | null;
   foto?: string | null; // caminho no R2 (migration 22 do privado): `${fotosUrl}/${foto}`
