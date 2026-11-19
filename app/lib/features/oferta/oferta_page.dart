@@ -11,6 +11,7 @@ import '../../core/widgets.dart';
 import '../anuncios/anuncios.dart';
 import '../anuncios/espaco_anuncio.dart';
 import '../avisos/avisos.dart';
+import 'grafico_preco.dart';
 
 final _db = Supabase.instance.client;
 
@@ -179,6 +180,7 @@ class _Detalhe extends StatelessWidget {
           ]),
         ),
       ),
+      if (o.produtoId case final id?) GraficoPreco(key: ValueKey(id), produtoId: id),
       const SizedBox(height: 12),
       Card(
         child: Padding(

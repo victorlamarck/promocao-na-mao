@@ -1,0 +1,31 @@
+---
+// Prévia do gráfico de preço (decisão do dev, 19/11/2026): o gráfico completo é só do app; aqui um desenho
+// ILUSTRATIVO e borrado (não são os dados do produto) com o convite para baixar.
+// shortcut: botões direto para as lojas; com o rastreio de público/criativo (t45) passam pelo /baixar.
+import { lojaAndroid, lojaIos } from '../lib/config';
+---
+<section class="previa-grafico" aria-labelledby="previa-grafico-titulo">
+  <svg class="previa-desenho" viewBox="0 0 320 120" aria-hidden="true" focusable="false">
+    <path d="M0 70H60V50H120V85H190V60H250V40H320" fill="none" stroke="#1D4ED8" stroke-width="5" />
+    <path d="M0 95H80V75H150V100H230V80H320" fill="none" stroke="#0F766E" stroke-width="5" />
+  </svg>
+  <div class="previa-texto">
+    <h2 id="previa-grafico-titulo">Veja como o preço variou no app</h2>
+    <p>No app Promoção na Mão você vê o preço deste produto nos últimos dias em cada mercado e o menor preço em 30 dias.</p>
+    {(lojaAndroid || lojaIos) && (
+      <div class="previa-botoes">
+        {lojaAndroid && <a class="botao botao-cheio" href={lojaAndroid} target="_blank" rel="noopener">Baixar na Google Play</a>}
+        {lojaIos && <a class="botao botao-cheio" href={lojaIos} target="_blank" rel="noopener">Baixar na App Store</a>}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .previa-grafico { position: relative; overflow: hidden; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); min-height: 200px; display: flex; align-items: center; justify-content: center; }
+  .previa-desenho { position: absolute; inset: 0; width: 100%; height: 100%; filter: blur(6px); opacity: .5; }
+  .previa-texto { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; text-align: center; max-width: 440px; }
+  .previa-texto h2 { font-size: 20px; }
+  .previa-texto p { margin: 0; color: var(--suave); }
+  .previa-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
+</style>
