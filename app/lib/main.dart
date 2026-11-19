@@ -8,6 +8,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/abertura.dart';
+import 'core/analytics.dart';
 import 'core/config.dart';
 import 'core/rotas.dart';
 import 'core/tema.dart';
@@ -73,6 +74,7 @@ void _telasNoAnalytics() {
     final tela = rotas.routerDelegate.currentConfiguration.fullPath;
     if (tela.isEmpty || tela == ultima) return;
     ultima = tela;
+    novaTela(); // tela nova: o que é contado ao aparecer conta de novo
     FirebaseAnalytics.instance.logScreenView(screenName: tela);
   });
 }

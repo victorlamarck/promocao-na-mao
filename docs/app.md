@@ -396,6 +396,20 @@ Notifications service (APNs)** → baixar o `.p8` (uma vez só) e anotar o **Key
 - **Analytics**: uma "tela vista" por troca de rota com o **molde** do caminho (`/l/:codigo`, `/oferta/:id`),
   nunca o caminho real, que levaria o código secreto da lista. **Sem ID de publicidade**: o manifest remove a
   permissão `AD_ID` e desliga `google_analytics_adid_collection_enabled`.
+- **Eventos de ação** (`evento()` e `eventoUmaVezPorTela()` em `core/analytics.dart`; o que é contado ao aparecer
+  conta uma vez por tela, e a troca de rota zera a conta):
+
+  | Evento | Quando | Parâmetros |
+  |---|---|---|
+  | `busca` | o termo ficou 2 s na tela (não conta cada letra) | `com_resultado` (sim/nao). **Sem o termo**: a ficha declara a busca como efêmera |
+  | `item_adicionado` | oferta ou item anotado entrou na lista | `origem` (oferta/anotado), `mercado` (slug) |
+  | `lista_compartilhada` | copiou o link ou abriu o WhatsApp | `como` (link/whatsapp), `permissao` |
+  | `lista_comparada` | apareceu "Quanto a lista sai em cada mercado" | `mercados` |
+  | `aviso_ligado` | ligou um sino | `tipo` (mercado/produto) |
+  | `notificacao_aberta` | abriu o app tocando num aviso | `tipo` (mercado/produto) |
+  | `anuncio_visto` / `anuncio_clique` | anúncio vendido apareceu / foi tocado ("quantos viram", para o anunciante) | `anuncio_id`, `espaco` (inicio/mercado/oferta/busca) |
+
+  Para filtrar pelos parâmetros no console, cadastrá-los como dimensões personalizadas do GA4.
 - Declarados na política de privacidade e em `docs/loja/seguranca-dos-dados.md`.
 
 ## Fontes

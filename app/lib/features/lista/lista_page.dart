@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/analytics.dart';
 import '../../core/config.dart';
 import '../../core/tema.dart';
 import '../../core/widgets.dart';
@@ -201,6 +202,7 @@ class _CompartilharState extends State<_Compartilhar> {
                 onPressed: () async {
                   await _salvarNome();
                   await Clipboard.setData(ClipboardData(text: _link));
+                  evento('lista_compartilhada', {'como': 'link', 'permissao': _permissao});
                   if (context.mounted) {
                     Navigator.pop(context);
                     avisar(context, 'Link copiado', verLista: false);
@@ -216,6 +218,7 @@ class _CompartilharState extends State<_Compartilhar> {
                   await _salvarNome();
                   final texto = 'Minha lista de compras no Promoção na Mão: $_link';
                   await launchUrl(Uri.parse('https://wa.me/?text=${Uri.encodeComponent(texto)}'));
+                  evento('lista_compartilhada', {'como': 'whatsapp', 'permissao': _permissao});
                   if (context.mounted) Navigator.pop(context);
                 },
                 icon: const Icon(Icons.send),

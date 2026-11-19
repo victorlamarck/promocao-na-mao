@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/analytics.dart';
 import '../../core/modelos.dart';
 
 final _db = Supabase.instance.client;
@@ -199,6 +200,7 @@ class Lista extends ChangeNotifier {
     await _garantirLista();
     final texto = o.nome.length > 120 ? o.nome.substring(0, 120) : o.nome; // limite do banco
     await _rpc('lista_adicionar', {'oferta_id': o.id, 'texto': texto, 'quantidade': 1});
+    evento('item_adicionado', {'origem': 'oferta', 'mercado': o.redeSlug});
   }
 
   /// Item anotado à mão ("Pão francês"), sem mercado definido.
@@ -206,6 +208,7 @@ class Lista extends ChangeNotifier {
     if (texto.trim().isEmpty) return;
     await _garantirLista();
     await _rpc('lista_adicionar', {'oferta_id': null, 'texto': texto.trim(), 'quantidade': 1});
+    evento('item_adicionado', {'origem': 'anotado'});
   }
 
   Future<void> mudarQuantidade(ItemLista i, int quantidade) =>
