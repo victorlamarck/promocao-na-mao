@@ -1,7 +1,7 @@
 // node --test (Node 24 roda TypeScript direto). Mesmos casos do app/test/logica_test.dart.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { reais, valeAte, nomeDaOferta, intercalar, distanciaKm, textoDistancia, porUnidade, avisoValidade, hojeEmGV, atualizadoEm, atacado, condicaoCurta, type Oferta } from './formato.ts';
+import { reais, valeAte, nomeDaOferta, tamanho, intercalar, distanciaKm, textoDistancia, porUnidade, avisoValidade, hojeEmGV, atualizadoEm, atacado, condicaoCurta, type Oferta } from './formato.ts';
 
 test('atacado: selo e condição curta no card', () => {
   const com = (condicao: string | null) => ({ condicao }) as Oferta;
@@ -42,6 +42,18 @@ test('nome da oferta', () => {
   assert.equal(nomeDaOferta({ itens: [{ nome: 'Cerveja Pilsen', marca: 'Brahma' }, { nome: 'Cerveja Pilsen', marca: 'Skol' }], texto_original: t }),
     'Cerveja Pilsen Brahma ou Cerveja Pilsen Skol');
   assert.equal(nomeDaOferta({ itens: [], texto_original: t }), t);
+
+});
+
+test('tamanho da embalagem: selo na foto do card (igual ao app)', () => {
+  const emb = (itens: Oferta['itens'], preco_por = 'embalagem') => tamanho({ itens, preco_por });
+  assert.equal(emb([{ quantidade: 430, unidade: 'g' }]), '430g');
+  assert.equal(emb([{ quantidade: 1.5, unidade: 'l' }]), '1,5l');
+  assert.equal(emb([{ quantidade: 32, unidade: 'un' }]), 'c/32');
+  assert.equal(emb([{ quantidade: 1, unidade: 'un' }]), null);
+  assert.equal(emb([{ quantidade: 1, unidade: 'kg' }, { quantidade: 2, unidade: 'kg' }]), '1kg ou 2kg');
+  assert.equal(emb([{ quantidade: 500, unidade: 'ml' }, { quantidade: null, unidade: 'ml' }]), null); // "A/B" não distribuído
+  assert.equal(emb([{ quantidade: 1, unidade: 'kg' }], 'kg'), null);
 });
 
 test('anúncio a cada 8 ofertas, nunca sobrando no fim sem 8 antes', () => {

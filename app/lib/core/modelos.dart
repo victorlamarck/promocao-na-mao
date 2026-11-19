@@ -73,6 +73,21 @@ class Oferta {
     return itens.map((i) => junta([i['nome'], i['marca']])).toSet().join(' ou ');
   }
 
+  /// Tamanho da embalagem para o selo na foto do card ("430g", "1,5l", "c/12"; "1kg ou 2kg" se as alternativas
+  /// diferem). Nulo no vendido a peso (o preço já é do kg), quando algum item não tem tamanho e no "1 un".
+  String? get tamanho {
+    if (precoPor != 'embalagem') return null;
+    String numero(num n) => n == n.roundToDouble() ? n.toInt().toString() : n.toString().replaceAll('.', ',');
+    final tamanhos = <String>{};
+    for (final i in itens) {
+      final q = i['quantidade'] as num?, u = i['unidade'] as String?;
+      if (q == null || u == null) return null;
+      if (u == 'un' && q == 1) continue;
+      tamanhos.add(u == 'un' ? 'c/${numero(q)}' : '${numero(q)}$u');
+    }
+    return tamanhos.isEmpty ? null : tamanhos.join(' ou ');
+  }
+
   /// Oferta de folheto de atacado (a rede pode ter um de varejo e um de atacado, com produtos iguais):
   /// a condição começa com "preço de atacado".
   // shortcut: depende do texto da extração; virar coluna na API se outra rede tiver folheto de atacado.
