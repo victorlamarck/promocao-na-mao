@@ -8,13 +8,11 @@ Material para publicar o app Android (flavor `prod`, `br.com.promocaonamao.app`)
 | [seguranca-dos-dados.md](seguranca-dos-dados.md) | respostas do formulário "Segurança dos dados", conferidas no código, e pendências |
 | `icone-512.png` | ícone 512×512 RGBA, redimensionado de `app/assets/icone/icone.png` |
 | `destaque-1024x500.png` | imagem de destaque, sem transparência, texto longe das bordas |
-| `capturas/` | 7 prints 1080×1920 do **app** (APK de dev num Pixel 9 Pro XL, 20/10/2026; dados do Supabase de dev), tema claro e cor padrão |
-| `capturas-com-legenda/` | 4 desses prints numa moldura verde com legenda em Fredoka |
+| `capturas-com-legenda/` | 5 telas 1080×1920 do app (versão 0.10.0, dados de prod de 19/11/2026) numa moldura verde com legenda em Fredoka: início, gráfico de preço, busca, lista, mercados |
 
-Como foram feitas: tela do celular em 9:16 (`adb shell wm size 1008x1920`), barra de status cortada (some
-também a faixa DEV) e ampliado para 1080×1920. **Localização negada** durante as capturas: as distâncias
-"814 m" etc. mostrariam onde o dev estava. Sem o painel Compartilhar (mostra o link do domínio de dev).
-Refazer quando o app de prod estiver no ar, se a interface mudar. Os scripts ficaram no scratchpad da sessão.
+Como foram feitas: com os mesmos scripts das capturas da App Store ([app-store/tools/](app-store/tools/), passo a passo no
+[README de lá](app-store/README.md)), moldura com `node moldura.mjs <cru> <saida> play`. Na Play o celular aparece
+cortado mais acima, por isso a tela do gráfico tem uma captura própria, mais rolada (`roteiro-play-preco.json`).
 
 ## O que só o dev faz no Play Console
 

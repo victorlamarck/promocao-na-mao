@@ -102,9 +102,9 @@ Antes de publicar, confira com o dev:
 |---|---|---|
 | Ícone 512×512 (PNG 32 bits) | [icone-512.png](icone-512.png) | 512×512, RGBA |
 | Imagem de destaque 1024×500 | [destaque-1024x500.png](destaque-1024x500.png) | 1024×500, RGB sem transparência |
-| Capturas de celular (2 a 8) | [capturas/](capturas/) (cruas) ou [capturas-com-legenda/](capturas-com-legenda/) | 1080×1920 (9:16) |
+| Capturas de celular (2 a 8) | [capturas-com-legenda/](capturas-com-legenda/) | 1080×1920 (9:16) |
 
-Ordem sugerida das capturas com legenda: ofertas de hoje → busca → lista → lista recebida.
+Ordem das capturas (pelo nome do arquivo): início → como o preço variou → busca → lista → mercados (refeitas em 19/11/2026, versão 0.10.0).
 Se usar as cruas, sugestão: 2-ofertas-de-hoje, 4-busca, 3-mercado, 5-lista, 6-compartilhar, 7-lista-recebida.
 
 ## Classificação de conteúdo (questionário IARC)

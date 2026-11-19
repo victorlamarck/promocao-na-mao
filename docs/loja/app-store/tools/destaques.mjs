@@ -20,9 +20,9 @@ const css = `
 const pecas = [
   // Header: sem texto (a Apple põe o nome e o ícone do app por cima); telas sangrando para baixo.
   ['header', 3840, 1646, `<div class="linha" style="top:250px">
-      ${cel('2-busca', 760, 'margin-top:160px')}${cel('1-inicio', 820)}${cel('4-lista', 760, 'margin-top:160px')}</div>`],
+      ${cel('2-preco', 760, 'margin-top:160px')}${cel('1-inicio', 820)}${cel('4-lista', 760, 'margin-top:160px')}</div>`],
   ['busca', 3840, 2560, `<h1>As ofertas de GV numa lista só</h1><div class="linha" style="top:720px">
-      ${cel('2-busca', 860, 'margin-top:140px')}${cel('1-inicio', 920)}${cel('4-lista', 860, 'margin-top:140px')}</div>`],
+      ${cel('3-busca', 860, 'margin-top:140px')}${cel('1-inicio', 920)}${cel('4-lista', 860, 'margin-top:140px')}</div>`],
 ];
 fs.mkdirSync(saida, { recursive: true });
 const b = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
