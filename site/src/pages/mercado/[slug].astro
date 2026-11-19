@@ -4,6 +4,7 @@
 import Base from '../../layouts/Base.astro';
 import CardOferta from '../../components/CardOferta.tsx';
 import Anuncio from '../../components/Anuncio.astro';
+import Sino from '../../components/Sino.astro';
 import { dados } from '../../lib/dados';
 import { diaMes, mercado, valeAte } from '../../lib/formato';
 
@@ -30,6 +31,7 @@ const visiveis = 8; // por seção; o resto abre em "Ver todas" (continua no HTM
         <span class="suave">{rede.ofertas} ofertas · {rede.lojas} {rede.lojas === 1 ? 'loja' : 'lojas'} em GV · {valeAte(rede.ate)}</span>
       </div>
     </div>
+    <Sino tipo="mercado" nome={rede.nome} />
     {m.clube && <p class="tracejado" style="margin: 0">O preço com <strong>{m.clube}</strong> vale para quem tem o cadastro do {rede.nome}.</p>}
   </section>
 
