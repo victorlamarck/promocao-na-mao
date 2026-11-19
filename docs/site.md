@@ -104,6 +104,24 @@ Letra: fontes do sistema (DejaVu Sans na esteira), não a Fredoka.
 | `SITE_URL` | endereço canônico e sitemap | `https://www.promocaonamao.com.br` |
 | `PUBLIC_PLAY_STORE_URL`, `PUBLIC_APP_STORE_URL` | folha "Abrir no app" (Android / iPhone) | vazio: sem folha |
 | `ANDROID_SHA256` | `/.well-known/assetlinks.json` (App Links) | vazio: lista vazia |
+| `PUBLIC_GA_ID` | Google Analytics 4 (app Web do Firebase de prod, mesma propriedade do app) | prod: `G-W4DJ7PTC1N` fixo em `lib/config.ts`; dev: sem GA |
+| `PUBLIC_META_PIXEL_ID` | Pixel da Meta, só depois do aceite dos cookies | vazio: sem Pixel |
+
+## Anúncios: de onde veio, até a loja (t45)
+
+O anúncio da Meta aponta para o site com `?p=<público>&c=<criativo>` (`p` = `jovens`, `adultos` ou `vizinhas`;
+`c` = `A1`…`B6`, `A1v2`), de preferência junto dos `utm_*` (o GA4 lê sozinho):
+`?p=jovens&c=A2&utm_source=meta&utm_medium=paid&utm_campaign=ads-jovens&utm_content=A2`.
+- `lib/origem.ts`: guarda `p` e `c` no navegador por 30 dias (valor desconhecido é ignorado) e monta os links das
+  lojas: App Store com `pt=129712555` (provider token da conta; sem ele a Apple ignora o `ct`) e
+  `ct=ads-<p>-<c>`; Google Play com `referrer=utm_source=meta&utm_campaign=ads-<p>&utm_content=<c>` (o Firebase do
+  app lê na 1ª abertura). Sem anúncio, a origem é `site`.
+- Botões de baixar: `<a data-loja="android|ios" data-onde="...">` (prévia do gráfico, `/baixar`) e a folha
+  "Abrir no app". `/baixar` manda o celular direto para a loja (Android: abre o app se já estiver instalado).
+- Eventos (GA4 e, com aceite, Pixel): `chegou_do_anuncio` e `clique_baixar` (`loja`, `onde`, `publico`, `criativo`).
+  No GA4, registrar `publico`, `criativo`, `loja` e `onde` como dimensões personalizadas (escopo evento).
+- Cookies (LGPD): o GA4 começa no modo de consentimento negado (contagem sem cookie); a faixa do rodapé (depois da
+  folha) pergunta; o Pixel só carrega com "Aceitar". Texto em `/privacidade#cookies`.
 
 ## Esteira (`.github/workflows/site.yml`)
 

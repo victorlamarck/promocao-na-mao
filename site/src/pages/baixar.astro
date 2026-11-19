@@ -1,0 +1,44 @@
+---
+// /baixar: um link só para Android e iPhone (anúncios, rodapé, QR impresso). No celular manda direto para a loja
+// certa com a origem do anúncio (p e c, src/lib/origem.ts); no Android, com o app instalado, abre o app.
+// No computador mostra os dois botões.
+// shortcut: sem QR code no computador (pediria uma dependência nova); se muita gente chegar pelo computador, pôr um.
+import Base from '../layouts/Base.astro';
+import { lojaAndroid, lojaIos, pacoteAndroid } from '../lib/config';
+---
+<Base titulo="Baixe o app" descricao="O app Promoção na Mão para Android e iPhone: as ofertas dos supermercados de Governador Valadares numa lista só." botaoLista={false}>
+  <section class="secao baixar" data-android={lojaAndroid} data-ios={lojaIos} data-pacote={pacoteAndroid}>
+    <h1>Baixe o app Promoção na Mão</h1>
+    <p>As ofertas dos encartes dos supermercados de Governador Valadares numa lista só, com o gráfico de preço e o aviso quando o produto entrar em oferta.</p>
+    <div class="baixar-botoes">
+      {lojaAndroid && <a class="botao botao-cheio botao-grande" href={lojaAndroid} data-loja="android" data-onde="baixar">Baixar na Google Play</a>}
+      {lojaIos && <a class="botao botao-cheio botao-grande" href={lojaIos} data-loja="ios" data-onde="baixar">Baixar na App Store</a>}
+    </div>
+    <p class="suave">No celular, abra <strong>promocaonamao.com.br/baixar</strong> que a loja certa abre sozinha.</p>
+  </section>
+</Base>
+
+<script>
+  import { linkDaLoja, origemAtual } from '../lib/origem';
+  import { evento } from '../lib/medir';
+
+  const d = document.querySelector<HTMLElement>('.baixar')!.dataset;
+  const ua = navigator.userAgent, o = origemAtual(location.search);
+  const loja = /Android/i.test(ua) && d.android ? 'android' : /iPhone|iPad|iPod/i.test(ua) && d.ios ? 'ios' : null;
+  if (loja) {
+    const url = linkDaLoja(loja, loja === 'android' ? d.android! : d.ios!, o);
+    // Android: link de intent para a Início do app; sem o app instalado, o Android abre a Play (fallback)
+    const destino = loja === 'android'
+      ? `intent://${location.host}/#Intent;scheme=https;package=${d.pacote};S.browser_fallback_url=${encodeURIComponent(url)};end`
+      : url;
+    evento('clique_baixar', { loja, onde: 'baixar_direto', publico: o?.p, criativo: o?.c });
+    setTimeout(() => location.replace(destino), 300); // dá tempo de o evento sair
+  }
+</script>
+
+<style>
+  .baixar { align-items: center; text-align: center; padding: 24px 0; }
+  .baixar h1 { font-size: 28px; line-height: 34px; text-wrap: balance; }
+  .baixar p { margin: 0; max-width: 480px; }
+  .baixar-botoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 8px 0; }
+</style>
