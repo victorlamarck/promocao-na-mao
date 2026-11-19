@@ -2,7 +2,7 @@
 // Android: link de intent com o MESMO endereço → abre o app nesta página se ele estiver instalado;
 // sem o app, o Android leva para a Play Store (browser_fallback_url).
 // iPhone: com o app instalado o iOS já abre o link no app (Universal Links); aqui só oferecemos a App Store.
-import { linkDoApp } from '../lib/app';
+import { faixaFechadaRecente, linkDoApp } from '../lib/app';
 import { linkDaLoja, origemAtual } from '../lib/origem';
 import { evento } from '../lib/medir';
 
@@ -36,4 +36,18 @@ if (folha && !visto()) {
     folha.hidden = false;
     (document.getElementById('abrir-app-nao') as HTMLButtonElement).focus({ preventScroll: true });
   }
+}
+
+// Faixa "Baixe o app" no Android (no iPhone é a do próprio Safari, meta apple-itunes-app no Base.astro):
+// discreta no topo, fechável (some por 30 dias) e nunca junto com a folha acima.
+const faixa = document.getElementById('faixa-app');
+const FECHADA = 'faixa_app_fechada';
+function fechadaEm() { try { return localStorage.getItem(FECHADA); } catch { return null; } }
+if (faixa && /Android/i.test(navigator.userAgent) && (!folha || folha.hidden) && !faixaFechadaRecente(fechadaEm(), Date.now())) {
+  faixa.hidden = false;
+  faixa.querySelector('.faixa-app-fechar')!.addEventListener('click', () => {
+    faixa.hidden = true;
+    try { localStorage.setItem(FECHADA, String(Date.now())); } catch { /* sem storage: volta na próxima página */ }
+    evento('faixa_app_fechada', {});
+  });
 }

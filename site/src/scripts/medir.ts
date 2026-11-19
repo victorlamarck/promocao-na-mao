@@ -15,6 +15,11 @@ for (const a of document.querySelectorAll<HTMLAnchorElement>('a[data-loja]')) {
   a.addEventListener('click', () => evento('clique_baixar', { loja, onde: a.dataset.onde, ...origem }));
 }
 
+// Toque num recurso que só o app tem (o sino): <details data-recurso="sino">. O gráfico e a faixa contam pelo clique_baixar.
+for (const d of document.querySelectorAll<HTMLDetailsElement>('details[data-recurso]')) {
+  d.addEventListener('toggle', () => { if (d.open) evento('toque_recurso_app', { recurso: d.dataset.recurso, ...origem }); });
+}
+
 // Faixa de cookies: discreta, no rodapé, só depois que a folha "Abrir no app" sai da tela.
 const faixa = document.getElementById('cookies');
 if (faixa && consentimento() === null) {
