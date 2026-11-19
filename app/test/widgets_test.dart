@@ -47,6 +47,19 @@ void main() {
     await t.pumpWidget(MaterialApp(home: Scaffold(body: EspacoAnuncioView(anuncio: a, espaco: 'inicio'))));
     expect(find.text('Patrocinado'), findsOneWidget);
     expect(find.text('Anúncio'), findsNothing);
+    expect(find.textContaining('Cupom'), findsNothing); // sem cupom, sem caixa
+    novaTela();
+  });
+
+  testWidgets('anúncio com cupom: código, regra e validade', (t) async {
+    final a = Anuncio.fromJson({
+      'id': 2, 'formato': 'feed', 'titulo': 'Padaria do Bairro',
+      'cupom_codigo': 'PAO10', 'cupom_regra': '10% no pão', 'fim': '2026-11-30',
+    });
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: EspacoAnuncioView(anuncio: a, espaco: 'inicio'))));
+    expect(find.text('Cupom PAO10'), findsOneWidget);
+    expect(find.text('10% no pão · até 30/11'), findsOneWidget);
+    expect(find.text('Copiar'), findsOneWidget);
     novaTela();
   });
 
