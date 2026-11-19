@@ -144,7 +144,7 @@ class _OfertasDoMercadoState extends State<_OfertasDoMercado> {
             padding: const EdgeInsets.only(bottom: 10),
             child: switch (linhas[i]) {
               List<Oferta> par => ParDeCards([for (final o in par) CardOferta(o, mostrarMercado: false)]),
-              EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio, alturaRede: 90),
+              EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio, espaco: 'mercado', alturaRede: 90),
               _ => const SizedBox.shrink(),
             },
           ),

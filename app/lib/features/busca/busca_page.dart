@@ -277,7 +277,8 @@ class _ResultadosState extends State<_Resultados> {
           Text(_total == null ? 'Buscando…' : '$_total ${_total == 1 ? 'oferta válida' : 'ofertas válidas'} hoje',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           const SizedBox(height: 10),
-          for (final a in _patrocinados) ...[EspacoAnuncioView(anuncio: a, selo: 'Patrocinado'), const SizedBox(height: 10)],
+          // no máximo 1 patrocinado por busca (docs/design.md, "Anúncios")
+          for (final a in _patrocinados.take(1)) ...[EspacoAnuncioView(anuncio: a, espaco: 'busca'), const SizedBox(height: 10)],
         ]),
       ),
       SliverPadding(

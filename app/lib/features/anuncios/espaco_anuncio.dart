@@ -20,21 +20,26 @@ class SeloAnuncio extends StatelessWidget {
       );
 }
 
-/// Espaço de anúncio: o vendido pelo dev; senão a rede do Google (AdSense no web, AdMob no Android); senão "Anuncie aqui".
+/// Espaço de anúncio: o vendido pelo dev (selo "Patrocinado"); senão a rede do Google (AdSense no web, AdMob no
+/// celular) ou "Anuncie aqui", com o selo "Anúncio".
 class EspacoAnuncioView extends StatelessWidget {
-  const EspacoAnuncioView({super.key, this.anuncio, this.selo = 'Anúncio', this.alturaRede = 100});
+  const EspacoAnuncioView({super.key, this.anuncio, required this.espaco, this.alturaRede = 100});
   final Anuncio? anuncio;
-  final String selo;
+
+  /// Onde está, para o Analytics: inicio, mercado, oferta ou busca.
+  final String espaco;
   final double alturaRede;
 
   @override
   Widget build(BuildContext context) {
     final a = anuncio;
-    final cartao = _cartao(context, a);
-    return (a == null ? blocoAdsense(alturaRede, selo: SeloAnuncio(texto: selo), reserva: cartao) : null) ?? cartao;
+    // build roda quando o espaço entra na tela (listas são preguiçosas); registrarAnuncio não repete na mesma tela
+    if (a != null) registrarAnuncio('anuncio_visto', a, espaco);
+    final cartao = _cartao(context, a, a == null ? 'Anúncio' : 'Patrocinado');
+    return (a == null ? blocoAdsense(alturaRede, selo: const SeloAnuncio(), reserva: cartao) : null) ?? cartao;
   }
 
-  Widget _cartao(BuildContext context, Anuncio? a) {
+  Widget _cartao(BuildContext context, Anuncio? a, String selo) {
     // contatoAnuncie é da config do dev (mailto: no prod); o link do anúncio vem do banco e só abre se for https
     final uri = a == null ? Uri.tryParse(contatoAnuncie) : linkDoAnuncio(a.linkUrl);
     return Semantics(
@@ -43,7 +48,12 @@ class EspacoAnuncioView extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: uri == null ? null : () => launchUrl(uri),
+          onTap: uri == null
+              ? null
+              : () {
+                  if (a != null) registrarAnuncio('anuncio_clique', a, espaco);
+                  launchUrl(uri);
+                },
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:promocao_na_mao/core/modelos.dart';
 import 'package:promocao_na_mao/core/widgets.dart';
+import 'package:promocao_na_mao/features/anuncios/anuncios.dart';
+import 'package:promocao_na_mao/features/anuncios/espaco_anuncio.dart';
 import 'package:promocao_na_mao/features/lista/lista.dart';
 import 'package:promocao_na_mao/features/lista/lista_page.dart';
 
@@ -16,6 +18,14 @@ void main() {
     expect(find.bySemanticsLabel('Café 500 g, R\$ 12,90 no Atacadão, antes R\$ 15,90'), findsOneWidget);
     expect(find.bySemanticsLabel('Adicionar'), findsOneWidget);
     semantica.dispose();
+  });
+
+  testWidgets('anúncio vendido leva o selo "Patrocinado"', (t) async {
+    final a = Anuncio.fromJson({'id': 1, 'formato': 'feed', 'titulo': 'Padaria do Bairro'});
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: EspacoAnuncioView(anuncio: a, espaco: 'inicio'))));
+    expect(find.text('Patrocinado'), findsOneWidget);
+    expect(find.text('Anúncio'), findsNothing);
+    anunciosVistos.clear();
   });
 
   testWidgets('lista carregando: indicador em vez de "0 itens em 0 mercados"', (t) async {

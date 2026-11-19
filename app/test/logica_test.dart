@@ -110,6 +110,16 @@ void main() {
     expect(intercalar(ofertas, []).whereType<EspacoAnuncio>().first.anuncio, isNull); // → AdSense / "Anuncie aqui"
   });
 
+  test('anuncio_visto: uma vez por anúncio e espaço em cada tela', () {
+    anunciosVistos.clear();
+    registrarAnuncio('anuncio_visto', anuncio(1), 'inicio');
+    registrarAnuncio('anuncio_visto', anuncio(1), 'inicio'); // rolou e voltou: não conta de novo
+    registrarAnuncio('anuncio_visto', anuncio(1), 'busca');
+    registrarAnuncio('anuncio_clique', anuncio(2), 'inicio'); // clique não entra na conta dos vistos
+    expect(anunciosVistos, {'inicio:1', 'busca:1'});
+    anunciosVistos.clear(); // o main.dart limpa ao trocar de tela
+  });
+
   test('link de anúncio: só https abre', () {
     expect(linkDoAnuncio('https://bigmais.com.br/oferta')?.host, 'bigmais.com.br');
     for (final ruim in ['tel:33999999999', 'intent://x#Intent;end', 'javascript:alert(1)', 'http://x.com', 'https:', 'nada', '', null]) {

@@ -396,6 +396,10 @@ Notifications service (APNs)** → baixar o `.p8` (uma vez só) e anotar o **Key
 - **Analytics**: uma "tela vista" por troca de rota com o **molde** do caminho (`/l/:codigo`, `/oferta/:id`),
   nunca o caminho real, que levaria o código secreto da lista. **Sem ID de publicidade**: o manifest remove a
   permissão `AD_ID` e desliga `google_analytics_adid_collection_enabled`.
+- **Anúncios vendidos** (`registrarAnuncio` em `features/anuncios/anuncios.dart`): `anuncio_visto` uma vez por
+  anúncio e espaço em cada tela (a troca de rota zera a conta) e `anuncio_clique` ao tocar, com `anuncio_id` e
+  `espaco` (`inicio`, `mercado`, `oferta`, `busca`). É o "quantos viram" para o anunciante; o banco não muda.
+  Para filtrar por anúncio no console, cadastrar `anuncio_id` e `espaco` como dimensões personalizadas do GA4.
 - Declarados na política de privacidade e em `docs/loja/seguranca-dos-dados.md`.
 
 ## Fontes

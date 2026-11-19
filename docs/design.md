@@ -90,9 +90,9 @@ Navegação: **4 abas** — Início, Buscar, Mercados, Lista.
 
 | Formato | Selo | Onde | Para quem | Regra |
 |---|---|---|---|---|
-| Card no meio das ofertas | Anúncio | lista do Início, depois de cada 8 ofertas | comércio local | mesmo tamanho de uma oferta |
-| Resultado patrocinado | Patrocinado | primeiro resultado da busca | mercados e marcas | só quando combina com o termo buscado |
-| Banner na página | Anúncio | mercado (358×90) e oferta (358×100) | qualquer anunciante | abaixo do conteúdo principal |
+| Card no meio das ofertas | Patrocinado (vendido) / Anúncio (Google) | lista do Início, depois de cada 8 ofertas | comércio local | mesmo tamanho de uma oferta |
+| Resultado patrocinado | Patrocinado | primeiro resultado da busca | mercados e marcas | só quando combina com o termo buscado; no máximo 1 por busca |
+| Banner na página | Patrocinado (vendido) / Anúncio (Google) | mercado (358×90) e oferta (358×100) | qualquer anunciante | abaixo do conteúdo principal |
 | Mercado em destaque | Patrocinado | 1ª posição em "Mercados" | os mercados | um por vez, selo visível |
 
 Regras para todos: sempre com selo "Anúncio" ou "Patrocinado"; nunca cobrir preço ou validade; no

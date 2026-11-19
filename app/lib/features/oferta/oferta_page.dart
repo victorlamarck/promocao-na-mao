@@ -119,7 +119,7 @@ class _OfertaPageState extends State<OfertaPage> {
             _carregar();
           }),
         null => const Center(child: CircularProgressIndicator()),
-        final o => _Detalhe(o, _lojas ?? const [], _bannerPronto ? EspacoAnuncioView(anuncio: _banner) : null, _comparacao),
+        final o => _Detalhe(o, _lojas ?? const [], _bannerPronto ? EspacoAnuncioView(anuncio: _banner, espaco: 'oferta') : null, _comparacao),
       },
     );
   }

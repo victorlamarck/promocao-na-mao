@@ -193,7 +193,7 @@ class _OfertasDeHojeState extends State<_OfertasDeHoje> {
           separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (_, i) => switch (linhas[i]) {
             List<Oferta> par => ParDeCards([for (final o in par) CardOferta(o)]),
-            EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio),
+            EspacoAnuncio e => EspacoAnuncioView(anuncio: e.anuncio, espaco: 'inicio'),
             _ => const SizedBox.shrink(),
           },
         ),
