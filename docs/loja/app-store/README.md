@@ -90,13 +90,15 @@ Dúvidas, sugestões ou quer anunciar? Escreva para oi.promocaonamao@gmail.com.
 **1206×2622** (ou 1179×2556), RGB sem transparência → [capturas-6.3/](capturas-6.3/). As de 6,9" (1320×2868, [capturas/](capturas/))
 foram recusadas nessa área em 08/11/2026 ("File dimensions are invalid"); `tools/reduzir.mjs` faz uma a partir da outra.
 Ordem:
-`1-inicio`, `2-busca`, `3-lista`, `4-oferta`, `5-mercados`. A Apple reduz sozinha para os iPhones menores.
+`1-inicio`, `2-preco` (gráfico "Como o preço variou"), `3-busca`, `4-lista`, `5-mercados` (refeitas em 19/11/2026, versão 0.10.0). A Apple reduz sozinha para os iPhones menores.
 iPad: não precisa (o app é só iPhone).
 
-Como foram feitas: o próprio app (Flutter web, `config/prod.json`, dados reais de prod de 08/11/2026) num Chrome
+Como foram feitas: o próprio app (Flutter web, `config/prod.json`, dados reais de prod de 19/11/2026) num Chrome
 sem janela em 390×844 ×3, localização negada, e a moldura com legenda em Fredoka no estilo das capturas da Play.
 Scripts em [tools/](tools/) (`npm i playwright-core` numa pasta temporária; usa o Chrome instalado):
-`node fotos.mjs <app/build/web> <cru> roteiro.json` e `node moldura.mjs <cru> <saida>`.
+`node fotos.mjs <app/build/web> <cru> roteiro.json` e `node moldura.mjs <cru> <saida>`. O `fotos.mjs` repassa as fotos do R2
+com cabeçalho de CORS (o bucket não libera `localhost`). A tela do gráfico abre uma oferta fixa do roteiro
+(`/oferta/15463`): na próxima vez, troque por uma oferta vigente cujo produto tenha histórico em vários mercados.
 Atenção: o roteiro cria uma lista de verdade no banco de prod (some sozinha em 6 meses; rodar com cuidado).
 
 **Header e Search Results** (aba "Header and Search Results", opcionais, só aparecem no iOS 27+; sem transparência):

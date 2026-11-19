@@ -13,7 +13,7 @@ const tipos = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.html': 't
 const raiz = path.resolve(web);
 const srv = http.createServer((req, res) => {
   let f = path.resolve(raiz, '.' + decodeURIComponent(req.url.split('?')[0]));
-  if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(raiz, 'index.html');
+  if (!f.startsWith(raiz) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { if (path.extname(f)) console.log('[faltou]', req.url); f = path.join(raiz, 'index.html'); }
   res.writeHead(200, { 'content-type': tipos[path.extname(f)] ?? 'application/octet-stream' });
   fs.createReadStream(f).pipe(res);
 }).listen(8765);
@@ -23,7 +23,10 @@ const ctx = await browser.newContext({
   viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true,
   locale: 'pt-BR', timezoneId: 'America/Sao_Paulo', permissions: [], // localização negada: não mostra onde o dev está
 });
+// fotos do R2: o bucket não manda CORS para localhost; o teste repassa a resposta com o cabeçalho
+await ctx.route('https://fotos.promocaonamao.com.br/**', async (r) => { const resp = await r.fetch(); await r.fulfill({ response: resp, headers: { ...resp.headers(), 'access-control-allow-origin': '*' } }); });
 const page = await ctx.newPage();
+page.on('pageerror', (e) => console.log('[pageerror]', String(e).slice(0, 300)));
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(saida, { recursive: true });
 

@@ -174,12 +174,14 @@ class ComparacaoDaLista extends StatelessWidget {
                         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: c.onPrimaryContainer)),
                   ),
               ]),
-              subtitle: Text(r.encontrados == r.itens ? 'Todos os itens' : '${r.encontrados} de ${r.itens} itens'),
-              trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text(reais(r.total), style: TextStyle(fontWeight: FontWeight.w800, color: context.corPreco)),
+              // o total do clube vai embaixo, não à direita: "R$ 43,80 com app Meu Atacadão" espremia o nome do mercado
+              subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(r.encontrados == r.itens ? 'Todos os itens' : '${r.encontrados} de ${r.itens} itens'),
                 if (r.totalClube != null && r.totalClube! < r.total)
-                  Text('${reais(r.totalClube!)} com ${Mercado.de(r.redeSlug).clube ?? 'clube'}', style: const TextStyle(fontSize: 12)),
+                  Text('${reais(r.totalClube!)} com ${Mercado.de(r.redeSlug).clube ?? 'clube'}',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: context.corPreco)),
               ]),
+              trailing: Text(reais(r.total), style: TextStyle(fontWeight: FontWeight.w800, color: context.corPreco)),
             ),
         ]),
       ),

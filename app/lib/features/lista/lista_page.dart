@@ -103,7 +103,8 @@ class _ListaPageState extends State<ListaPage> {
                     label: const Text('Esvaziar lista'),
                   ),
                 ],
-                if (l.erro) Erro(onTentar: l.carregar, texto: 'Não conseguimos carregar a lista.'),
+                // com a lista salva na tela, o aviso "Sem internet" lá em cima já diz isso
+                if (l.erro && !l.salva) Erro(onTentar: l.carregar, texto: 'Não conseguimos carregar a lista.'),
               ]),
             );
           },
