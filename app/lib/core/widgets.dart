@@ -352,9 +352,9 @@ class ParDeCards extends StatelessWidget {
 
 /// Card de uma oferta: mercado e validade, nome, preço (o elemento mais forte), clube, "antes", condição, Adicionar.
 class CardOferta extends StatelessWidget {
-  const CardOferta(this.oferta, {super.key, this.mostrarPorUnidade = false, this.mostrarMercado = true, this.maisBarato = false});
+  const CardOferta(this.oferta, {super.key, this.mostrarMercado = true, this.maisBarato = false});
   final Oferta oferta;
-  final bool mostrarPorUnidade, mostrarMercado;
+  final bool mostrarMercado;
 
   /// Selo "Mais barato por kg/litro" (busca e comparação).
   final bool maisBarato;
@@ -368,7 +368,8 @@ class CardOferta extends StatelessWidget {
     final clubeMenor = o.precoClube != null && (o.preco == null || o.precoClube! < o.preco!);
     final valor = clubeMenor ? o.precoClube : o.preco;
     // o R$/kg do banco já é o do preço mais baixo (o mesmo do preço grande)
-    final unidade = mostrarPorUnidade ? porUnidade(o.porUnidadeValor, o.porUnidadeTipo, preco: valor) : null;
+    final unidade = porUnidade(o.porUnidadeValor, o.porUnidadeTipo, preco: valor);
+    final tamanho = o.tamanho;
     final preco = valor == null ? 'preço no mercado' : reais(valor);
     final etiquetaClube = o.precoClube == null
         ? null
@@ -379,6 +380,7 @@ class CardOferta extends StatelessWidget {
     // Leitor de tela: o card vira uma frase só ("Café 500 g, R$ 12,90 no Atacadão, antes R$ 15,90"); o Adicionar fica à parte.
     final rotulo = [
       o.nome,
+      ?tamanho,
       mostrarMercado ? '$preco no ${o.redeNome}' : preco,
       ?unidade,
       ?etiquetaClube,
@@ -395,10 +397,12 @@ class CardOferta extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 6, children: [
-            // foto com o logo do mercado no canto
+            // foto com o logo do mercado num canto e o tamanho da embalagem no outro ("430g": o preço é do pacote)
             Stack(children: [
               FotoOferta(o, altura: 120),
               if (mostrarMercado) Positioned(top: 6, left: 6, child: ExcludeSemantics(child: AvatarMercado(o.redeSlug, tamanho: 26))),
+              if (tamanho != null)
+                Positioned(top: 6, right: 6, child: ExcludeSemantics(child: Etiqueta(tamanho, cor: c.onSurface, fundo: c.surfaceContainerHighest))),
             ]),
             Semantics(
               label: rotulo,
@@ -411,14 +415,15 @@ class CardOferta extends StatelessWidget {
                 if (o.atacado) Etiqueta('Preço de atacado', cor: c.onTertiaryContainer, fundo: c.tertiaryContainer),
                 Text(o.nome,
                     maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, height: 1.25)),
-                // Wrap: no card estreito, o "antes" e o "R$ X o kg" descem para a linha de baixo
+                // Wrap: no card estreito, o "antes" desce para a linha de baixo
                 Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 6, children: [
                   Text(valor == null ? 'Preço no mercado' : reais(valor), style: fredoka(valor == null ? 15 : 20, cor: context.corPreco)),
                   if (o.precoDe != null)
                     Text(reais(o.precoDe!),
                         style: TextStyle(fontSize: 12, color: c.onSurfaceVariant, decoration: TextDecoration.lineThrough)),
-                  if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
                 ]),
+                // "R$ 162,56 o kg": compara o pacote com o vendido a peso
+                if (unidade != null) Text(unidade, style: TextStyle(fontSize: 12, color: c.onSurfaceVariant)),
                 if (etiquetaClube != null) Etiqueta(etiquetaClube),
                 // até 2 linhas no card; o texto todo na tela da oferta
                 if (o.condicaoCurta != null) Etiqueta(o.condicaoCurta!, cor: c.onTertiaryContainer, fundo: c.tertiaryContainer, linhas: 2),

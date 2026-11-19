@@ -34,7 +34,9 @@ concurrency: ios
 
 jobs:
   # O pubspec também muda quando só se atualiza um pacote: no push, publica só se a linha "version:" mudou.
+  # Só do main (como o android.yml): o botão num outro ramo assinava e enviava código que não passou pelo main.
   versao:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       publicar: ${{ steps.v.outputs.publicar }}
@@ -62,7 +64,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           flutter-version: 3.47.3 # a mesma da máquina de desenvolvimento
           channel: stable
