@@ -11,6 +11,7 @@ import '../../core/widgets.dart';
 import '../anuncios/anuncios.dart';
 import '../anuncios/espaco_anuncio.dart';
 import '../avisos/avisos.dart';
+import 'dica.dart';
 import 'grafico_preco.dart';
 
 final _db = Supabase.instance.client;
@@ -140,6 +141,14 @@ class _Detalhe extends StatelessWidget {
     final porKg = porUnidade(o.precoReferencia, o.unidadeReferencia, preco: o.precoClube ?? o.preco);
     final secundario = TextStyle(fontSize: 13, color: c.onSurfaceVariant);
     return ListView(padding: const EdgeInsets.all(16), children: [
+      if (o.produtoCodigo case final codigo? when avisosDisponiveis && !avisoProduto.ligados.value.contains(codigo))
+        Dica(
+          id: 'sino',
+          icone: Icons.notifications_none,
+          texto: 'Toque no sino lá em cima e a gente avisa quando entrar em oferta.',
+          acao: 'Avisar',
+          onAcao: () => BotaoAviso.produto(codigo: codigo, nome: o.nome).alternarEAvisar(context),
+        ),
       Row(spacing: 8, children: [
         AvatarMercado(o.redeSlug, tamanho: 12),
         Expanded(child: Text('${o.redeNome} · ${valeAte(o.validadeFim).toLowerCase()}', style: secundario)),

@@ -6,8 +6,30 @@ import 'package:promocao_na_mao/core/widgets.dart';
 import 'package:promocao_na_mao/features/anuncios/espaco_anuncio.dart';
 import 'package:promocao_na_mao/features/lista/lista.dart';
 import 'package:promocao_na_mao/features/lista/lista_page.dart';
+import 'package:promocao_na_mao/features/oferta/dica.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  testWidgets('dica: aparece só na 1ª vez e some com um toque', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    var usou = false;
+    Widget tela() => MaterialApp(
+        home: Scaffold(
+            body: Dica(id: 'sino', icone: Icons.notifications_none, texto: 'Toque no sino', acao: 'Avisar', onAcao: () => usou = true)));
+    await t.pumpWidget(tela());
+    await t.pumpAndSettle();
+    expect(find.text('Toque no sino'), findsOneWidget);
+    await t.tap(find.text('Avisar'));
+    await t.pump();
+    expect(usou, isTrue);
+    expect(find.text('Toque no sino'), findsNothing);
+
+    await t.pumpWidget(const SizedBox()); // sai da tela e volta: já foi vista
+    await t.pumpWidget(tela());
+    await t.pumpAndSettle();
+    expect(find.text('Toque no sino'), findsNothing);
+  });
+
   testWidgets('card: uma frase para o leitor de tela, Adicionar à parte', (t) async {
     final semantica = t.ensureSemantics();
     final o = Oferta.fromJson({
