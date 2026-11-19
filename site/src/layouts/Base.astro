@@ -3,7 +3,7 @@
 // fica ao lado das ofertas (no celular, embaixo).
 import MinhaLista from '../components/MinhaLista.tsx';
 import ContagemLista from '../components/ContagemLista.tsx';
-import { ehProd, contatoAnuncie, adsenseCliente, lojaAndroid, lojaIos, pacoteAndroid } from '../lib/config';
+import { ehProd, contatoAnuncie, adsenseCliente, lojaAndroid, lojaIos, pacoteAndroid, gaId, metaPixelId } from '../lib/config';
 
 interface Props { titulo: string; descricao?: string; comLista?: boolean; termo?: string; indexar?: boolean; botaoLista?: boolean; imagem?: string }
 const { titulo, descricao = 'As ofertas dos encartes dos supermercados de Governador Valadares numa lista só.', comLista = false, termo = '', indexar = true, botaoLista = true, imagem = '/previa/site.png' } = Astro.props;
@@ -35,6 +35,20 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Nunito:wght@400;600;700;800&display=swap">
+  {gaId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>}
+  <!-- GA4 no modo de consentimento: sem aceite, sem cookie (contagem anônima); o aceite fica em src/lib/medir.ts -->
+  <script is:inline define:vars={{ gaId }}>
+    if (gaId) {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      let aceito = null;
+      try { aceito = localStorage.getItem('consentimento'); } catch (e) { /* sem storage: sem aceite */ }
+      const v = aceito === 'sim' ? 'granted' : 'denied';
+      window.gtag('consent', 'default', { analytics_storage: v, ad_storage: v, ad_user_data: v, ad_personalization: v });
+      window.gtag('js', new Date());
+      window.gtag('config', gaId);
+    }
+  </script>
 </head>
 <body>
   {!ehProd && <div class="faixa-dev">DEV</div>}
@@ -77,16 +91,25 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
     </div>
   )}
 
+  {(gaId || metaPixelId) && (
+    <div id="cookies" class="cookies" role="region" aria-label="Cookies" hidden>
+      <p>Usamos cookies para medir as visitas e os nossos anúncios. <a href="/privacidade/#cookies">Saiba mais</a></p>
+      <button type="button" class="botao" data-sim="0">Só o necessário</button>
+      <button type="button" class="botao botao-cheio" data-sim="1">Aceitar</button>
+    </div>
+  )}
+
   <footer class="rodape">
     <div class="rodape-dentro">
       <span>Promoção na Mão · ofertas dos encartes de Governador Valadares</span>
-      <span class="links"><a href={contatoAnuncie}>Para mercados</a><a href={contatoAnuncie}>Anuncie</a><a href="/privacidade/">Privacidade</a></span>
+      <span class="links">{(lojaAndroid || lojaIos) && <a href="/baixar/">Baixe o app</a>}<a href={contatoAnuncie}>Para mercados</a><a href={contatoAnuncie}>Anuncie</a><a href="/privacidade/">Privacidade</a></span>
     </div>
   </footer>
 
   <script>
     import '../scripts/adicionar';
     import '../scripts/abrirApp';
+    import '../scripts/medir';
   </script>
 </body>
 </html>
@@ -198,10 +221,12 @@ const tituloCompleto = titulo === 'Promoção na Mão' ? titulo : `${titulo} · 
   .folha h2 { font-size: 20px; } .folha p { margin: 0 0 4px; color: var(--suave); }
   .aviso { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); margin: 0; max-width: calc(100% - 32px); padding: 12px 16px; border-radius: 12px; background: var(--texto); color: var(--branco); font-weight: 700; font-size: 14px; }
   .aviso:empty { display: none; }
+  .cookies { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 15; max-width: 640px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border-radius: 16px; background: var(--branco); border: 1px solid var(--linha); box-shadow: 0 4px 16px rgba(0,0,0,.12); font-size: 14px; }
+  .cookies p { flex: 1 1 260px; margin: 0; }
 
   .rodape { border-top: 1px solid var(--linha); background: var(--branco); }
   .rodape-dentro { max-width: 1240px; margin: 0 auto; padding: 20px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--suave); }
-  .rodape .links { display: flex; gap: 16px; }
+  .rodape .links { display: flex; flex-wrap: wrap; gap: 16px; }
 
   @media (max-width: 640px) {
     .lista { position: static; } .topo-dentro { gap: 10px; } .marca { font-size: 20px; }
