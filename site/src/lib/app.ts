@@ -5,3 +5,14 @@ export function linkDoApp(ua: string, local: { host: string; pathname: string; s
   if (/iPhone|iPad|iPod/i.test(ua) && d.ios) return d.ios;
   return null;
 }
+
+/** ID numérico do app na App Store (…/id6754123456) para a faixa nativa do Safari (meta apple-itunes-app). */
+export function idAppStore(url: string) {
+  return /\/id(\d+)/.exec(url)?.[1] ?? null;
+}
+
+/** Faixa "Baixe o app" no Android: fechada há menos de [dias] não volta. */
+export function faixaFechadaRecente(fechadaEm: string | null, agora: number, dias = 30) {
+  const t = Number(fechadaEm);
+  return fechadaEm != null && Number.isFinite(t) && agora - t < dias * 86_400_000;
+}

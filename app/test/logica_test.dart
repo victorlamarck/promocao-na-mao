@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:promocao_na_mao/core/analytics.dart';
 import 'package:promocao_na_mao/core/formato.dart';
 import 'package:promocao_na_mao/core/localizacao.dart';
 import 'package:promocao_na_mao/core/modelos.dart';
@@ -108,6 +109,17 @@ void main() {
     expect(espacos.map((e) => e.anuncio!.id), [1, 2]);
     expect(intercalar(ofertas.sublist(0, 7), [anuncio(1)]).whereType<EspacoAnuncio>(), isEmpty);
     expect(intercalar(ofertas, []).whereType<EspacoAnuncio>().first.anuncio, isNull); // → AdSense / "Anuncie aqui"
+  });
+
+  test('eventos ao aparecer: uma vez por chave em cada tela', () {
+    novaTela();
+    expect(eventoUmaVezPorTela('anuncio_visto', 'inicio:1'), isTrue);
+    expect(eventoUmaVezPorTela('anuncio_visto', 'inicio:1'), isFalse); // rolou e voltou: não conta de novo
+    expect(eventoUmaVezPorTela('anuncio_visto', 'busca:1'), isTrue);
+    expect(eventoUmaVezPorTela('lista_comparada', 'inicio:1'), isTrue); // outro evento, conta separada
+    novaTela(); // o main.dart zera ao trocar de tela
+    expect(eventoUmaVezPorTela('anuncio_visto', 'inicio:1'), isTrue);
+    novaTela();
   });
 
   test('link de anúncio: só https abre', () {

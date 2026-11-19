@@ -5,6 +5,7 @@ import Base from '../../layouts/Base.astro';
 import CardOferta from '../../components/CardOferta.tsx';
 import Comparacao from '../../components/Comparacao.tsx';
 import PreviaGrafico from '../../components/PreviaGrafico.astro';
+import Sino from '../../components/Sino.astro';
 import { dados } from '../../lib/dados';
 import { mercado, nomeDaOferta, reais, valeAte } from '../../lib/formato';
 
@@ -19,6 +20,7 @@ const { o, outras } = Astro.props;
 const nome = nomeDaOferta(o);
 const m = mercado(o.rede_slug);
 const preco = o.preco == null ? 'preço no mercado' : reais(o.preco);
+const doCatalogo = o.itens.some((i) => i.produto_id != null); // gráfico e sino do app só existem para produto do catálogo
 const url = new URL(Astro.url.pathname, Astro.site).href;
 // dados estruturados para o Google (schema.org): sem preço ("preço no mercado") a oferta sai sem price;
 // o texto vem do encarte, por isso o "<" vira \u003c (um "</script>" no nome não fecha a tag)
@@ -41,10 +43,11 @@ const ld = {
           <a class="botao" href={`https://www.google.com/maps/search/${encodeURIComponent(`${o.rede_nome} Governador Valadares`)}`} target="_blank" rel="noopener">Como chegar</a>
           <a class="botao" href={`/mercado/${o.rede_slug}/`}>Mais ofertas do {o.rede_nome}</a>
         </div>
+        {doCatalogo && <Sino tipo="produto" nome={nome} />}
       </div>
     </div>
   </section>
-  {o.itens.some((i) => i.produto_id != null) && <PreviaGrafico />}  <!-- só onde o app tem gráfico: produto do catálogo -->
+  {doCatalogo && <PreviaGrafico />}
   <!-- client:idle (não visible): no build o componente não desenha nada, então não haveria o que observar -->
   <Comparacao client:idle id={o.id} />
   {outras.length > 0 && (

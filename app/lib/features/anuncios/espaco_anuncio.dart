@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/analytics.dart';
 import '../../core/config.dart';
 import '../../core/modelos.dart';
 import '../../core/tema.dart';
@@ -20,21 +21,26 @@ class SeloAnuncio extends StatelessWidget {
       );
 }
 
-/// Espaço de anúncio: o vendido pelo dev; senão a rede do Google (AdSense no web, AdMob no Android); senão "Anuncie aqui".
+/// Espaço de anúncio: o vendido pelo dev (selo "Patrocinado"); senão a rede do Google (AdSense no web, AdMob no
+/// celular) ou "Anuncie aqui", com o selo "Anúncio".
 class EspacoAnuncioView extends StatelessWidget {
-  const EspacoAnuncioView({super.key, this.anuncio, this.selo = 'Anúncio', this.alturaRede = 100});
+  const EspacoAnuncioView({super.key, this.anuncio, required this.espaco, this.alturaRede = 100});
   final Anuncio? anuncio;
-  final String selo;
+
+  /// Onde está, para o Analytics: inicio, mercado, oferta ou busca.
+  final String espaco;
   final double alturaRede;
 
   @override
   Widget build(BuildContext context) {
     final a = anuncio;
-    final cartao = _cartao(context, a);
-    return (a == null ? blocoAdsense(alturaRede, selo: SeloAnuncio(texto: selo), reserva: cartao) : null) ?? cartao;
+    // "quantos viram", para o anunciante: o build roda quando o espaço entra na tela (listas são preguiçosas)
+    if (a != null) eventoUmaVezPorTela('anuncio_visto', '$espaco:${a.id}', {'anuncio_id': a.id, 'espaco': espaco});
+    final cartao = _cartao(context, a, a == null ? 'Anúncio' : 'Patrocinado');
+    return (a == null ? blocoAdsense(alturaRede, selo: const SeloAnuncio(), reserva: cartao) : null) ?? cartao;
   }
 
-  Widget _cartao(BuildContext context, Anuncio? a) {
+  Widget _cartao(BuildContext context, Anuncio? a, String selo) {
     // contatoAnuncie é da config do dev (mailto: no prod); o link do anúncio vem do banco e só abre se for https
     final uri = a == null ? Uri.tryParse(contatoAnuncie) : linkDoAnuncio(a.linkUrl);
     return Semantics(
@@ -43,7 +49,12 @@ class EspacoAnuncioView extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: uri == null ? null : () => launchUrl(uri),
+          onTap: uri == null
+              ? null
+              : () {
+                  if (a != null) evento('anuncio_clique', {'anuncio_id': a.id, 'espaco': espaco});
+                  launchUrl(uri);
+                },
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -59,10 +70,12 @@ class EspacoAnuncioView extends StatelessWidget {
                 ],
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(a?.titulo ?? 'Anuncie aqui', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                    // limites do Guia do Anunciante (privado: docs/guia-do-anunciante.md): título até 40, texto até 80 caracteres
+                    Text(a?.titulo ?? 'Anuncie aqui',
+                        maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 2),
                     Text(a?.texto ?? 'Seu comércio para quem está fazendo as compras em Governador Valadares.',
-                        style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
+                        maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, color: context.cores.onSurfaceVariant)),
                   ]),
                 ),
               ]),

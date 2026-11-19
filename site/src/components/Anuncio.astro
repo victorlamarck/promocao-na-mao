@@ -1,6 +1,7 @@
 ---
 // Anúncio vendido pelo dev (tabela anuncio) ou, sem anúncio, o convite "Anuncie aqui".
-// Regras (docs/design.md): sempre com selo, nunca cobre preço/validade, máx. 1 a cada 8 ofertas.
+// Regras (docs/design.md): sempre com selo ("Patrocinado" no vendido, como no app), nunca cobre preço/validade,
+// máx. 1 a cada 8 ofertas. Imagem quadrada; título em até 2 linhas e texto em até 3 (Guia do Anunciante).
 import type { Anuncio } from '../lib/dados';
 import { contatoAnuncie } from '../lib/config';
 
@@ -9,10 +10,10 @@ const { anuncio, faixa = false } = Astro.props;
 ---
 {anuncio ? (
   <a class:list={['anuncio', { 'anuncio-faixa': faixa }]} href={anuncio.link_url ?? undefined} rel="sponsored noopener" target="_blank">
-    <span class="selo">Anúncio</span>
+    <span class="selo">Patrocinado</span>
     {anuncio.imagem_url && <img src={anuncio.imagem_url} alt="" loading="lazy">}
-    <strong>{anuncio.titulo}</strong>
-    {anuncio.texto && <span class="suave">{anuncio.texto}</span>}
+    <strong class="anuncio-linhas" style="--linhas: 2">{anuncio.titulo}</strong>
+    {anuncio.texto && <span class="suave anuncio-linhas" style="--linhas: 3">{anuncio.texto}</span>}
   </a>
 ) : (
   <a class:list={['anuncio', { 'anuncio-faixa': faixa }]} href={contatoAnuncie} rel="noopener" target={contatoAnuncie.startsWith('http') ? '_blank' : undefined}>

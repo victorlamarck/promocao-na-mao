@@ -1,11 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:promocao_na_mao/core/analytics.dart';
 import 'package:promocao_na_mao/core/modelos.dart';
 import 'package:promocao_na_mao/core/widgets.dart';
+import 'package:promocao_na_mao/features/anuncios/espaco_anuncio.dart';
 import 'package:promocao_na_mao/features/lista/lista.dart';
 import 'package:promocao_na_mao/features/lista/lista_page.dart';
+import 'package:promocao_na_mao/features/oferta/dica.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  testWidgets('dica: aparece só na 1ª vez e some com um toque', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    var usou = false;
+    Widget tela() => MaterialApp(
+        home: Scaffold(
+            body: Dica(id: 'sino', icone: Icons.notifications_none, texto: 'Toque no sino', acao: 'Avisar', onAcao: () => usou = true)));
+    await t.pumpWidget(tela());
+    await t.pumpAndSettle();
+    expect(find.text('Toque no sino'), findsOneWidget);
+    await t.tap(find.text('Avisar'));
+    await t.pump();
+    expect(usou, isTrue);
+    expect(find.text('Toque no sino'), findsNothing);
+
+    await t.pumpWidget(const SizedBox()); // sai da tela e volta: já foi vista
+    await t.pumpWidget(tela());
+    await t.pumpAndSettle();
+    expect(find.text('Toque no sino'), findsNothing);
+  });
+
   testWidgets('card: uma frase para o leitor de tela, Adicionar à parte', (t) async {
     final semantica = t.ensureSemantics();
     final o = Oferta.fromJson({
@@ -16,6 +40,14 @@ void main() {
     expect(find.bySemanticsLabel('Café 500 g, R\$ 12,90 no Atacadão, antes R\$ 15,90'), findsOneWidget);
     expect(find.bySemanticsLabel('Adicionar'), findsOneWidget);
     semantica.dispose();
+  });
+
+  testWidgets('anúncio vendido leva o selo "Patrocinado"', (t) async {
+    final a = Anuncio.fromJson({'id': 1, 'formato': 'feed', 'titulo': 'Padaria do Bairro'});
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: EspacoAnuncioView(anuncio: a, espaco: 'inicio'))));
+    expect(find.text('Patrocinado'), findsOneWidget);
+    expect(find.text('Anúncio'), findsNothing);
+    novaTela();
   });
 
   testWidgets('lista carregando: indicador em vez de "0 itens em 0 mercados"', (t) async {

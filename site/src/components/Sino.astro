@@ -1,0 +1,35 @@
+---
+// Sino "Me avise" (t48): no site não há aviso (ele chega pelo app, por push). Tocar explica isso e oferece o app.
+// Os botões levam a origem do anúncio até a loja e contam o toque (src/scripts/medir.ts, data-loja e data-recurso).
+import { lojaAndroid, lojaIos } from '../lib/config';
+
+interface Props { tipo: 'produto' | 'mercado'; nome: string }
+const { tipo, nome } = Astro.props;
+const chamada = tipo === 'produto' ? 'Me avise quando entrar em oferta' : `Avise as ofertas novas do ${nome}`;
+const explica = tipo === 'produto'
+  ? `No app, toque no sino desta oferta e a gente avisa no celular quando ${nome} entrar em oferta de novo.`
+  : `No app, toque no sino do ${nome} e a gente avisa no celular quando sair encarte novo.`;
+---
+{(lojaAndroid || lojaIos) && (
+  <details class="sino" data-recurso="sino">
+    <summary class="botao">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+      {chamada}
+    </summary>
+    <div class="sino-texto">
+      <p><strong>O aviso chega pelo app.</strong> {explica}</p>
+      <div class="sino-botoes">
+        {lojaAndroid && <a class="botao botao-cheio" href={lojaAndroid} data-loja="android" data-onde="sino" target="_blank" rel="noopener">Baixar na Google Play</a>}
+        {lojaIos && <a class="botao botao-cheio" href={lojaIos} data-loja="ios" data-onde="sino" target="_blank" rel="noopener">Baixar na App Store</a>}
+      </div>
+    </div>
+  </details>
+)}
+
+<style>
+  .sino summary { list-style: none; display: inline-flex; align-items: center; gap: 8px; }
+  .sino summary::-webkit-details-marker { display: none; }
+  .sino-texto { margin-top: 10px; padding: 14px 16px; border-radius: 16px; background: var(--verde-claro); display: flex; flex-direction: column; gap: 10px; max-width: 520px; }
+  .sino-texto p { margin: 0; }
+  .sino-botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+</style>

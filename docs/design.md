@@ -90,13 +90,18 @@ Navegação: **4 abas** — Início, Buscar, Mercados, Lista.
 
 | Formato | Selo | Onde | Para quem | Regra |
 |---|---|---|---|---|
-| Card no meio das ofertas | Anúncio | lista do Início, depois de cada 8 ofertas | comércio local | mesmo tamanho de uma oferta |
-| Resultado patrocinado | Patrocinado | primeiro resultado da busca | mercados e marcas | só quando combina com o termo buscado |
-| Banner na página | Anúncio | mercado (358×90) e oferta (358×100) | qualquer anunciante | abaixo do conteúdo principal |
+| Card no meio das ofertas | Patrocinado (vendido) / Anúncio (Google) | lista do Início, depois de cada 8 ofertas | comércio local | mesmo tamanho de uma oferta |
+| Resultado patrocinado | Patrocinado | primeiro resultado da busca | mercados e marcas | só quando combina com o termo buscado; no máximo 1 por busca |
+| Banner na página | Patrocinado (vendido) / Anúncio (Google) | mercado (358×90) e oferta (358×100) | qualquer anunciante | abaixo do conteúdo principal |
 | Mercado em destaque | Patrocinado | 1ª posição em "Mercados" | os mercados | um por vez, selo visível |
 
 Regras para todos: sempre com selo "Anúncio" ou "Patrocinado"; nunca cobrir preço ou validade; no
 máximo 1 a cada 8 ofertas; sem pop-up, tela cheia ou vídeo com som; **nunca na tela da Lista de compras**.
+
+Peça do anúncio vendido (a mesma nos três formatos: card, banner e Busca usam o mesmo cartão): **uma imagem
+quadrada** (600×600 px; no app ela vira miniatura de 64×64 ao lado do texto, no site ocupa o card no meio das
+ofertas e vira miniatura no banner), **título até 40 caracteres** (2 linhas no máximo) e **texto até 80** (3 linhas).
+O que passar disso é cortado com "…". O Guia do Anunciante, com o que o comerciante manda, fica no repositório privado.
 
 ## O que o protótipo pede além da API atual
 

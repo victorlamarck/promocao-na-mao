@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/analytics.dart';
 import '../../core/rotas.dart';
 
 /// Avisos push (docs/app.md#avisos-de-ofertas-novas-push), sem login e sem guardar o aparelho no nosso banco:
@@ -38,6 +39,7 @@ class TipoAviso {
     final novo = {...ligados.value};
     ligar ? novo.add(valor) : novo.remove(valor);
     ligados.value = novo;
+    if (ligar) evento('aviso_ligado', {'tipo': _prefixo == 'produto-' ? 'produto' : 'mercado'});
     await (await SharedPreferences.getInstance()).setStringList(_chave, novo.toList());
     return true;
   }
@@ -68,7 +70,10 @@ Future<void> iniciarAvisos() async {
 
 void _abrir(RemoteMessage m) {
   final rota = m.data['rota'];
-  if (rota is String && (rota.startsWith('/mercado/') || rota.startsWith('/oferta/'))) rotas.push(rota);
+  if (rota is String && (rota.startsWith('/mercado/') || rota.startsWith('/oferta/'))) {
+    evento('notificacao_aberta', {'tipo': rota.startsWith('/mercado/') ? 'mercado' : 'produto'});
+    rotas.push(rota);
+  }
 }
 
 /// Sino: na tela do mercado (ofertas novas) e na da oferta (produto em oferta).
@@ -104,21 +109,24 @@ class BotaoAviso extends StatelessWidget {
               isSelected: esta,
               icon: const Icon(Icons.notifications_none),
               selectedIcon: const Icon(Icons.notifications_active),
-              onPressed: () async {
-                final msg = ScaffoldMessenger.of(context);
-                try {
-                  final ok = await tipo.alternar(valor);
-                  msg.showSnackBar(SnackBar(
-                      content: Text(!ok
-                          ? 'Para avisar, libere as notificações do app nas configurações do celular.'
-                          : tipo.ligados.value.contains(valor)
-                              ? ligado
-                              : desligado)));
-                } catch (_) {
-                  msg.showSnackBar(const SnackBar(content: Text('Não deu agora. Confira a internet e tente de novo.')));
-                }
-              },
+              onPressed: () => alternarEAvisar(context),
             );
           },
         );
+
+  /// O mesmo que tocar no sino (também usado pela dica da tela da oferta): liga ou desliga e diz o resultado.
+  Future<void> alternarEAvisar(BuildContext context) async {
+    final msg = ScaffoldMessenger.of(context);
+    try {
+      final ok = await tipo.alternar(valor);
+      msg.showSnackBar(SnackBar(
+          content: Text(!ok
+              ? 'Para avisar, libere as notificações do app nas configurações do celular.'
+              : tipo.ligados.value.contains(valor)
+                  ? ligado
+                  : desligado)));
+    } catch (_) {
+      msg.showSnackBar(const SnackBar(content: Text('Não deu agora. Confira a internet e tente de novo.')));
+    }
+  }
 }
