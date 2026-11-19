@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/formato.dart';
 import '../../core/tema.dart';
+import 'dica.dart';
 
 /// Um período de historico_produto (migration 29 do privado): dias seguidos com o mesmo preço num mercado.
 class PeriodoPreco {
@@ -59,7 +60,18 @@ class _GraficoPrecoState extends State<GraficoPreco> {
 
   @override
   Widget build(BuildContext context) =>
-      temHistorico(_periodos) ? CartaoGraficoPreco(_periodos, hoje: DateTime.now()) : const SizedBox.shrink();
+      temHistorico(_periodos)
+          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              // a dica só nasce quando o gráfico aparece: é a "1ª vez que o gráfico aparece"
+              const Dica(
+                id: 'grafico',
+                icone: Icons.show_chart,
+                texto: 'Novo: veja aqui como o preço deste produto variou nos últimos dias em cada mercado.',
+                margem: EdgeInsets.only(top: 12),
+              ),
+              CartaoGraficoPreco(_periodos, hoje: DateTime.now()),
+            ])
+          : const SizedBox.shrink();
 }
 
 class CartaoGraficoPreco extends StatelessWidget {

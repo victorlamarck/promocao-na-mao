@@ -109,21 +109,24 @@ class BotaoAviso extends StatelessWidget {
               isSelected: esta,
               icon: const Icon(Icons.notifications_none),
               selectedIcon: const Icon(Icons.notifications_active),
-              onPressed: () async {
-                final msg = ScaffoldMessenger.of(context);
-                try {
-                  final ok = await tipo.alternar(valor);
-                  msg.showSnackBar(SnackBar(
-                      content: Text(!ok
-                          ? 'Para avisar, libere as notificações do app nas configurações do celular.'
-                          : tipo.ligados.value.contains(valor)
-                              ? ligado
-                              : desligado)));
-                } catch (_) {
-                  msg.showSnackBar(const SnackBar(content: Text('Não deu agora. Confira a internet e tente de novo.')));
-                }
-              },
+              onPressed: () => alternarEAvisar(context),
             );
           },
         );
+
+  /// O mesmo que tocar no sino (também usado pela dica da tela da oferta): liga ou desliga e diz o resultado.
+  Future<void> alternarEAvisar(BuildContext context) async {
+    final msg = ScaffoldMessenger.of(context);
+    try {
+      final ok = await tipo.alternar(valor);
+      msg.showSnackBar(SnackBar(
+          content: Text(!ok
+              ? 'Para avisar, libere as notificações do app nas configurações do celular.'
+              : tipo.ligados.value.contains(valor)
+                  ? ligado
+                  : desligado)));
+    } catch (_) {
+      msg.showSnackBar(const SnackBar(content: Text('Não deu agora. Confira a internet e tente de novo.')));
+    }
+  }
 }
