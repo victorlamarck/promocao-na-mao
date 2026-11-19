@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/analytics.dart';
 import '../../core/config.dart';
 import '../../core/modelos.dart';
 import '../../core/tema.dart';
@@ -33,8 +34,8 @@ class EspacoAnuncioView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = anuncio;
-    // build roda quando o espaço entra na tela (listas são preguiçosas); registrarAnuncio não repete na mesma tela
-    if (a != null) registrarAnuncio('anuncio_visto', a, espaco);
+    // "quantos viram", para o anunciante: o build roda quando o espaço entra na tela (listas são preguiçosas)
+    if (a != null) eventoUmaVezPorTela('anuncio_visto', '$espaco:${a.id}', {'anuncio_id': a.id, 'espaco': espaco});
     final cartao = _cartao(context, a, a == null ? 'Anúncio' : 'Patrocinado');
     return (a == null ? blocoAdsense(alturaRede, selo: const SeloAnuncio(), reserva: cartao) : null) ?? cartao;
   }
@@ -51,7 +52,7 @@ class EspacoAnuncioView extends StatelessWidget {
           onTap: uri == null
               ? null
               : () {
-                  if (a != null) registrarAnuncio('anuncio_clique', a, espaco);
+                  if (a != null) evento('anuncio_clique', {'anuncio_id': a.id, 'espaco': espaco});
                   launchUrl(uri);
                 },
           child: Padding(

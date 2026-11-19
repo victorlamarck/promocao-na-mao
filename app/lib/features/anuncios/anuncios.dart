@@ -1,19 +1,6 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/modelos.dart';
-
-/// Anúncios vendidos já contados como vistos nesta tela ("espaço:id"); o main.dart limpa ao trocar de tela.
-final anunciosVistos = <String>{};
-
-/// anuncio_visto (uma vez por anúncio e espaço em cada tela) ou anuncio_clique, para mostrar ao anunciante.
-/// [espaco]: inicio, mercado, oferta ou busca.
-void registrarAnuncio(String evento, Anuncio a, String espaco) {
-  if (evento == 'anuncio_visto' && !anunciosVistos.add('$espaco:${a.id}')) return;
-  try {
-    FirebaseAnalytics.instance.logEvent(name: evento, parameters: {'anuncio_id': a.id, 'espaco': espaco}).ignore();
-  } catch (_) {} // sem Firebase (testes): não conta
-}
 
 /// Regra do protótipo: no máximo 1 anúncio a cada 8 ofertas.
 const ofertasPorAnuncio = 8;

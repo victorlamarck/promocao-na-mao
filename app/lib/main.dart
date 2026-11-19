@@ -8,11 +8,11 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/abertura.dart';
+import 'core/analytics.dart';
 import 'core/config.dart';
 import 'core/rotas.dart';
 import 'core/tema.dart';
 import 'features/anuncios/admob.dart' if (dart.library.js_interop) 'features/anuncios/adsense_web.dart';
-import 'features/anuncios/anuncios.dart';
 import 'features/avisos/avisos.dart';
 import 'features/boas_vindas/boas_vindas.dart';
 import 'features/lista/lista.dart';
@@ -74,7 +74,7 @@ void _telasNoAnalytics() {
     final tela = rotas.routerDelegate.currentConfiguration.fullPath;
     if (tela.isEmpty || tela == ultima) return;
     ultima = tela;
-    anunciosVistos.clear(); // tela nova: cada anúncio conta de novo como visto
+    novaTela(); // tela nova: o que é contado ao aparecer conta de novo
     FirebaseAnalytics.instance.logScreenView(screenName: tela);
   });
 }

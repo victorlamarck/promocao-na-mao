@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/analytics.dart';
 import '../../core/modelos.dart';
 import '../../core/paginador.dart';
 import '../../core/widgets.dart';
@@ -183,6 +184,15 @@ class _ResultadosState extends State<_Resultados> {
     if (widget.consulta.geracao != antes.consulta.geracao) _buscar();
   }
 
+  @override
+  void dispose() {
+    _registro?.cancel();
+    super.dispose();
+  }
+
+  /// O evento "busca" só sai se o termo ficar 2 s na tela: digitando "arroz" não conta "arr", "arro" e "arroz".
+  Timer? _registro;
+
   /// A resposta pode chegar depois de a pessoa sair da tela: setState aí derrubava o app (Crashlytics 0.3.0).
   void _atualizar() {
     if (mounted) setState(() {});
@@ -194,7 +204,11 @@ class _ResultadosState extends State<_Resultados> {
     _patrocinados = [];
     _resultados.proxima(_atualizar);
     final k = widget.consulta;
+    _registro?.cancel();
     if (k.termo.trim().isEmpty) return;
+    // sem o termo: a ficha da Play declara a busca como efêmera (docs/loja/seguranca-dos-dados.md, item 4)
+    _registro = Timer(const Duration(seconds: 2),
+        () => evento('busca', {if (_total != null) 'com_resultado': _total! > 0 ? 'sim' : 'nao'}));
     anunciosDaBusca(k.termo).then((a) {
       if (mounted && k.geracao == widget.consulta.geracao) setState(() => _patrocinados = a);
     }, onError: (_) {});

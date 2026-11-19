@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:promocao_na_mao/core/analytics.dart';
 import 'package:promocao_na_mao/core/modelos.dart';
 import 'package:promocao_na_mao/core/widgets.dart';
-import 'package:promocao_na_mao/features/anuncios/anuncios.dart';
 import 'package:promocao_na_mao/features/anuncios/espaco_anuncio.dart';
 import 'package:promocao_na_mao/features/lista/lista.dart';
 import 'package:promocao_na_mao/features/lista/lista_page.dart';
@@ -25,7 +25,7 @@ void main() {
     await t.pumpWidget(MaterialApp(home: Scaffold(body: EspacoAnuncioView(anuncio: a, espaco: 'inicio'))));
     expect(find.text('Patrocinado'), findsOneWidget);
     expect(find.text('Anúncio'), findsNothing);
-    anunciosVistos.clear();
+    novaTela();
   });
 
   testWidgets('lista carregando: indicador em vez de "0 itens em 0 mercados"', (t) async {
