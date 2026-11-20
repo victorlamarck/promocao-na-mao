@@ -15,16 +15,16 @@ Recomendo o nome curto: o Google desaconselha palavras-chave no título, e a cid
 ## Descrição curta (máx. 80)
 
 ```
-Ofertas dos mercados de GV, busca por produto e lista de compras compartilhada
+Compare os mercados de GV e veja onde sua lista de compras sai mais barata
 ```
 
-**78 caracteres.**
+**74 caracteres.**
 
 ## Descrição completa (máx. 4000)
 
 <!-- início da descrição -->
 ```
-Vai fazer compras em Governador Valadares? O Promoção na Mão junta as ofertas dos encartes dos supermercados da cidade num lugar só, para você achar o que precisa sem folhear um folheto de cada vez.
+Descubra em qual mercado de Governador Valadares a sua compra sai mais barata. O Promoção na Mão junta as ofertas dos encartes dos supermercados da cidade num lugar só, compara os preços e avisa quando o produto que você quer entra em oferta.
 
 MERCADOS QUE JÁ ESTÃO NO APP
 • Atacadão
@@ -43,8 +43,14 @@ Mostramos só as ofertas que valem hoje. Cada oferta diz até quando vale ("Vale
 MONTE SUA LISTA DE COMPRAS
 Toque em "Adicionar" nas ofertas que interessam. A lista já fica separada por mercado, com a quantidade de cada item. Também dá para anotar itens à mão, como "pão francês", mesmo sem oferta.
 
-AVISO DE OFERTAS NOVAS
-Toque no sino na página de um mercado e o app avisa quando sair encarte novo dele. Toque no aviso e veja as ofertas. Você escolhe os mercados e desliga quando quiser.
+QUANTO A SUA LISTA SAI EM CADA MERCADO
+Com itens de mais de um mercado na lista, o app mostra quanto ela sai em cada um, pelo menor preço de hoje do mesmo produto nos outros encartes, e marca o mais barato.
+
+VEJA COMO O PREÇO VARIOU
+Na página de uma oferta, o gráfico mostra como o preço daquele produto variou nos últimos dias em cada mercado e qual foi o menor preço em 30 dias. Assim você sabe se a promoção é boa de verdade.
+
+AVISO DE OFERTAS
+Toque no sino na página de um mercado e o app avisa quando sair encarte novo dele. Toque no sino na página de uma oferta e o app avisa quando aquele produto entrar em oferta de novo. Você escolhe o que acompanhar e desliga quando quiser, na tela "Meus avisos".
 
 COMPARTILHE A LISTA POR LINK
 Mande a lista pelo WhatsApp para quem vai ao mercado. Quem recebe abre o link no celular, sem instalar nada e sem criar conta, e marca o que já pegou. Você vê na hora o que já foi para o carrinho. É sempre o mesmo link: se você mudar a lista, quem recebeu vê a versão nova. Você escolhe se a pessoa só vê a lista ou se também pode marcar os itens.
@@ -71,7 +77,7 @@ Dúvidas, sugestões ou quer anunciar? Escreva para oi.promocaonamao@gmail.com.
 ```
 <!-- fim da descrição -->
 
-**3211 caracteres** (de 4000).
+**3773 caracteres** (de 4000).
 
 Antes de publicar, confira com o dev:
 - "conferidos e atualizados pela nossa equipe a cada novo folheto" — hoje a coleta é manual pelo dev
