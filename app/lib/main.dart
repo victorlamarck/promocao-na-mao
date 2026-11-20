@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/abertura.dart';
 import 'core/analytics.dart';
+import 'core/avaliacao.dart';
 import 'core/config.dart';
 import 'core/rotas.dart';
 import 'core/tema.dart';
@@ -37,6 +38,7 @@ Future<void> main() async {
     };
   }
   final novo = await primeiraVez(); // antes do Supabase e do cache gravarem algo
+  await contarAbertura(); // depois do primeiraVez(), que olha se não há nada gravado
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseChavePublica);
   await carregarAparencia();
   Lista.minha.iniciar(); // sem await: o app abre enquanto a lista carrega

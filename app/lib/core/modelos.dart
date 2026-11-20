@@ -162,10 +162,15 @@ class Anuncio {
         texto = j['texto'] as String?,
         imagemUrl = j['imagem_url'] as String?,
         linkUrl = j['link_url'] as String?,
-        redeId = j['rede_id'] as int?;
+        redeId = j['rede_id'] as int?,
+        // cupom do comércio local (migration 30 do privado); vale até o fim do anúncio
+        cupomCodigo = j['cupom_codigo'] as String?,
+        cupomRegra = j['cupom_regra'] as String?,
+        fim = j['fim'] == null ? null : DateTime.parse(j['fim'] as String);
 
   final int id;
   final String formato, titulo;
-  final String? texto, imagemUrl, linkUrl;
+  final String? texto, imagemUrl, linkUrl, cupomCodigo, cupomRegra;
   final int? redeId;
+  final DateTime? fim;
 }

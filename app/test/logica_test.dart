@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:promocao_na_mao/core/analytics.dart';
+import 'package:promocao_na_mao/core/avaliacao.dart';
 import 'package:promocao_na_mao/core/formato.dart';
 import 'package:promocao_na_mao/core/localizacao.dart';
 import 'package:promocao_na_mao/core/modelos.dart';
@@ -109,6 +110,14 @@ void main() {
     expect(espacos.map((e) => e.anuncio!.id), [1, 2]);
     expect(intercalar(ofertas.sublist(0, 7), [anuncio(1)]).whereType<EspacoAnuncio>(), isEmpty);
     expect(intercalar(ofertas, []).whereType<EspacoAnuncio>().first.anuncio, isNull); // → AdSense / "Anuncie aqui"
+  });
+
+  test('avaliação: nunca na 1ª abertura e no máximo 1 vez a cada 90 dias', () {
+    final agora = DateTime(2026, 11, 20);
+    expect(devePedirAvaliacao(aberturas: 1, agora: agora), isFalse);
+    expect(devePedirAvaliacao(aberturas: 2, agora: agora), isTrue);
+    expect(devePedirAvaliacao(aberturas: 9, ultimoPedido: agora.subtract(const Duration(days: 89)), agora: agora), isFalse);
+    expect(devePedirAvaliacao(aberturas: 9, ultimoPedido: agora.subtract(const Duration(days: 90)), agora: agora), isTrue);
   });
 
   test('eventos ao aparecer: uma vez por chave em cada tela', () {
