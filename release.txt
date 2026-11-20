@@ -1,5 +1,1 @@
-- Dicas rápidas sobre o sino de aviso e o gráfico de preço
-- Cupons de desconto do comércio local nos anúncios
-- Anúncios patrocinados identificados e só 1 por busca
-- Nome inteiro do mercado ao comparar a lista
-- Sem aviso de erro repetido quando cai a internet
+- A lista mostra na hora o que já foi pego quando você volta para o app
