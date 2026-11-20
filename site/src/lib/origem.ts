@@ -20,10 +20,20 @@ export function lerOrigem(search: string): Origem | null {
 /** Provider token da conta na App Store Connect: sem ele a Apple ignora o ct. Não é segredo. */
 export const providerTokenApple = '129712555';
 
+/** Página personalizada de cada público (t17): ppid da App Store e listing da Play. Enquanto a loja não aprova
+ * (ou com o app fora da Play), ela abre a página padrão. "vizinhas" é a Campanha B: mesma página dos adultos. */
+const PAGINA: Record<string, { ppid: string; listing: string }> = {
+  jovens: { ppid: '91cbfa21-3c76-4263-a71c-49c8eecc9a05', listing: 'jovens' },
+  adultos: { ppid: 'b47499fd-50f4-4df3-9102-bbadded019e4', listing: 'adultos' },
+  vizinhas: { ppid: 'b47499fd-50f4-4df3-9102-bbadded019e4', listing: 'adultos' },
+};
+
 /** Link da loja com a origem. Sem anúncio, a origem é "site" (quem achou o site sozinho). */
 export function linkDaLoja(loja: 'android' | 'ios', url: string, o: Origem | null): string {
   const u = new URL(url);
   const campanha = o ? `ads-${o.p}` : 'site';
+  const pagina = o && PAGINA[o.p];
+  if (pagina) u.searchParams.set(loja === 'ios' ? 'ppid' : 'listing', loja === 'ios' ? pagina.ppid : pagina.listing);
   if (loja === 'ios') {
     u.searchParams.set('pt', providerTokenApple);
     u.searchParams.set('ct', o?.c ? `${campanha}-${o.c}` : campanha);

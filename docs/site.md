@@ -116,6 +116,8 @@ O anúncio da Meta aponta para o site com `?p=<público>&c=<criativo>` (`p` = `j
   lojas: App Store com `pt=129712555` (provider token da conta; sem ele a Apple ignora o `ct`) e
   `ct=ads-<p>-<c>`; Google Play com `referrer=utm_source=meta&utm_campaign=ads-<p>&utm_content=<c>` (o Firebase do
   app lê na 1ª abertura). Sem anúncio, a origem é `site`.
+- Cada público abre a sua página personalizada (t17): App Store com `ppid` e Google Play com `listing=jovens|adultos`
+  (`vizinhas` usa a de adultos). Enquanto a loja não aprova a página, ela mostra a ficha padrão.
 - Botões de baixar: `<a data-loja="android|ios" data-onde="...">` (prévia do gráfico, `/baixar`) e a folha
   "Abrir no app". `/baixar` manda o celular direto para a loja (Android: abre o app se já estiver instalado).
 - Eventos (GA4 e, com aceite, Pixel): `chegou_do_anuncio` e `clique_baixar` (`loja`, `onde`, `publico`, `criativo`).
