@@ -90,8 +90,9 @@ jobs:
         id: notas
         run: |
           v=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)
-          # nome da versão no Play Console, igual ao do app: "0.7.0 (13)" (sem ele, a Play reaproveita o nome do rascunho)
-          echo "nome=$v ($(sed -n 's/^version: *[^+]*+//p' pubspec.yaml))" >> "$GITHUB_OUTPUT"
+          # nome da versão no Play Console, só a versão: "0.11.0", sem o build (decisão do dev, 20/11/2026).
+          # Sem ele, a Play reaproveita o nome do rascunho.
+          echo "nome=$v" >> "$GITHUB_OUTPUT"
           head -1 ../versions.txt | tr -d '\r' | grep -qx "v $v" || { echo "::error::o topo do versions.txt não é \"v $v\""; exit 1; }
           n=$(tr -d '\r' < ../release.txt | wc -m)
           [ "$n" -ge 1 ] && [ "$n" -le 300 ] || { echo "::error::release.txt com $n caracteres (1 a 300)"; exit 1; }
