@@ -29,11 +29,11 @@ class InicioPage extends StatefulWidget {
 }
 
 class _InicioPageState extends State<InicioPage> {
-  late var _mercados = mercadosOrdenados();
+  late var _mercados = mercadosOrdenados(pedirLocalizacao: false);
   final _ofertas = GlobalKey<_OfertasDeHojeState>();
 
   Future<void> _recarregar() async {
-    setState(() => _mercados = mercadosOrdenados());
+    setState(() => _mercados = mercadosOrdenados(pedirLocalizacao: false));
     await _ofertas.currentState?.recarregar();
   }
 
