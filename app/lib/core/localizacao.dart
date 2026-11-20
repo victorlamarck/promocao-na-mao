@@ -18,8 +18,21 @@ String textoDistancia(double km) => km < 1 ? '${(km * 1000).round()} m' : '${km.
 Future<Map<int, double>>? _cache;
 
 /// Distância da loja mais perto de cada rede (rede_id → km). Vazio se a pessoa negar a localização.
-/// Pede a permissão uma vez por abertura do app.
-Future<Map<int, double>> distanciaPorRede() => _cache ??= _calcular();
+/// Pede a permissão uma vez por abertura do app. Com [pedir] false (Início) só usa se a pessoa já permitiu:
+/// o pedido sem contexto aparecia por cima das boas-vindas, antes da 1ª oferta (t13); quem pede é a aba Mercados.
+Future<Map<int, double>> distanciaPorRede({bool pedir = true}) async {
+  if (!pedir && !await _permitida()) return {};
+  return _cache ??= _calcular();
+}
+
+Future<bool> _permitida() async {
+  try {
+    final p = await Geolocator.checkPermission();
+    return p == LocationPermission.whileInUse || p == LocationPermission.always;
+  } catch (_) {
+    return false;
+  }
+}
 
 Future<Map<int, double>> _calcular() async {
   try {

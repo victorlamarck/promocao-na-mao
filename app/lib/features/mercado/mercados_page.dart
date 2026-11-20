@@ -17,9 +17,9 @@ final _db = Supabase.instance.client;
 
 /// Mercados com ofertas válidas hoje, do mais perto ao mais longe (sem localização: ordem alfabética).
 /// O destaque pago vai primeiro, com selo.
-Future<(List<Rede>, Map<int, double>, int?)> mercadosOrdenados() async {
+Future<(List<Rede>, Map<int, double>, int?)> mercadosOrdenados({bool pedirLocalizacao = true}) async {
   final redes = (await comCache('redes', () => _db.from('rede_com_ofertas').select().order('nome'))).map(Rede.fromJson).toList();
-  final distancias = await distanciaPorRede();
+  final distancias = await distanciaPorRede(pedir: pedirLocalizacao);
   final destaque = await anunciosDoFormato('mercado_destaque').catchError((_) => <Anuncio>[]); // sem internet: sem destaque
   final id = destaque.isEmpty ? null : destaque.first.redeId;
   double ordem(Rede r) => r.id == id ? -1 : distancias[r.id] ?? 0;
