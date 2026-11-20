@@ -4,8 +4,13 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<!-- App em português: sem isto a App Store lista o idioma como "Inglês" (padrão do Xcode) -->
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>pt-BR</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>pt-BR</string>
+	</array>
 	<!-- AdMob: sem isto o SDK fecha o app ao abrir. ID de TESTE do Google; trocar pelo do app de iPhone quando ele for para a loja (docs/app.md). -->
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
