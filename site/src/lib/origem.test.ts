@@ -33,6 +33,14 @@ test('Google Play: referrer com utm, mantendo o id do app', () => {
   assert.equal(site.get('utm_content'), null);
 });
 
+test('cada público abre a sua página personalizada; sem anúncio, a página padrão', () => {
+  assert.equal(new URL(linkDaLoja('ios', apple, { p: 'jovens', c: 'A1' })).searchParams.get('ppid'), '91cbfa21-3c76-4263-a71c-49c8eecc9a05');
+  assert.equal(new URL(linkDaLoja('ios', apple, { p: 'vizinhas', c: null })).searchParams.get('ppid'), 'b47499fd-50f4-4df3-9102-bbadded019e4');
+  assert.equal(new URL(linkDaLoja('android', play, { p: 'adultos', c: 'B1' })).searchParams.get('listing'), 'adultos');
+  assert.equal(new URL(linkDaLoja('ios', apple, null)).searchParams.get('ppid'), null);
+  assert.equal(new URL(linkDaLoja('android', play, null)).searchParams.get('listing'), null);
+});
+
 test('origem guardada vale por 30 dias; a da URL troca a guardada', () => {
   const mem = new Map<string, string>();
   globalThis.localStorage = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) } as Storage;
