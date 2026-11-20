@@ -409,6 +409,7 @@ Notifications service (APNs)** → baixar o `.p8` (uma vez só) e anotar o **Key
   | `notificacao_aberta` | abriu o app tocando num aviso | `tipo` (mercado/produto) |
   | `anuncio_visto` / `anuncio_clique` | anúncio vendido apareceu / foi tocado ("quantos viram", para o anunciante) | `anuncio_id`, `espaco` (inicio/mercado/oferta/busca) |
   | `dica_vista` / `dica_usada` | dica de uma vez só na tela da oferta apareceu / a pessoa tocou em "Avisar" nela (`features/oferta/dica.dart`; vista fica guardada como `dica_<id>`) | `dica` (sino/grafico) |
+  | `avaliacao_pedida` | o app pediu avaliação na loja (`core/avaliacao.dart`, pacote `in_app_review`): só da 2ª abertura em diante, no máximo 1 vez a cada 90 dias, depois de copiar o link da lista ou ver quanto ela sai em cada mercado. As lojas ainda decidem se a janela aparece | `momento` (compartilhou/comparacao) |
 
   Para filtrar pelos parâmetros no console, cadastrá-los como dimensões personalizadas do GA4.
 - Declarados na política de privacidade e em `docs/loja/seguranca-dos-dados.md`.

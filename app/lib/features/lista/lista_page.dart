@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/analytics.dart';
+import '../../core/avaliacao.dart';
 import '../../core/config.dart';
 import '../../core/tema.dart';
 import '../../core/widgets.dart';
@@ -207,6 +208,7 @@ class _CompartilharState extends State<_Compartilhar> {
                     Navigator.pop(context);
                     avisar(context, 'Link copiado', verLista: false);
                   }
+                  pedirAvaliacao('compartilhou');
                 },
                 icon: const Icon(Icons.copy),
                 label: const Text('Copiar link'),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/analytics.dart';
+import '../../core/avaliacao.dart';
 import '../../core/formato.dart';
 import '../../core/tema.dart';
 import '../../core/widgets.dart';
@@ -144,7 +145,10 @@ class ComparacaoDaLista extends StatelessWidget {
   Widget build(BuildContext context) {
     final m = lista.comparacao;
     if (m.length < 2) return const SizedBox.shrink();
-    eventoUmaVezPorTela('lista_comparada', '', {'mercados': m.length});
+    if (eventoUmaVezPorTela('lista_comparada', '', {'mercados': m.length})) {
+      // momento bom para pedir avaliação (depois do frame: nunca no meio do build)
+      WidgetsBinding.instance.addPostFrameCallback((_) => pedirAvaliacao('comparacao'));
+    }
     final c = context.cores;
     final n = m.first.itens;
     return Card(
