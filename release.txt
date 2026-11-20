@@ -1,1 +1,2 @@
-- A lista mostra na hora o que já foi pego quando você volta para o app
+- Gráfico de preço com 7, 15, 30 e 90 dias: toque para ver o preço de cada mercado no dia
+- O app só pede a sua localização quando você abre a aba Mercados
