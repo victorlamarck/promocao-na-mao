@@ -4,6 +4,7 @@
 // máx. 1 a cada 8 ofertas. Imagem quadrada; título em até 2 linhas e texto em até 3 (Guia do Anunciante).
 import type { Anuncio } from '../lib/dados';
 import { contatoAnuncie } from '../lib/config';
+import { diaMes } from '../lib/formato';
 
 interface Props { anuncio?: Anuncio; faixa?: boolean }
 const { anuncio, faixa = false } = Astro.props;
@@ -14,6 +15,12 @@ const { anuncio, faixa = false } = Astro.props;
     {anuncio.imagem_url && <img src={anuncio.imagem_url} alt="" loading="lazy">}
     <strong class="anuncio-linhas" style="--linhas: 2">{anuncio.titulo}</strong>
     {anuncio.texto && <span class="suave anuncio-linhas" style="--linhas: 3">{anuncio.texto}</span>}
+    {(anuncio.cupom_codigo || anuncio.cupom_regra) && (
+      <span class="cupom">
+        {anuncio.cupom_codigo && <strong>Cupom {anuncio.cupom_codigo}</strong>}
+        <span>{[anuncio.cupom_regra, `até ${diaMes(anuncio.fim)}`].filter(Boolean).join(' · ')}</span>
+      </span>
+    )}
   </a>
 ) : (
   <a class:list={['anuncio', { 'anuncio-faixa': faixa }]} href={contatoAnuncie} rel="noopener" target={contatoAnuncie.startsWith('http') ? '_blank' : undefined}>
@@ -22,3 +29,8 @@ const { anuncio, faixa = false } = Astro.props;
     <strong class="verde">Anuncie aqui</strong>
   </a>
 )}
+
+<style>
+  /* cupom do comércio local (como no app): código, regra e validade */
+  .cupom { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 10px; border: 1px dashed var(--verde); background: var(--verde-claro); color: var(--verde-escuro); font-size: 14px; user-select: text; }
+</style>
