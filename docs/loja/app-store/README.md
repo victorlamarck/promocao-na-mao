@@ -9,7 +9,7 @@ Contagens com Python (caracteres Unicode). Se o app mudar, revise junto com a fi
 | Campo | Valor | Limite |
 |---|---|---|
 | Name | `Promoção na Mão` | 15/30 |
-| Subtitle | `Ofertas dos mercados de GV` | 26/30 |
+| Subtitle | `Ache o menor preço em GV` (era "Ofertas dos mercados de GV"; revisão de 20/11: o anúncio fala de economia) | 24/30 |
 | Primary Category | **Shopping** | |
 | Secondary Category | **Food & Drink** (opcional) | |
 | Content Rights | "Contains third-party content": **Yes** (nomes, logos e preços dos encartes dos mercados) → confirmar que pode usar. **[dev decide]** | |
@@ -22,9 +22,9 @@ Contagens com Python (caracteres Unicode). Se o app mudar, revise junto com a fi
 
 ## Versão 1.0 (na prática a 0.7.2) — Product Page
 
-**Promotional Text** (pode mudar a qualquer hora sem nova revisão; 153/170):
+**Promotional Text** (pode mudar a qualquer hora sem nova revisão; 155/170):
 ```
-Ofertas de hoje do Atacadão, Big Mais, Coelho Diniz, Mart Minas e Supermercados BH num lugar só. Busque o produto e monte sua lista separada por mercado.
+Descubra onde sua lista sai mais barata: compare os encartes dos mercados de GV, veja como o preço variou e receba aviso quando o produto entrar em oferta.
 ```
 
 **Keywords** (separadas por vírgula, sem espaço depois da vírgula; não repetir palavras do nome/subtítulo; 100/100):
@@ -36,10 +36,10 @@ encarte,promocao,supermercado,folheto,lista de compras,preço,desconto,governado
 **Marketing URL:** `https://www.promocaonamao.com.br`
 **Copyright:** `2026 VL Desenvolvimento e Tecnologia LTDA`
 
-**Description** (2886/4000):
+**Description** (3448/4000):
 <!-- início da descrição -->
 ```
-Vai fazer compras em Governador Valadares? O Promoção na Mão junta as ofertas dos encartes dos supermercados da cidade num lugar só, para você achar o que precisa sem folhear um folheto de cada vez.
+Descubra em qual mercado de Governador Valadares a sua compra sai mais barata. O Promoção na Mão junta as ofertas dos encartes dos supermercados da cidade num lugar só, compara os preços e avisa quando o produto que você quer entra em oferta.
 
 MERCADOS QUE JÁ ESTÃO NO APP
 • Atacadão
@@ -58,8 +58,14 @@ Mostramos só as ofertas que valem hoje. Cada oferta diz até quando vale e em q
 MONTE SUA LISTA DE COMPRAS
 Toque em "Adicionar" nas ofertas que interessam. A lista já fica separada por mercado, com a quantidade e o total de cada um. Também dá para anotar itens à mão, como "pão francês", mesmo sem oferta.
 
-AVISO DE OFERTAS NOVAS
-Toque no sino na página de um mercado e o app avisa quando sair encarte novo dele. Toque no aviso e veja as ofertas. Você escolhe os mercados e desliga quando quiser.
+QUANTO A SUA LISTA SAI EM CADA MERCADO
+Com itens de mais de um mercado na lista, o app mostra quanto ela sai em cada um, pelo menor preço de hoje do mesmo produto nos outros encartes, e marca o mais barato.
+
+VEJA COMO O PREÇO VARIOU
+Na página de uma oferta, o gráfico mostra como o preço daquele produto variou nos últimos dias em cada mercado e qual foi o menor preço em 30 dias. Assim você sabe se a promoção é boa de verdade.
+
+AVISO DE OFERTAS
+Toque no sino na página de um mercado e o app avisa quando sair encarte novo dele. Toque no sino na página de uma oferta e o app avisa quando aquele produto entrar em oferta de novo. Você escolhe o que acompanhar e desliga quando quiser, na tela "Meus avisos".
 
 COMPARTILHE A LISTA POR LINK
 Mande a lista pelo WhatsApp para quem vai ao mercado. Quem recebe abre o link no celular, sem instalar nada e sem criar conta, e marca o que já pegou. Você vê na hora o que já foi para o carrinho.
@@ -91,6 +97,9 @@ Dúvidas, sugestões ou quer anunciar? Escreva para oi.promocaonamao@gmail.com.
 foram recusadas nessa área em 08/11/2026 ("File dimensions are invalid"); `tools/reduzir.mjs` faz uma a partir da outra.
 Ordem:
 `1-inicio`, `2-preco` (gráfico "Como o preço variou"), `3-busca`, `4-lista`, `5-mercados` (refeitas em 19/11/2026, versão 0.10.0). A Apple reduz sozinha para os iPhones menores.
+Revisão de 20/11 (t15): quem chega pelo anúncio vem atrás de economia, então os 3 primeiros devem falar disso. Na
+próxima troca de capturas, abrir com "Veja onde sua lista sai mais barata" (quanto a lista sai em cada mercado; a
+captura sai junto com as das páginas personalizadas, t16), depois `2-preco` e `3-busca`.
 iPad: não precisa (o app é só iPhone).
 
 Como foram feitas: o próprio app (Flutter web, `config/prod.json`, dados reais de prod de 19/11/2026) num Chrome
