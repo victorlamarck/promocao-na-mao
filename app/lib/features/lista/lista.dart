@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -79,6 +79,7 @@ class Lista extends ChangeNotifier {
   /// Sem internet: mostrando a última versão salva no aparelho (marcar e editar ficam para depois).
   bool salva = false;
   RealtimeChannel? _canal;
+  AppLifecycleListener? _vida;
 
   bool get podeEditar => !salva && (permissao == null || permissao == 'dono');
   bool get podeMarcar => !salva && (podeEditar || permissao == 'marcar');
@@ -155,9 +156,12 @@ class Lista extends ChangeNotifier {
   }
 
   /// Tempo real: o banco avisa "mudou" no canal da lista; recarregamos.
+  /// Em segundo plano o Android derruba a conexão e o aviso "mudou" que chega nesse meio-tempo se perde (o canal
+  /// volta sozinho, mas sem ele): ao voltar para o app, relemos a lista.
   void _ouvir() {
     if (_canal != null || id == null) return;
     _canal = _db.channel('lista-$id')..onBroadcast(event: 'mudou', callback: (_) => _recarregarLogo())..subscribe();
+    _vida ??= AppLifecycleListener(onResume: _recarregarLogo);
   }
 
   // O canal é público (quem tem o link sabe o id): no máximo uma leitura por segundo, mesmo com rajada de avisos.
@@ -187,6 +191,8 @@ class Lista extends ChangeNotifier {
     itens = [];
     await _canal?.unsubscribe();
     _canal = null;
+    _vida?.dispose();
+    _vida = null;
     await (await SharedPreferences.getInstance()).remove(_chave);
   }
 
@@ -233,6 +239,7 @@ class Lista extends ChangeNotifier {
   void dispose() {
     _espera?.cancel();
     _canal?.unsubscribe();
+    _vida?.dispose();
     super.dispose();
   }
 }

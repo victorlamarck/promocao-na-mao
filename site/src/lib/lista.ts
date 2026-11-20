@@ -61,6 +61,8 @@ export class Lista {
     if (this.canal || !this.lida) return;
     const id = this.lida.id;
     this.canal = { unsubscribe() {} }; // reserva: evita abrir dois canais enquanto a biblioteca carrega
+    // Com a aba escondida (foi ao WhatsApp no mercado) a conexão cai e o aviso "mudou" se perde: ao voltar, relemos.
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.recarregarLogo(); });
     const { createClient } = await import('@supabase/supabase-js');
     this.canal = createClient(supabaseUrl, supabaseChave)
       .channel(`lista-${id}`).on('broadcast', { event: 'mudou' }, () => this.recarregarLogo()).subscribe();
