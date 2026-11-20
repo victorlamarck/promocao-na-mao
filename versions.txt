@@ -1,3 +1,12 @@
+v 0.11.0
+
+- Dicas rápidas sobre o sino de aviso e o gráfico de preço
+- Cupons de desconto do comércio local nos anúncios
+- Anúncios patrocinados identificados e só 1 por busca
+- Nome inteiro do mercado ao comparar a lista
+- Sem aviso de erro repetido quando cai a internet
+_______________________________________________________________________________________________________________________
+
 v 0.10.0
 
 - Veja como o preço variou em cada mercado e o menor preço em 30 dias
