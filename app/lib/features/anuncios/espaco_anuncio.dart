@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/analytics.dart';
 import '../../core/config.dart';
+import '../../core/formato.dart';
 import '../../core/modelos.dart';
 import '../../core/tema.dart';
+import '../../core/widgets.dart';
 import 'admob.dart' if (dart.library.js_interop) 'adsense_web.dart';
 import 'anuncios.dart';
 
@@ -79,6 +82,7 @@ class EspacoAnuncioView extends StatelessWidget {
                   ]),
                 ),
               ]),
+              if (a?.cupomCodigo != null || a?.cupomRegra != null) _Cupom(a!),
               const SizedBox(height: 8),
               Text(a == null ? 'Quero anunciar' : 'Saiba mais',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: context.cores.primary)),
@@ -86,6 +90,47 @@ class EspacoAnuncioView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Cupom do comércio local: código (toque copia), regra e validade (o fim do anúncio).
+class _Cupom extends StatelessWidget {
+  const _Cupom(this.a);
+  final Anuncio a;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.cores;
+    final codigo = a.cupomCodigo;
+    final detalhe = [a.cupomRegra, if (a.fim != null) 'até ${diaMes(a.fim!)}'].whereType<String>().join(' · ');
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+      decoration: BoxDecoration(
+          color: c.secondaryContainer, borderRadius: BorderRadius.circular(10), border: Border.all(color: c.outlineVariant)),
+      child: Row(children: [
+        Icon(Icons.local_offer_outlined, size: 18, color: c.onSecondaryContainer),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (codigo != null)
+              Text('Cupom $codigo', style: TextStyle(fontWeight: FontWeight.w800, color: c.onSecondaryContainer)),
+            if (detalhe.isNotEmpty)
+              Text(detalhe, maxLines: 2, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: c.onSecondaryContainer)),
+          ]),
+        ),
+        if (codigo != null)
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: codigo));
+              evento('cupom_copiado', {'anuncio_id': a.id});
+              avisar(context, 'Cupom $codigo copiado', verLista: false);
+            },
+            child: const Text('Copiar'),
+          ),
+      ]),
     );
   }
 }
