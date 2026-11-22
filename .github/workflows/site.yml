@@ -67,6 +67,7 @@ jobs:
         env:
           CONFIG: ${{ matrix.alvo == 'prod' && secrets.APP_CONFIG_PROD || secrets.APP_CONFIG_DEV }}
           ALVO: ${{ matrix.alvo }}
+          META_PIXEL_ID: ${{ vars.META_PIXEL_ID }}
         run: |
           [ -n "$CONFIG" ] || { echo "::error::falta o secret APP_CONFIG_$(echo "$ALVO" | tr a-z A-Z)"; exit 1; }
           c() { printf '%s' "$CONFIG" | jq -r ".$1 // empty"; }
@@ -80,6 +81,7 @@ jobs:
             echo "ANDROID_SHA256=$(c ANDROID_SHA256)"
             if [ "$ALVO" = prod ]; then
               echo "PUBLIC_FLAVOR=prod"; echo "SITE_URL=https://www.promocaonamao.com.br"; echo "PROJETO=promocaonamao-1"
+              echo "PUBLIC_META_PIXEL_ID=$META_PIXEL_ID"  # só no prod: o site dev não mistura visitas de teste nos anúncios
             else
               echo "PUBLIC_FLAVOR=dev"; echo "SITE_URL=https://promocaonamao-f08a7.web.app"; echo "PROJETO=promocaonamao-f08a7"
             fi

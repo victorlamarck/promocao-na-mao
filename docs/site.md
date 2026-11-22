@@ -105,7 +105,7 @@ Letra: fontes do sistema (DejaVu Sans na esteira), não a Fredoka.
 | `PUBLIC_PLAY_STORE_URL`, `PUBLIC_APP_STORE_URL` | folha "Abrir no app" (Android / iPhone) | vazio: sem folha |
 | `ANDROID_SHA256` | `/.well-known/assetlinks.json` (App Links) | vazio: lista vazia |
 | `PUBLIC_GA_ID` | Google Analytics 4 (app Web do Firebase de prod, mesma propriedade do app) | prod: `G-W4DJ7PTC1N` fixo em `lib/config.ts`; dev: sem GA |
-| `PUBLIC_META_PIXEL_ID` | Pixel da Meta, só depois do aceite dos cookies | vazio: sem Pixel |
+| `PUBLIC_META_PIXEL_ID` | Pixel da Meta, só depois do aceite dos cookies; na esteira vem da variável `META_PIXEL_ID` do repositório (não é segredo), só no prod | vazio: sem Pixel |
 
 ## Anúncios: de onde veio, até a loja (t45)
 
